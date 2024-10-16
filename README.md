@@ -4,6 +4,8 @@
 # ImportanceMetric
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/mkim425/ImportanceMetric/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mkim425/ImportanceMetric/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of ImportanceMetric is to …
