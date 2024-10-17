@@ -26,5 +26,5 @@ hub_con |>
   filter(output_type == "quantile") |>
   collect() |>
   valid_input_data()
-  }
+}
 }
