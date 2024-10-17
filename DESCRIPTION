@@ -12,3 +12,5 @@ LazyData: true
 RoxygenNote: 7.2.3
 Imports:
     hubUtils
+Depends: 
+    R (>= 2.10)
