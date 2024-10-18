@@ -6,6 +6,7 @@
 #' @return a model_out_tbl format that has a single output type
 #' @export
 #' @import hubUtils
+#' @import dplyr
 #' @examples \dontrun{
 #' library(hubUtils)
 #' library(dplyr)
