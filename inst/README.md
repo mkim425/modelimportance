@@ -1,4 +1,4 @@
-# tests Directory
+# inst Directory
 
 ## testhubs
 

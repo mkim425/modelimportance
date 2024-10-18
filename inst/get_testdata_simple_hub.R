@@ -28,8 +28,8 @@ example_quantile_model_output <- example_model_output |>
     format(output_type_id, nsmall = 3) %in% q_levels
   )
 
-save(example_quantile_model_output,
-  file = "inst/testdata/simple_example_quantile_model_output.rda"
+saveRDS(example_quantile_model_output,
+  file = "tests/testdata/simple_example_quantile_model_output.rds"
 )
 
 # example median model output
@@ -40,8 +40,8 @@ example_median_model_output <- example_model_output |>
     output_type == "median"
   )
 
-save(example_median_model_output,
-  file = "inst/testdata/simple_example_median_model_output.rda"
+saveRDS(example_median_model_output,
+  file = "tests/testdata/simple_example_median_model_output.rds"
 )
 
 # example mean model output
@@ -62,14 +62,14 @@ example_mean_model_output <- example_model_output |>
     output_type_id = "NA"
   )
 
-save(example_mean_model_output,
-  file = "inst/testdata/simple_example_mean_model_output.rda"
+saveRDS(example_mean_model_output,
+  file = "tests/testdata/simple_example_mean_model_output.rds"
 )
 
 # example target data (true values)
 simple_example_target_data <-
   read.csv(paste0(hub_path, "/target-data/covid-hospitalizations.csv"))
 
-save(simple_example_target_data,
-  file = "inst/testdata/simple_example_target_data.rda"
+saveRDS(simple_example_target_data,
+  file = "tests/testdata/simple_example_target_data.rds"
 )
