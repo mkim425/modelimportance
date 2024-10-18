@@ -29,7 +29,7 @@ example_quantile_model_output <- example_model_output |>
   )
 
 save(example_quantile_model_output,
-  file = "inst/testdata/simple_example_quantile_model_output.rda"
+  file = "tests/testdata/simple_example_quantile_model_output.rda"
 )
 
 # example median model output
@@ -41,7 +41,7 @@ example_median_model_output <- example_model_output |>
   )
 
 save(example_median_model_output,
-  file = "inst/testdata/simple_example_median_model_output.rda"
+  file = "tests/testdata/simple_example_median_model_output.rda"
 )
 
 # example mean model output
@@ -63,7 +63,7 @@ example_mean_model_output <- example_model_output |>
   )
 
 save(example_mean_model_output,
-  file = "inst/testdata/simple_example_mean_model_output.rda"
+  file = "tests/testdata/simple_example_mean_model_output.rda"
 )
 
 # example target data (true values)
@@ -71,5 +71,5 @@ simple_example_target_data <-
   read.csv(paste0(hub_path, "/target-data/covid-hospitalizations.csv"))
 
 save(simple_example_target_data,
-  file = "inst/testdata/simple_example_target_data.rda"
+  file = "tests/testdata/simple_example_target_data.rda"
 )
