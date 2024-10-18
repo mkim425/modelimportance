@@ -71,4 +71,5 @@ simple_example_target_data <-
   read.csv(paste0(hub_path, "/target-data/covid-hospitalizations.csv"))
 
 save(simple_example_target_data,
-  file = "inst/testdata/simple_example_target_data.rda")
+  file = "inst/testdata/simple_example_target_data.rda"
+)
