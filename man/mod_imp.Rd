@@ -16,7 +16,7 @@ mod_imp(
   importance_algorithm = c("lomo", "lasomo"),
   subset_wt = c("equal", "perm_based"),
   scoring_rule = c("MAE", "MSE", "WIS", "CRPS", "Logscore"),
-  na.action = c("worst", "average", "drop")
+  na_action = c("worst", "average", "drop")
 )
 }
 \arguments{
@@ -63,7 +63,7 @@ to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.}
 importance; `c("MAE", "MSE", "WIS", "CRPS", "Logscore")`. Specify one of them
 depending on which is available for the output type in the input data.}
 
-\item{na.action}{A character string specifying treatment for missing data;
+\item{na_action}{A character string specifying treatment for missing data;
 `c("worst," "average," "drop").` `"worst"` replaces missing values with
 the smallest value from the other models. `"average"` replaces
 missing values with the average value from the other models.
