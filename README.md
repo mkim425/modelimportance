@@ -5,19 +5,19 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/mkim425/ImportanceMetric/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mkim425/ImportanceMetric/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/mkim425/ModelImportance/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mkim425/ModelImportance/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of ImportanceMetric is to …
+The goal of ModelImportance is to …
 
 ## Installation
 
-You can install the development version of ImportanceMetric from
+You can install the development version of ModelImportance from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("mkim425/ImportanceMetric")
+devtools::install_github("mkim425/ModelImportance")
 ```
 
 ## Example
@@ -25,6 +25,6 @@ devtools::install_github("mkim425/ImportanceMetric")
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-library(ImportanceMetric)
+library(ModelImportance)
 ## basic example code
 ```
