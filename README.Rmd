@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# ImportanceMetric
+# ModelImportance
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/mkim425/ModelImportance/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mkim425/ModelImportance/actions/workflows/R-CMD-check.yaml)
