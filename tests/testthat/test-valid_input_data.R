@@ -5,13 +5,13 @@ test_that("valid_input_data() requires a single output type in a dataset", {
   forecast_data1 <- readRDS(
     system.file("testdata",
       "simple_example_mean_model_output.rds",
-      package = "ImportanceMetric"
+      package = "ModelImportance"
     )
   )
   forecast_data2 <- readRDS(
     system.file("testdata",
       "simple_example_quantile_model_output.rds",
-      package = "ImportanceMetric"
+      package = "ModelImportance"
     )
   )
   forecast_data_mix <- rbind(forecast_data1, forecast_data2)
