@@ -4,7 +4,7 @@ test_that("split_data_by_task() groups data correctly", {
   forecast_data <- readRDS(
     system.file("testdata",
       "simple_example_quantile_model_output.rds",
-      package = "ModelImportance"
+      package = "modelimportance"
     )
   ) |>
     valid_input_data()

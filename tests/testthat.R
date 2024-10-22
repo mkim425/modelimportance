@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(ModelImportance)
+library(modelimportance)
 
-test_check("ModelImportance")
+test_check("modelimportance")

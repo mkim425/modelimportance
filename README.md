@@ -1,23 +1,23 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ModelImportance
+# modelimportance
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/mkim425/ModelImportance/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mkim425/ModelImportance/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/mkim425/modelimportance/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mkim425/modelimportance/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of ModelImportance is to …
+The goal of modelimportance is to …
 
 ## Installation
 
-You can install the development version of ModelImportance from
+You can install the development version of modelimportance from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("mkim425/ModelImportance")
+devtools::install_github("mkim425/modelimportance")
 ```
 
 ## Example
@@ -25,6 +25,6 @@ devtools::install_github("mkim425/ModelImportance")
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-library(ModelImportance)
+library(modelimportance)
 ## basic example code
 ```
