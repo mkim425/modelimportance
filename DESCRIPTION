@@ -12,7 +12,8 @@ LazyData: true
 RoxygenNote: 7.2.3
 Imports:
     hubUtils,
-    dplyr
+    dplyr,
+    magrittr
 Depends: 
     R (>= 2.10)
 Suggests: 
