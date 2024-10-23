@@ -47,16 +47,18 @@
 #' @export
 #'
 #' @examples
-mod_imp <- function(forecast_data,
-                    true_value,
-                    ensemble_fun = c("simple_ensemble", "linear_pool"),
-                    agg_fun = "mean",
-                    weighted = FALSE,
-                    training_window_length = 0,
-                    importance_algorithm = c("lomo", "lasomo"),
-                    subset_wt = c("equal", "perm_based"),
-                    scoring_rule = c("MAE", "MSE", "WIS", "CRPS", "Logscore"),
-                    na_action = c("worst", "average", "drop")) {
+model_importance <- function(forecast_data,
+                             true_value,
+                             ensemble_fun = c("simple_ensemble", "linear_pool"),
+                             agg_fun = "mean",
+                             weighted = FALSE,
+                             training_window_length = 0,
+                             importance_algorithm = c("lomo", "lasomo"),
+                             subset_wt = c("equal", "perm_based"),
+                             scoring_rule = c(
+                               "MAE", "MSE", "WIS", "CRPS", "Logscore"
+                             ),
+                             na_action = c("worst", "average", "drop")) {
   # validate input data and get a model_out_tbl format with a single output type
   valid_tbl <- valid_input_data(forecast_data)
   # forecast_dates
@@ -77,24 +79,7 @@ mod_imp <- function(forecast_data,
 
   # Verify that the selected metric is appropriate for each output_type
   output_type <- valid_tbl$output_type |> unique()
-  if (output_type %in% c("mean", "median")) {
-    if (!(scoring_rule %in% c("MAE", "MSE"))) {
-      stop("The scoring rule needs to be either MAE or MSE")
-    }
-  } else if (output_type == "quantile") {
-    if (!(scoring_rule == "WIS")) {
-      stop("The scoring rule needs to be WIS")
-    }
-  } else if (output_type %in% c("pmf", "cdf")) {
-    if (!(scoring_rule == "CRPS")) {
-      stop("The scoring rule needs to be CRPS")
-    }
-  } else if (output_type == "sample") {
-    stop("sample model output type is under development and not yet supported.
-         Please use a different output type.")
-  } else {
-    stop("invalid output type.")
-  }
+  check_metric_selection(output_type, scoring_rule)
 
   score_result <- forecast_data
   return(score_result)
