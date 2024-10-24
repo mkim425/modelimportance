@@ -1,5 +1,4 @@
-test_that("check_metric_selection() checks for valid combinations of
-          output type and scoring rule", {
+test_that("check_metric_selection() checks for valid scoring rule", {
   # valid combinations
   expect_true(check_metric_selection("mean", "MAE"))
   expect_true(check_metric_selection("mean", "MSE"))
