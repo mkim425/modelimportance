@@ -1,6 +1,4 @@
-#' Evaluate ensemble component model's importance based on a measure of their
-#' contribution to ensemble prediction accuracy for each combination of
-#' model task.
+#' validate inputs
 #'
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format.
@@ -42,53 +40,36 @@
 #' missing values with the average value from the other models.
 #' `"drop"` removes missing values.
 #'
-#' @return A data.frame with columns
-#' `task_id`, `output_type`, `model`, `importance_score`.
-#' @export
-#'
-#' @examples
-model_importance <- function(forecast_data,
-                             true_value,
-                             ensemble_fun = c("simple_ensemble", "linear_pool"),
-                             agg_fun = mean,
-                             weighted = FALSE,
-                             training_window_length = 0,
-                             importance_algorithm = c("lomo", "lasomo"),
-                             subset_wt = c("equal", "perm_based"),
-                             scoring_rule = c(
-                               "MAE", "MSE", "WIS", "CRPS", "Logscore"
-                             ),
-                             na_action = c("worst", "average", "drop")) {
+#' @return TRUE if inputs are valid, otherwise an error is raised.
+#' @noRd
+valid_inputs <- function(forecast_data, true_value, ensemble_fun, agg_fun,
+                         weighted, training_window_length, importance_algorithm,
+                         subset_wt, scoring_rule, na_action) {
   # validate inputs
-  valid_inputs(
-    forecast_data, true_value, ensemble_fun, agg_fun, weighted,
-    training_window_length, importance_algorithm, subset_wt,
-    scoring_rule, na_action
-  )
+  if (!is.data.frame(forecast_data)) {
+    stop("Invalid input: 'forecast_data' must be a data frame.")
+  }
+  if (!is.data.frame(true_value)) {
+    stop("Invalid input: 'true_value' must be a data frame.")
+  }
+  if (!is.logical(weighted)) {
+    stop("Invalid value for 'weighted'. It must be either TRUE or FALSE.
+         Default is FALSE.")
+  }
+  if (!is.integer(training_window_length)) {
+    stop("Invalid value for 'training_window_length'. It must be an integer.
+         Default is 0.")
+  }
+  if (!is.function(agg_fun)) {
+    stop("Invalid input for 'agg_fun' must be one of 'mean', 'median' or
+         a custom function.")
+  }
+  ensemble_fun <- match.arg(ensemble_fun)
+  importance_algorithm <- match.arg(importance_algorithm)
+  subset_wt <- match.arg(subset_wt)
+  scoring_rule <- match.arg(scoring_rule)
+  na_action <- match.arg(na_action)
 
-  # validate input data and get a model_out_tbl format with a single output type
-  valid_tbl <- valid_input_data(forecast_data)
-
-  # validate that the selected metric is suitable for each output_type
-  output_type <- valid_tbl$output_type |> unique()
-  check_metric_selection(output_type, scoring_rule)
-
-  # forecast_dates
-  forecast_dates <- valid_tbl |>
-    dplyr::select(
-      dplyr::any_of(
-        c("forecast_date", "origin_date", "reference_date")
-      )
-    ) |>
-    pull() |>
-    unique()
-
-  # Give a message for the user to check the forecast dates
-  message(
-    "The input data has forecast from ", min(forecast_dates),
-    " to ", max(forecast_dates), "."
-  )
-
-  score_result <- forecast_data
-  return(score_result)
+  # return TRUE if all validations pass
+  return(TRUE)
 }
