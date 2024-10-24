@@ -10,7 +10,7 @@ model_importance(
   forecast_data,
   true_value,
   ensemble_fun = c("simple_ensemble", "linear_pool"),
-  agg_fun = "mean",
+  agg_fun = mean,
   weighted = FALSE,
   training_window_length = 0,
   importance_algorithm = c("lomo", "lasomo"),
@@ -35,10 +35,10 @@ it takes into account the weight option specified in `weighted`.
 a linear pool of component model outputs. This method supports only
 an `output_type` of `mean`, `quantile`, `cdf`, or `pmf`.}
 
-\item{agg_fun}{A character string specifying aggregation method of component
-model outputs. Default is `"mean"`, meaning that equally (or weighted) mean
-is calculated across all component model outputs for each unique
-`output_type_id`. This can be `"median"` or a custom function
+\item{agg_fun}{A character string name for a function specifying aggregation
+method of component model outputs. Default is `mean`, meaning that equally
+(or weighted) mean is calculated across all component model outputs for each
+unique `output_type_id`. This can be `median` or a custom function
 (e.g., geometric_mean. Details can be found in
 https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)}
 
