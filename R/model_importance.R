@@ -14,10 +14,10 @@
 #' * When `"linear_pool"` is specified, ensemble model outputs are created as
 #' a linear pool of component model outputs. This method supports only
 #' an `output_type` of `mean`, `quantile`, `cdf`, or `pmf`.
-#' @param agg_fun A character string specifying aggregation method of component
-#' model outputs. Default is `"mean"`, meaning that equally (or weighted) mean
-#' is calculated across all component model outputs for each unique
-#' `output_type_id`. This can be `"median"` or a custom function
+#' @param agg_fun A character string name for a function specifying aggregation
+#' method of component model outputs. Default is `mean`, meaning that equally
+#' (or weighted) mean is calculated across all component model outputs for each
+#' unique `output_type_id`. This can be `median` or a custom function
 #' (e.g., geometric_mean. Details can be found in
 #' https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
 #' @param weighted Boolean indicating whether model weighting should be done.
@@ -47,18 +47,32 @@
 #' @export
 #'
 #' @examples
-mod_imp <- function(forecast_data,
-                    true_value,
-                    ensemble_fun = c("simple_ensemble", "linear_pool"),
-                    agg_fun = "mean",
-                    weighted = FALSE,
-                    training_window_length = 0,
-                    importance_algorithm = c("lomo", "lasomo"),
-                    subset_wt = c("equal", "perm_based"),
-                    scoring_rule = c("MAE", "MSE", "WIS", "CRPS", "Logscore"),
-                    na_action = c("worst", "average", "drop")) {
+model_importance <- function(forecast_data,
+                             true_value,
+                             ensemble_fun = c("simple_ensemble", "linear_pool"),
+                             agg_fun = mean,
+                             weighted = FALSE,
+                             training_window_length = 0,
+                             importance_algorithm = c("lomo", "lasomo"),
+                             subset_wt = c("equal", "perm_based"),
+                             scoring_rule = c(
+                               "MAE", "MSE", "WIS", "CRPS", "Logscore"
+                             ),
+                             na_action = c("worst", "average", "drop")) {
+  # validate inputs
+  valid_inputs(
+    forecast_data, true_value, ensemble_fun, agg_fun, weighted,
+    training_window_length, importance_algorithm, subset_wt,
+    scoring_rule, na_action
+  )
+
   # validate input data and get a model_out_tbl format with a single output type
   valid_tbl <- valid_input_data(forecast_data)
+
+  # validate that the selected metric is suitable for each output_type
+  output_type <- valid_tbl$output_type |> unique()
+  check_metric_selection(output_type, scoring_rule)
+
   # forecast_dates
   forecast_dates <- valid_tbl |>
     dplyr::select(
@@ -74,27 +88,6 @@ mod_imp <- function(forecast_data,
     "The input data has forecast from ", min(forecast_dates),
     " to ", max(forecast_dates), "."
   )
-
-  # Verify that the selected metric is appropriate for each output_type
-  output_type <- valid_tbl$output_type |> unique()
-  if (output_type %in% c("mean", "median")) {
-    if (!(scoring_rule %in% c("MAE", "MSE"))) {
-      stop("The scoring rule needs to be either MAE or MSE")
-    }
-  } else if (output_type == "quantile") {
-    if (!(scoring_rule == "WIS")) {
-      stop("The scoring rule needs to be WIS")
-    }
-  } else if (output_type %in% c("pmf", "cdf")) {
-    if (!(scoring_rule == "CRPS")) {
-      stop("The scoring rule needs to be CRPS")
-    }
-  } else if (output_type == "sample") {
-    stop("sample model output type is under development and not yet supported.
-         Please use a different output type.")
-  } else {
-    stop("invalid output type.")
-  }
 
   score_result <- forecast_data
   return(score_result)
