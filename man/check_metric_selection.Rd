@@ -8,14 +8,13 @@ check_metric_selection(output_type, scoring_rule)
 }
 \arguments{
 \item{output_type}{A character string specifying the type of prediction
-output. Should be one of
-"mean", "median", "quantile", "pmf", "cdf", or "sample".}
+output. Should be one of "mean", "median", "quantile", "pmf", or "sample".}
 
 \item{scoring_rule}{A character string specifying the scoring rule to use
 as input}
 }
 \value{
-TRUE if inputs are valid, otherwise an error is raised.
+An error is raised if any of the inputs is not valid.
 }
 \description{
 Validate metric selection for output types
@@ -23,9 +22,9 @@ Validate metric selection for output types
 \examples{
 \dontrun{
 # Invalid combinations
-check_metric_selection("mean", "WIS") # Raises an error
-check_metric_selection("quantile", "MAE") # Raises an error
-check_metric_selection("mean", "MSE") # Returns TRUE
-check_metric_selection("quantile", "WIS") # Returns TRUE
+check_metric_selection("mean", "wis") # Raises an error
+check_metric_selection("quantile", "ae_point") # Raises an error
+check_metric_selection("mean", "se_point") # Returns TRUE
+check_metric_selection("quantile", "wis") # Returns TRUE
 }
 }
