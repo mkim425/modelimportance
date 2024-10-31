@@ -17,19 +17,19 @@
 check_metric_selection <- function(output_type, scoring_rule) {
   if (output_type == "median") {
     if (scoring_rule != "ae_point") {
-      stop("The scoring rule needs to be ae_point")
+      stop("The scoring rule needs to be ae_point.")
     }
   } else if (output_type == "mean") {
     if (scoring_rule != "se_point") {
-      stop("The scoring rule needs to be se_point")
+      stop("The scoring rule needs to be se_point.")
     }
   } else if (output_type == "quantile") {
     if (scoring_rule != "wis") {
-      stop("The scoring rule needs to be wis")
+      stop("The scoring rule needs to be wis.")
     }
   } else if (output_type == "pmf") {
     if (scoring_rule != "logscore") {
-      stop("The scoring rule needs to be logscore")
+      stop("The scoring rule needs to be logscore.")
     }
   } else if (output_type == "sample") {
     stop("sample model output type is under development and not yet supported.
@@ -37,4 +37,6 @@ check_metric_selection <- function(output_type, scoring_rule) {
   } else {
     stop("invalid output type.")
   }
+  # return TRUE if all validations pass
+  return(TRUE)
 }
