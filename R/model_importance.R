@@ -13,7 +13,7 @@
 #' it takes into account the weight option specified in `weighted`.
 #' * When `"linear_pool"` is specified, ensemble model outputs are created as
 #' a linear pool of component model outputs. This method supports only
-#' an `output_type` of `mean`, `quantile`, `cdf`, or `pmf`.
+#' an `output_type` of `mean`, `quantile`, or `pmf`.
 #' @param agg_fun A character string name for a function specifying aggregation
 #' method of component model outputs. Default is `mean`, meaning that equally
 #' (or weighted) mean is calculated across all component model outputs for each
@@ -26,7 +26,7 @@
 #' @param training_window_length An integer value representing the time interval
 #' of historical data used during the training process
 #' to estimate model weights.
-#' Default is `0`, meaning that prior data is available for training.
+#' Default is `0`, meaning that no prior data is available for training.
 #' @param importance_algorithm A character string specifying algorithm for model
 #' importance calculation; `c("lomo", "lasomo")`.
 #' `"lomo"` stands for leave-one-model-out and
@@ -34,8 +34,9 @@
 #' @param subset_wt A character string specifying method for assigning weight
 #' to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.
 #' @param scoring_rule A character string specifying metric to use to calculate
-#' importance; `c("MAE", "MSE", "WIS", "CRPS", "Logscore")`. Specify one of them
-#' depending on which is available for the output type in the input data.
+#' importance; `c("ae_point", "se_point", "wis", "logscore")`.
+#' Specify one of them depending on which is available for the output type in
+#' the input data.
 #' @param na_action A character string specifying treatment for missing data;
 #' `c("worst," "average," "drop").` `"worst"` replaces missing values with
 #' the smallest value from the other models. `"average"` replaces
@@ -56,7 +57,7 @@ model_importance <- function(forecast_data,
                              importance_algorithm = c("lomo", "lasomo"),
                              subset_wt = c("equal", "perm_based"),
                              scoring_rule = c(
-                               "MAE", "MSE", "WIS", "CRPS", "Logscore"
+                               "ae_point", "se_point", "wis", "logscore"
                              ),
                              na_action = c("worst", "average", "drop")) {
   # validate inputs
