@@ -1,126 +1,85 @@
 test_that("check_metric_selection() checks for valid scoring rule", {
   # valid combinations
-  expect_true(check_metric_selection("mean", "MAE"))
-  expect_true(check_metric_selection("mean", "MSE"))
-  expect_true(check_metric_selection("median", "MAE"))
-  expect_true(check_metric_selection("median", "MSE"))
-  expect_true(check_metric_selection("quantile", "WIS"))
-  expect_true(check_metric_selection("quantile", "Logscore"))
-  expect_true(check_metric_selection("pmf", "CRPS"))
-  expect_true(check_metric_selection("cdf", "CRPS"))
+  expect_true(check_metric_selection("mean", "se_point"))
+  expect_true(check_metric_selection("median", "ae_point"))
+  expect_true(check_metric_selection("quantile", "wis"))
+  expect_true(check_metric_selection("pmf", "logscore"))
 
   # invalid combinations
   expect_error(
-    check_metric_selection("mean", "WIS"),
-    "The scoring rule needs to be either MAE or MSE"
+    check_metric_selection("mean", "wis"),
+    "The scoring rule needs to be se_point."
   )
   expect_error(
-    check_metric_selection("mean", "Logscore"),
-    "The scoring rule needs to be either MAE or MSE"
+    check_metric_selection("mean", "logscore"),
+    "The scoring rule needs to be se_point."
   )
   expect_error(
-    check_metric_selection("mean", "CRPS"),
-    "The scoring rule needs to be either MAE or MSE"
+    check_metric_selection("median", "wis"),
+    "The scoring rule needs to be ae_point."
   )
   expect_error(
-    check_metric_selection("median", "WIS"),
-    "The scoring rule needs to be either MAE or MSE"
+    check_metric_selection("median", "logscore"),
+    "The scoring rule needs to be ae_point."
   )
   expect_error(
-    check_metric_selection("median", "Logscore"),
-    "The scoring rule needs to be either MAE or MSE"
+    check_metric_selection("quantile", "ae_point"),
+    "The scoring rule needs to be wis."
   )
   expect_error(
-    check_metric_selection("median", "CRPS"),
-    "The scoring rule needs to be either MAE or MSE"
+    check_metric_selection("quantile", "se_point"),
+    "The scoring rule needs to be wis."
   )
   expect_error(
-    check_metric_selection("quantile", "MAE"),
-    "The scoring rule needs to be either WIS or Logscore"
+    check_metric_selection("quantile", "logscore"),
+    "The scoring rule needs to be wis."
   )
   expect_error(
-    check_metric_selection("quantile", "MSE"),
-    "The scoring rule needs to be either WIS or Logscore"
+    check_metric_selection("pmf", "ae_point"),
+    "The scoring rule needs to be logscore."
   )
   expect_error(
-    check_metric_selection("quantile", "CRPS"),
-    "The scoring rule needs to be either WIS or Logscore"
+    check_metric_selection("pmf", "se_point"),
+    "The scoring rule needs to be logscore."
   )
   expect_error(
-    check_metric_selection("pmf", "MAE"),
-    "The scoring rule needs to be CRPS"
+    check_metric_selection("pmf", "wis"),
+    "The scoring rule needs to be logscore."
   )
   expect_error(
-    check_metric_selection("pmf", "MSE"),
-    "The scoring rule needs to be CRPS"
-  )
-  expect_error(
-    check_metric_selection("pmf", "WIS"),
-    "The scoring rule needs to be CRPS"
-  )
-  expect_error(
-    check_metric_selection("pmf", "Logscore"),
-    "The scoring rule needs to be CRPS"
-  )
-  expect_error(
-    check_metric_selection("cdf", "MAE"),
-    "The scoring rule needs to be CRPS"
-  )
-  expect_error(
-    check_metric_selection("cdf", "MSE"),
-    "The scoring rule needs to be CRPS"
-  )
-  expect_error(
-    check_metric_selection("cdf", "WIS"),
-    "The scoring rule needs to be CRPS"
-  )
-  expect_error(
-    check_metric_selection("cdf", "Logscore"),
-    "The scoring rule needs to be CRPS"
-  )
-  expect_error(
-    check_metric_selection("sample", "MAE"),
+    check_metric_selection("sample", "ae_point"),
     "sample model output type is under development and not yet supported.
          Please use a different output type."
   )
   expect_error(
-    check_metric_selection("sample", "MSE"),
+    check_metric_selection("sample", "se_point"),
     "sample model output type is under development and not yet supported.
          Please use a different output type."
   )
   expect_error(
-    check_metric_selection("sample", "WIS"),
+    check_metric_selection("sample", "wis"),
     "sample model output type is under development and not yet supported.
          Please use a different output type."
   )
   expect_error(
-    check_metric_selection("sample", "Logscore"),
+    check_metric_selection("sample", "logscore"),
     "sample model output type is under development and not yet supported.
          Please use a different output type."
   )
   expect_error(
-    check_metric_selection("sample", "CRPS"),
-    "sample model output type is under development and not yet supported.
-         Please use a different output type."
-  )
-  expect_error(
-    check_metric_selection("other", "MAE"),
+    check_metric_selection("other", "ae_point"),
     "invalid output type."
   )
   expect_error(
-    check_metric_selection("other", "MSE"),
+    check_metric_selection("other", "se_point"),
     "invalid output type."
   )
   expect_error(
-    check_metric_selection("other", "WIS"),
+    check_metric_selection("other", "wis"),
     "invalid output type."
   )
   expect_error(
-    check_metric_selection("other", "Logscore"),
-    "invalid output type."
-  )
-  expect_error(
-    check_metric_selection("other", "CRPS"),
+    check_metric_selection("other", "logscore"),
     "invalid output type."
   )
 })
