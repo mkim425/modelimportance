@@ -4,8 +4,8 @@
 #'
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format.
-#' @param true_value Ground truth data, i.e., "target data", for the variables
-#' that are used to define modeling targets.
+#' @param target_data Ground truth data for the variables that are used to
+#' define modeling targets.
 #' @param ensemble_fun A character string specifying a ensemble method, either
 #' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
 #' * When `"simple_ensemble"` is specified, the ensemble is generated using
@@ -49,7 +49,7 @@
 #'
 #' @examples
 model_importance <- function(forecast_data,
-                             true_value,
+                             target_data,
                              ensemble_fun = c("simple_ensemble", "linear_pool"),
                              agg_fun = mean,
                              weighted = FALSE,
@@ -61,14 +61,14 @@ model_importance <- function(forecast_data,
                              ),
                              na_action = c("worst", "average", "drop")) {
   # validate inputs
-  valid_inputs(
+  validate_inputs(
     forecast_data, true_value, ensemble_fun, agg_fun, weighted,
     training_window_length, importance_algorithm, subset_wt,
     scoring_rule, na_action
   )
 
   # validate input data and get a model_out_tbl format with a single output type
-  valid_tbl <- valid_input_data(forecast_data)
+  valid_tbl <- validate_input_data(forecast_data)
 
   # validate that the selected metric is suitable for each output_type
   output_type <- valid_tbl$output_type |> unique()

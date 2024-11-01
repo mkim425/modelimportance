@@ -8,7 +8,7 @@ model task.}
 \usage{
 model_importance(
   forecast_data,
-  true_value,
+  target_data,
   ensemble_fun = c("simple_ensemble", "linear_pool"),
   agg_fun = mean,
   weighted = FALSE,
@@ -23,8 +23,8 @@ model_importance(
 \item{forecast_data}{A data.frame with the predictions that is or can be
 coerced to a model_out_tbl format.}
 
-\item{true_value}{Ground truth data, i.e., "target data", for the variables
-that are used to define modeling targets.}
+\item{target_data}{Ground truth data for the variables that are used to
+define modeling targets.}
 
 \item{ensemble_fun}{A character string specifying a ensemble method, either
 "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
