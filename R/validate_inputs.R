@@ -24,7 +24,7 @@
 #' @param training_window_length An integer value representing the time interval
 #' of historical data used during the training process
 #' to estimate model weights.
-#' Default is `0`, meaning that prior data is available for training.
+#' Default is `0`, meaning that no prior data is available for training.
 #' @param importance_algorithm A character string specifying algorithm for model
 #' importance calculation; `c("lomo", "lasomo")`.
 #' `"lomo"` stands for leave-one-model-out and
