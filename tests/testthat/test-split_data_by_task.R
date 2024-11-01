@@ -7,7 +7,7 @@ test_that("split_data_by_task() groups data correctly", {
       package = "modelimportance"
     )
   ) |>
-    valid_input_data()
+    validate_input_data()
 
   task_id_cols <- setdiff(
     colnames(forecast_data),
