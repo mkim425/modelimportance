@@ -12,12 +12,6 @@
 #' * When `"linear_pool"` is specified, ensemble model outputs are created as
 #' a linear pool of component model outputs. This method supports only
 #' an `output_type` of `mean`, `quantile`, `cdf`, or `pmf`.
-#' @param agg_fun A character string name for a function specifying aggregation
-#' method of component model outputs. Default is `mean`, meaning that equally
-#' (or weighted) mean is calculated across all component model outputs for each
-#' unique `output_type_id`. This can be `median` or a custom function
-#' (e.g., geometric_mean. Details can be found in
-#' https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
 #' @param weighted Boolean indicating whether model weighting should be done.
 #' If `FALSE`, all models are given equal weight.
 #' If `TRUE`, model weights are estimated.
@@ -32,8 +26,9 @@
 #' @param subset_wt A character string specifying method for assigning weight
 #' to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.
 #' @param scoring_rule A character string specifying metric to use to calculate
-#' importance; `c("MAE", "MSE", "WIS", "CRPS", "Logscore")`. Specify one of them
-#' depending on which is available for the output type in the input data.
+#' importance; `c("ae_point", "se_point", "wis", "logscore")`.
+#' Specify one of them depending on which is available for the output type in
+#' the input data.
 #' @param na_action A character string specifying treatment for missing data;
 #' `c("worst," "average," "drop").` `"worst"` replaces missing values with
 #' the smallest value from the other models. `"average"` replaces
@@ -41,7 +36,7 @@
 #' `"drop"` removes missing values.
 #'
 #' @noRd
-validate_inputs <- function(forecast_data, target_data, ensemble_fun, agg_fun,
+validate_inputs <- function(forecast_data, target_data, ensemble_fun,
                             weighted, training_window_length,
                             importance_algorithm, subset_wt, scoring_rule,
                             na_action) {
@@ -59,10 +54,6 @@ validate_inputs <- function(forecast_data, target_data, ensemble_fun, agg_fun,
   if (!is.integer(training_window_length)) {
     stop("Invalid value for 'training_window_length'. It must be an integer.
          Default is 0.")
-  }
-  if (!is.function(agg_fun)) {
-    stop("Invalid input for 'agg_fun' must be one of 'mean', 'median' or
-         a custom function.")
   }
   ensemble_fun <- match.arg(ensemble_fun)
   importance_algorithm <- match.arg(importance_algorithm)
