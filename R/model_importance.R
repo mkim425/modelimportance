@@ -62,7 +62,7 @@ model_importance <- function(forecast_data,
                              na_action = c("worst", "average", "drop")) {
   # validate inputs
   validate_inputs(
-    forecast_data, true_value, ensemble_fun, agg_fun, weighted,
+    forecast_data, target_data, ensemble_fun, agg_fun, weighted,
     training_window_length, importance_algorithm, subset_wt,
     scoring_rule, na_action
   )
