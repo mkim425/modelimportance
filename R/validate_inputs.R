@@ -42,8 +42,9 @@
 #'
 #' @noRd
 validate_inputs <- function(forecast_data, target_data, ensemble_fun, agg_fun,
-                         weighted, training_window_length, importance_algorithm,
-                         subset_wt, scoring_rule, na_action) {
+                            weighted, training_window_length,
+                            importance_algorithm, subset_wt, scoring_rule,
+                            na_action) {
   # validate inputs
   if (!is.data.frame(forecast_data)) {
     stop("Invalid input: 'forecast_data' must be a data frame.")
