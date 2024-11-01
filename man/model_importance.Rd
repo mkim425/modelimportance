@@ -2,21 +2,20 @@
 % Please edit documentation in R/model_importance.R
 \name{model_importance}
 \alias{model_importance}
-\title{Evaluate ensemble component model's importance based on a measure of their
-contribution to ensemble prediction accuracy for each combination of
-model task.}
+\title{Quantify ensemble component model contributions to ensemble
+prediction accuracy}
 \usage{
 model_importance(
   forecast_data,
   target_data,
   ensemble_fun = c("simple_ensemble", "linear_pool"),
-  agg_fun = mean,
   weighted = FALSE,
   training_window_length = 0,
   importance_algorithm = c("lomo", "lasomo"),
   subset_wt = c("equal", "perm_based"),
   scoring_rule = c("ae_point", "se_point", "wis", "logscore"),
-  na_action = c("worst", "average", "drop")
+  na_action = c("worst", "average", "drop"),
+  ...
 )
 }
 \arguments{
@@ -28,19 +27,12 @@ define modeling targets.}
 
 \item{ensemble_fun}{A character string specifying a ensemble method, either
 "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
-* When `"simple_ensemble"` is specified, the ensemble is generated using
-the function selected in `agg_fun`, and
-it takes into account the weight option specified in `weighted`.
+* When `"simple_ensemble"` is specified, the ensemble is generated using the
+optional `agg_fun` function in `...` (see 'Details'). It takes into account
+the weight option specified in `weighted`.
 * When `"linear_pool"` is specified, ensemble model outputs are created as
 a linear pool of component model outputs. This method supports only
 an `output_type` of `mean`, `quantile`, or `pmf`.}
-
-\item{agg_fun}{A character string name for a function specifying aggregation
-method of component model outputs. Default is `mean`, meaning that equally
-(or weighted) mean is calculated across all component model outputs for each
-unique `output_type_id`. This can be `median` or a custom function
-(e.g., geometric_mean. Details can be found in
-https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)}
 
 \item{weighted}{Boolean indicating whether model weighting should be done.
 If `FALSE`, all models are given equal weight.
@@ -69,6 +61,9 @@ the input data.}
 the smallest value from the other models. `"average"` replaces
 missing values with the average value from the other models.
 `"drop"` removes missing values.}
+
+\item{...}{Optional arguments passed to `ensemble_fun` when it is specified
+as `"simple_ensemble"`. See 'Details'.}
 }
 \value{
 A data.frame with columns
@@ -78,4 +73,45 @@ A data.frame with columns
 Evaluate ensemble component model's importance based on a measure of their
 contribution to ensemble prediction accuracy for each combination of
 model task.
+}
+\details{
+Additional argument in ... is `agg_fun`, which is a character string name
+for a function specifying aggregation method of component model outputs.
+Default is `mean`, meaning that equally (or weighted) mean is calculated
+across all component model outputs for each unique `output_type_id`.
+This can be `median` or a custom function (e.g., geometric_mean. Details
+can be found in
+https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
+}
+\examples{
+\dontrun{
+library(dplyr)
+forecast_data <- readRDS(
+  system.file("testdata",
+    "simple_example_quantile_model_output.rds",
+    package = "modelimportance"
+  )
+)
+target_data <- readRDS(
+  system.file("testdata",
+    "simple_example_target_data.rds",
+    package = "modelimportance"
+  )
+)
+
+model_importance(
+  forecast_data = forecast_data, target_data = target_data,
+  ensemble_fun = "simple_ensemble", weighted = FALSE,
+  training_window_length = 0, importance_algorithm = "lomo",
+  subset_wt = "equal", scoring_rule = "ae_point", na_action = "drop"
+)
+# Example with the additional argument in `...`.
+model_importance(
+  forecast_data = forecast_data, target_data = target_data,
+  ensemble_fun = "simple_ensemble", weighted = FALSE,
+  training_window_length = 0, importance_algorithm = "lomo",
+  subset_wt = "equal", scoring_rule = "ae_point", na_action = "drop",
+  agg_fun = median
+)
+}
 }

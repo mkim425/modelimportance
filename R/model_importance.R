@@ -1,3 +1,6 @@
+#' @title Quantify ensemble component model contributions to ensemble
+#' prediction accuracy
+#' @description
 #' Evaluate ensemble component model's importance based on a measure of their
 #' contribution to ensemble prediction accuracy for each combination of
 #' model task.
@@ -8,18 +11,12 @@
 #' define modeling targets.
 #' @param ensemble_fun A character string specifying a ensemble method, either
 #' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
-#' * When `"simple_ensemble"` is specified, the ensemble is generated using
-#' the function selected in `agg_fun`, and
-#' it takes into account the weight option specified in `weighted`.
+#' * When `"simple_ensemble"` is specified, the ensemble is generated using the
+#' optional `agg_fun` function in `...` (see 'Details'). It takes into account
+#' the weight option specified in `weighted`.
 #' * When `"linear_pool"` is specified, ensemble model outputs are created as
 #' a linear pool of component model outputs. This method supports only
 #' an `output_type` of `mean`, `quantile`, or `pmf`.
-#' @param agg_fun A character string name for a function specifying aggregation
-#' method of component model outputs. Default is `mean`, meaning that equally
-#' (or weighted) mean is calculated across all component model outputs for each
-#' unique `output_type_id`. This can be `median` or a custom function
-#' (e.g., geometric_mean. Details can be found in
-#' https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
 #' @param weighted Boolean indicating whether model weighting should be done.
 #' If `FALSE`, all models are given equal weight.
 #' If `TRUE`, model weights are estimated.
@@ -42,16 +39,52 @@
 #' the smallest value from the other models. `"average"` replaces
 #' missing values with the average value from the other models.
 #' `"drop"` removes missing values.
-#'
+#' @param ... Optional arguments passed to `ensemble_fun` when it is specified
+#' as `"simple_ensemble"`. See 'Details'.
 #' @return A data.frame with columns
 #' `task_id`, `output_type`, `model`, `importance_score`.
 #' @export
+#' @details
+#' Additional argument in ... is `agg_fun`, which is a character string name
+#' for a function specifying aggregation method of component model outputs.
+#' Default is `mean`, meaning that equally (or weighted) mean is calculated
+#' across all component model outputs for each unique `output_type_id`.
+#' This can be `median` or a custom function (e.g., geometric_mean. Details
+#' can be found in
+#' https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
+#' @examples \dontrun{
+#' library(dplyr)
+#' forecast_data <- readRDS(
+#'   system.file("testdata",
+#'     "simple_example_quantile_model_output.rds",
+#'     package = "modelimportance"
+#'   )
+#' )
+#' target_data <- readRDS(
+#'   system.file("testdata",
+#'     "simple_example_target_data.rds",
+#'     package = "modelimportance"
+#'   )
+#' )
 #'
-#' @examples
+#' model_importance(
+#'   forecast_data = forecast_data, target_data = target_data,
+#'   ensemble_fun = "simple_ensemble", weighted = FALSE,
+#'   training_window_length = 0, importance_algorithm = "lomo",
+#'   subset_wt = "equal", scoring_rule = "ae_point", na_action = "drop"
+#' )
+#' # Example with the additional argument in `...`.
+#' model_importance(
+#'   forecast_data = forecast_data, target_data = target_data,
+#'   ensemble_fun = "simple_ensemble", weighted = FALSE,
+#'   training_window_length = 0, importance_algorithm = "lomo",
+#'   subset_wt = "equal", scoring_rule = "ae_point", na_action = "drop",
+#'   agg_fun = median
+#' )
+#' }
 model_importance <- function(forecast_data,
                              target_data,
                              ensemble_fun = c("simple_ensemble", "linear_pool"),
-                             agg_fun = mean,
                              weighted = FALSE,
                              training_window_length = 0,
                              importance_algorithm = c("lomo", "lasomo"),
@@ -59,12 +92,12 @@ model_importance <- function(forecast_data,
                              scoring_rule = c(
                                "ae_point", "se_point", "wis", "logscore"
                              ),
-                             na_action = c("worst", "average", "drop")) {
+                             na_action = c("worst", "average", "drop"),
+                             ...) {
   # validate inputs
   validate_inputs(
-    forecast_data, target_data, ensemble_fun, agg_fun, weighted,
-    training_window_length, importance_algorithm, subset_wt,
-    scoring_rule, na_action
+    forecast_data, target_data, ensemble_fun, weighted, training_window_length,
+    importance_algorithm, subset_wt, scoring_rule, na_action
   )
 
   # validate input data and get a model_out_tbl format with a single output type
