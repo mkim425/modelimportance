@@ -40,7 +40,6 @@
 #' missing values with the average value from the other models.
 #' `"drop"` removes missing values.
 #'
-#' @return TRUE if inputs are valid, otherwise an error is raised.
 #' @noRd
 validate_inputs <- function(forecast_data, target_data, ensemble_fun, agg_fun,
                          weighted, training_window_length, importance_algorithm,
@@ -69,7 +68,4 @@ validate_inputs <- function(forecast_data, target_data, ensemble_fun, agg_fun,
   subset_wt <- match.arg(subset_wt)
   scoring_rule <- match.arg(scoring_rule)
   na_action <- match.arg(na_action)
-
-  # return TRUE if all validations pass
-  return(TRUE)
 }
