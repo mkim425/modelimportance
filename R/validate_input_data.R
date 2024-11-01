@@ -15,9 +15,9 @@
 #' hub_con |>
 #'   filter(output_type == "quantile") |>
 #'   collect() |>
-#'   valid_input_data()
+#'   validate_input_data()
 #' }
-valid_input_data <- function(forecast_data) {
+validate_input_data <- function(forecast_data) {
   valid_tbl <- forecast_data |>
     # Convert model output to a `model_out_tbl` class object
     hubUtils::as_model_out_tbl() |>

@@ -1,6 +1,6 @@
 library(dplyr)
 
-test_that("valid_input_data() requires a single output type in a dataset", {
+test_that("validate_input_data() requires a single output type in a dataset", {
   # data to test
   forecast_data1 <- readRDS(
     system.file("testdata",
@@ -21,17 +21,17 @@ test_that("valid_input_data() requires a single output type in a dataset", {
 
   # test
   expect_error(
-    valid_input_data(forecast_data_mix),
+    validate_input_data(forecast_data_mix),
     "The input data must contain a single output type."
   )
 
   expect_error(
-    valid_input_data(forecast_data_na),
+    validate_input_data(forecast_data_na),
     "The output type has a missing value."
   )
 
   expect_equal(
-    valid_input_data(forecast_data2) |>
+    validate_input_data(forecast_data2) |>
       dplyr::select(output_type) |>
       unique() |>
       as.character(),

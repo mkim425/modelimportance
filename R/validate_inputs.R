@@ -2,8 +2,8 @@
 #'
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format.
-#' @param true_value Ground truth data, i.e., "target data", for the variables
-#' that are used to define modeling targets.
+#' @param target_data Ground truth data for the variables that are used to
+#' define modeling targets.
 #' @param ensemble_fun A character string specifying a ensemble method, either
 #' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
 #' * When `"simple_ensemble"` is specified, the ensemble is generated using
@@ -42,15 +42,15 @@
 #'
 #' @return TRUE if inputs are valid, otherwise an error is raised.
 #' @noRd
-valid_inputs <- function(forecast_data, true_value, ensemble_fun, agg_fun,
+validate_inputs <- function(forecast_data, target_data, ensemble_fun, agg_fun,
                          weighted, training_window_length, importance_algorithm,
                          subset_wt, scoring_rule, na_action) {
   # validate inputs
   if (!is.data.frame(forecast_data)) {
     stop("Invalid input: 'forecast_data' must be a data frame.")
   }
-  if (!is.data.frame(true_value)) {
-    stop("Invalid input: 'true_value' must be a data frame.")
+  if (!is.data.frame(target_data)) {
+    stop("Invalid input: 'target_data' must be a data frame.")
   }
   if (!is.logical(weighted)) {
     stop("Invalid value for 'weighted'. It must be either TRUE or FALSE.

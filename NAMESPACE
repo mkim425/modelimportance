@@ -2,7 +2,7 @@
 
 export(model_importance)
 export(split_data_by_task)
-export(valid_input_data)
+export(validate_input_data)
 import(dplyr)
 import(hubUtils)
 importFrom(dplyr,across)
