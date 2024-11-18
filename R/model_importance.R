@@ -108,8 +108,12 @@ model_importance <- function(forecast_data,
   unique_output_type <- unique(valid_tbl$output_type)
   check_metric_selection(unique_output_type, scoring_rule)
 
+  # check if valid_tbl contains exactly one of the columns:
+  # "forecast_date", "origin_date", "reference_date"
+  validate_one_forecast_date_col(valid_tbl)
+
   # forecast_dates
-  forecast_dates <- valid_tbl |>
+  forecast_date_list <- valid_tbl |>
     dplyr::select(
       dplyr::any_of(
         c("forecast_date", "origin_date", "reference_date")
@@ -122,7 +126,7 @@ model_importance <- function(forecast_data,
   message(sprintf(
     "The input data has forecast from %s to %s.
     There are a total of %d forecast dates.",
-    min(forecast_dates), max(forecast_dates), length(forecast_dates)
+    min(forecast_date_list), max(forecast_date_list), length(forecast_date_list)
   ))
 
   score_result <- forecast_data
