@@ -43,6 +43,7 @@
 #' as `"simple_ensemble"`. See 'Details'.
 #' @return A data.frame with columns
 #' `task_id`, `output_type`, `model`, `importance_score`.
+#' @import hubExamples
 #' @export
 #' @details
 #' Additional argument in ... is `agg_fun`, which is a character string name
@@ -54,31 +55,31 @@
 #' https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
 #' @examples \dontrun{
 #' library(dplyr)
-#' forecast_data <- readRDS(
-#'   system.file("testdata",
-#'     "simple_example_quantile_model_output.rds",
-#'     package = "modelimportance"
+#' library(hubExamples)
+#' forecast_data <- hubExamples::forecast_outputs |>
+#'   dplyr::filter(
+#'     output_type %in% c("quantile"),
+#'     location == "25",
+#'     horizon == 1
 #'   )
-#' )
-#' target_data <- readRDS(
-#'   system.file("testdata",
-#'     "simple_example_target_data.rds",
-#'     package = "modelimportance"
+#' target_data <- hubExamples::forecast_target_ts |>
+#'   dplyr::filter(
+#'     date %in% unique(forecast_data$reference_date),
+#'     location == "25"
 #'   )
-#' )
 #'
 #' model_importance(
 #'   forecast_data = forecast_data, target_data = target_data,
 #'   ensemble_fun = "simple_ensemble", weighted = FALSE,
 #'   training_window_length = 0, importance_algorithm = "lomo",
-#'   subset_wt = "equal", scoring_rule = "ae_point", na_action = "drop"
+#'   subset_wt = "equal", scoring_rule = "wis", na_action = "drop"
 #' )
 #' # Example with the additional argument in `...`.
 #' model_importance(
 #'   forecast_data = forecast_data, target_data = target_data,
 #'   ensemble_fun = "simple_ensemble", weighted = FALSE,
 #'   training_window_length = 0, importance_algorithm = "lomo",
-#'   subset_wt = "equal", scoring_rule = "ae_point", na_action = "drop",
+#'   subset_wt = "equal", scoring_rule = "wis", na_action = "drop",
 #'   agg_fun = median
 #' )
 #' }
@@ -104,8 +105,8 @@ model_importance <- function(forecast_data,
   valid_tbl <- validate_input_data(forecast_data)
 
   # validate that the selected metric is suitable for each output_type
-  output_type <- valid_tbl$output_type |> unique()
-  check_metric_selection(output_type, scoring_rule)
+  unique_output_type <- unique(valid_tbl$output_type)
+  check_metric_selection(unique_output_type, scoring_rule)
 
   # forecast_dates
   forecast_dates <- valid_tbl |>
@@ -118,10 +119,11 @@ model_importance <- function(forecast_data,
     unique()
 
   # Give a message for the user to check the forecast dates
-  message(
-    "The input data has forecast from ", min(forecast_dates),
-    " to ", max(forecast_dates), "."
-  )
+  message(sprintf(
+    "The input data has forecast from %s to %s.
+    There are a total of %d forecast dates.",
+    min(forecast_dates), max(forecast_dates), length(forecast_dates)
+  ))
 
   score_result <- forecast_data
   return(score_result)
