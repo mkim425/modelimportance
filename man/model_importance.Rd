@@ -86,31 +86,31 @@ https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
 \examples{
 \dontrun{
 library(dplyr)
-forecast_data <- readRDS(
-  system.file("testdata",
-    "simple_example_quantile_model_output.rds",
-    package = "modelimportance"
+library(hubExamples)
+forecast_data <- hubExamples::forecast_outputs |>
+  dplyr::filter(
+    output_type \%in\% c("quantile"),
+    location == "25",
+    horizon == 1
   )
-)
-target_data <- readRDS(
-  system.file("testdata",
-    "simple_example_target_data.rds",
-    package = "modelimportance"
+target_data <- hubExamples::forecast_target_ts |>
+  dplyr::filter(
+    date \%in\% unique(forecast_data$reference_date),
+    location == "25"
   )
-)
 
 model_importance(
   forecast_data = forecast_data, target_data = target_data,
   ensemble_fun = "simple_ensemble", weighted = FALSE,
   training_window_length = 0, importance_algorithm = "lomo",
-  subset_wt = "equal", scoring_rule = "ae_point", na_action = "drop"
+  subset_wt = "equal", scoring_rule = "wis", na_action = "drop"
 )
 # Example with the additional argument in `...`.
 model_importance(
   forecast_data = forecast_data, target_data = target_data,
   ensemble_fun = "simple_ensemble", weighted = FALSE,
   training_window_length = 0, importance_algorithm = "lomo",
-  subset_wt = "equal", scoring_rule = "ae_point", na_action = "drop",
+  subset_wt = "equal", scoring_rule = "wis", na_action = "drop",
   agg_fun = median
 )
 }
