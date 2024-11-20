@@ -76,7 +76,8 @@ contribution to ensemble prediction accuracy for each combination of
 model task.
 }
 \details{
-The `target_data` in the oracle output format should contain task ID columns,
+The `target_data` in the oracle output format should contain independent
+task ID columns (e.g. `location`, `target_date`, and `age_group`),
 `output_type` and `output_type_id` columns if the output is either `pmf` or
 `cdf`, and `oracle_value` column for the observed values.
 TBD for more details.
