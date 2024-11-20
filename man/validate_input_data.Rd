@@ -4,11 +4,14 @@
 \alias{validate_input_data}
 \title{Check the input forecast data structure}
 \usage{
-validate_input_data(forecast_data)
+validate_input_data(forecast_data, target_data)
 }
 \arguments{
 \item{forecast_data}{A data.frame with the predictions that is or can be
 coerced to a model_out_tbl format.}
+
+\item{target_data}{A data.frame with the target values. This data must follow
+the oracle output format.}
 }
 \value{
 a model_out_tbl format that has a single output type
