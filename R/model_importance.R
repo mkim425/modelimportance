@@ -8,7 +8,8 @@
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format.
 #' @param target_data Ground truth data for the variables that are used to
-#' define modeling targets.
+#' define modeling targets. This data must follow the oracle output format.
+#' See 'Details'.
 #' @param ensemble_fun A character string specifying a ensemble method, either
 #' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
 #' * When `"simple_ensemble"` is specified, the ensemble is generated using the
@@ -46,6 +47,11 @@
 #' @import hubExamples
 #' @export
 #' @details
+#' The `target_data` in the oracle output format should contain task ID columns,
+#' `output_type` and `output_type_id` columns if the output is either `pmf` or
+#' `cdf`, and `oracle_value` column for the observed values.
+#' TBD for more details.
+#'
 #' Additional argument in ... is `agg_fun`, which is a character string name
 #' for a function specifying aggregation method of component model outputs.
 #' Default is `mean`, meaning that equally (or weighted) mean is calculated

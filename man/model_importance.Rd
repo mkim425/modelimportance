@@ -23,7 +23,8 @@ model_importance(
 coerced to a model_out_tbl format.}
 
 \item{target_data}{Ground truth data for the variables that are used to
-define modeling targets.}
+define modeling targets. This data must follow the oracle output format.
+See 'Details'.}
 
 \item{ensemble_fun}{A character string specifying a ensemble method, either
 "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
@@ -75,6 +76,11 @@ contribution to ensemble prediction accuracy for each combination of
 model task.
 }
 \details{
+The `target_data` in the oracle output format should contain task ID columns,
+`output_type` and `output_type_id` columns if the output is either `pmf` or
+`cdf`, and `oracle_value` column for the observed values.
+TBD for more details.
+
 Additional argument in ... is `agg_fun`, which is a character string name
 for a function specifying aggregation method of component model outputs.
 Default is `mean`, meaning that equally (or weighted) mean is calculated
