@@ -47,7 +47,8 @@
 #' @import hubExamples
 #' @export
 #' @details
-#' The `target_data` in the oracle output format should contain task ID columns,
+#' The `target_data` in the oracle output format should contain independent
+#' task ID columns (e.g. `location`, `target_date`, and `age_group`),
 #' `output_type` and `output_type_id` columns if the output is either `pmf` or
 #' `cdf`, and `oracle_value` column for the observed values.
 #' TBD for more details.
@@ -107,16 +108,17 @@ model_importance <- function(forecast_data,
     importance_algorithm, subset_wt, scoring_rule, na_action
   )
 
-  # validate input data and get a model_out_tbl format with a single output type
-  valid_tbl <- validate_input_data(forecast_data)
+  # check if forecast_data contains exactly one of the columns:
+  # "forecast_date", "origin_date", "reference_date"
+  validate_one_forecast_date_col(forecast_data)
+
+  # validate input data: get a model_out_tbl format with a single output type
+  # and combine two datasets
+  valid_tbl <- validate_input_data(forecast_data, target_data)
 
   # validate that the selected metric is suitable for each output_type
   unique_output_type <- unique(valid_tbl$output_type)
   check_metric_selection(unique_output_type, scoring_rule)
-
-  # check if valid_tbl contains exactly one of the columns:
-  # "forecast_date", "origin_date", "reference_date"
-  validate_one_forecast_date_col(valid_tbl)
 
   # forecast_dates
   forecast_date_list <- valid_tbl |>
