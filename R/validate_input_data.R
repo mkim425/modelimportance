@@ -2,7 +2,8 @@
 #'
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format.
-#'
+#' @param target_data A data.frame with the target values. This data must follow
+#' the oracle output format.
 #' @return a model_out_tbl format that has a single output type
 #' @export
 #' @import hubUtils
@@ -17,7 +18,7 @@
 #'   collect() |>
 #'   validate_input_data()
 #' }
-validate_input_data <- function(forecast_data) {
+validate_input_data <- function(forecast_data, target_data) {
   valid_tbl <- forecast_data |>
     # Convert model output to a `model_out_tbl` class object
     hubUtils::as_model_out_tbl() |>
@@ -36,6 +37,33 @@ validate_input_data <- function(forecast_data) {
   if (num_output_type != 1) {
     stop("The input data must contain a single output type.")
   }
+
+  # Ensure that target_end_date is 'Date' class.
+  target_data$target_end_date <- as.Date(target_data$target_end_date)
+  # Check if all values in the target_end_date column of the forecast data are
+  # present in the target data
+  if (!all(valid_tbl$target_end_date %in% target_data$target_end_date)) {
+    stop("All values in the 'target_end_date' column of the forecast data must
+         present in the 'target_end_date' column of the target data.")
+  }
+
+  # get task_id columns to use for joining forecast and target data
+  indep_task_id_cols <- c("location", "target_end_date", "age_group", "target")
+  if (unique(valid_tbl$output_type) %in% c("pmf", "cdf")) {
+    task_id_cols <- intersect(
+      colnames(target_data),
+      c(indep_task_id_cols, "output_type", "output_type_id")
+    )
+  } else {
+    task_id_cols <- intersect(
+      colnames(target_data),
+      c(indep_task_id_cols, "output_type")
+    )
+  }
+
+  # Combine forecast data and target data into a single data frame
+  valid_tbl <- valid_tbl |>
+    dplyr::left_join(target_data, by = task_id_cols)
 
   return(valid_tbl)
 }
