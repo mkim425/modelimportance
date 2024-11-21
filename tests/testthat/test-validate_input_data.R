@@ -1,27 +1,24 @@
 library(dplyr)
 
-test_that("validate_input_data() requires a single output type in a dataset", {
-  # data to test
-  target_data <- readRDS(
-    testthat::test_path("testdata/flu_example_target_data.rds")
-  )
+# data for testing
+target_data <- readRDS(
+  testthat::test_path("testdata/flu_example_target_data.rds")
+)
+forecast_pmfs <- readRDS(
+  testthat::test_path("testdata/flu_example_pmf_model_output.rds")
+)
+forecast_means <- readRDS(
+  testthat::test_path("testdata/flu_example_mean_model_output.rds")
+)
+forecast_quantiles <- readRDS(
+  testthat::test_path("testdata/flu_example_quantile_model_output.rds")
+)
 
-  forecast_pmfs <- readRDS(
-    testthat::test_path("testdata/flu_example_pmf_model_output.rds")
-  )
-  forecast_means <- readRDS(
-    testthat::test_path("testdata/flu_example_mean_model_output.rds")
-  )
-  forecast_quantiles <- readRDS(
-    testthat::test_path("testdata/flu_example_quantile_model_output.rds")
-  )
+test_that("validate_input_data() requires a single output type in a dataset", {
   forecast_mix <- rbind(forecast_means, forecast_quantiles)
   na_row <- forecast_quantiles[1, ]
   na_row$output_type <- NA
   forecast_data_na <- rbind(na_row, forecast_quantiles[2:7, ])
-
-  reduced_target_data <- target_data |>
-    filter(target_end_date != min(forecast_means$target_end_date))
 
   # test
   expect_error(
@@ -49,7 +46,25 @@ test_that("validate_input_data() requires a single output type in a dataset", {
       as.character(),
     unique(forecast_pmfs$output_type)
   )
+})
 
+test_that("validate_input_data() requires exactly one forecast date column", {
+  forecast_quantiles2 <- forecast_quantiles |>
+          mutate(origin_date = reference_date)
+
+  # test
+  expect_error(
+    validate_input_data(forecast_quantiles2, target_data),
+    paste0("The input 'forecast_data' must contain exactly one of the columns:"
+           , " 'forecast_date', 'origin_date', 'reference_date'.")
+  )
+})
+
+test_that("No missing value in target_end_date of target_data", {
+  reduced_target_data <- target_data |>
+    filter(target_end_date != min(forecast_means$target_end_date))
+
+  # test
   expect_error(
     validate_input_data(forecast_means, reduced_target_data),
     "All values in the 'target_end_date' column of the forecast data must
