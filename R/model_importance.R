@@ -111,10 +111,6 @@ model_importance <- function(forecast_data,
     importance_algorithm, subset_wt, scoring_rule, na_action
   )
 
-  # check if forecast_data contains exactly one of the columns:
-  # "forecast_date", "origin_date", "reference_date"
-  validate_one_forecast_date_col(forecast_data)
-
   # validate input data: get a model_out_tbl format with a single output type
   # and combine two datasets
   valid_tbl <- validate_input_data(forecast_data, target_data)
