@@ -22,5 +22,4 @@ Suggests:
 Config/testthat/edition: 3
 Remotes:
     hubverse-org/hubUtils,
-    hubverse-org/hubExamples,
-    reichlab/distfromq
+    hubverse-org/hubExamples

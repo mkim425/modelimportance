@@ -8,7 +8,6 @@
 # 3 model_id: "Flusight-baseline", "MOBS-GLEAM_FLUH", "PSI-DICE"
 
 library(hubUtils)
-library(distfromq)
 
 # Sample Flusight Forecast Hub
 hub_path <- test_path("testhubs", "example-complex-forecast-hub")
