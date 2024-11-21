@@ -71,9 +71,12 @@
 #'   )
 #' target_data <- hubExamples::forecast_target_ts |>
 #'   dplyr::filter(
-#'     date %in% unique(forecast_data$reference_date),
+#'     date %in% unique(forecast_data$target_end_date),
 #'     location == "25"
-#'   )
+#'   ) |>
+#'   # Rename columns to match the oracle output format
+#'   rename(target_end_date = date,
+#'   oracle_value = observation)
 #'
 #' model_importance(
 #'   forecast_data = forecast_data, target_data = target_data,
