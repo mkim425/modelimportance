@@ -50,13 +50,15 @@ test_that("validate_input_data() requires a single output type in a dataset", {
 
 test_that("validate_input_data() requires exactly one forecast date column", {
   forecast_quantiles2 <- forecast_quantiles |>
-          mutate(origin_date = reference_date)
+    mutate(origin_date = reference_date)
 
   # test
   expect_error(
     validate_input_data(forecast_quantiles2, target_data),
-    paste0("The input 'forecast_data' must contain exactly one of the columns:"
-           , " 'forecast_date', 'origin_date', 'reference_date'.")
+    paste0(
+      "The input 'forecast_data' must contain exactly one of the columns:",
+      " 'forecast_date', 'origin_date', 'reference_date'."
+    )
   )
 })
 
