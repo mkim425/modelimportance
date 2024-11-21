@@ -42,7 +42,7 @@ validate_input_data <- function(forecast_data, target_data) {
   columns_to_check <- c("forecast_date", "origin_date", "reference_date")
   if (length(intersect(colnames(valid_tbl), columns_to_check)) != 1) {
     stop("The input 'forecast_data' must contain exactly one of the columns: ",
-         paste0("'", columns_to_check, "'", collapse = ", "),".")
+         paste0("'", columns_to_check, "'", collapse = ", "), ".")
   }
 
   # Ensure that target_end_date is 'Date' class.
