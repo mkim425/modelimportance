@@ -3,7 +3,7 @@
 #' @param output_type A character string specifying the type of prediction
 #' output. Should be one of "mean", "median", "quantile", "pmf", or "sample".
 #' @param scoring_rule A character string specifying the scoring rule to use
-#' as input
+#' as input. Should be one of "ae_point", "se_point", "wis", or "log_score".
 #'
 #' @return An error is raised if any of the inputs is not valid.
 #'
@@ -28,12 +28,12 @@ check_metric_selection <- function(output_type, scoring_rule) {
       stop("The scoring rule needs to be wis.")
     }
   } else if (output_type == "pmf") {
-    if (scoring_rule != "logscore") {
-      stop("The scoring rule needs to be logscore.")
+    if (scoring_rule != "log_score") {
+      stop("The scoring rule needs to be log_score.")
     }
-  } else if (output_type == "sample") {
-    stop("sample model output type is under development and not yet supported.
-         Please use a different output type.")
+  } else if (output_type %in% c("cdf", "sample")) {
+    stop("cdf and sample model output types are under development and not yet
+    supported. Please use a different output type.")
   } else {
     stop("invalid output type.")
   }
