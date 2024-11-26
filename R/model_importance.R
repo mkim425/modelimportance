@@ -8,8 +8,8 @@
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format. Only one `output_type` is allowed in the
 #' data.frame
-#' @param oracle_output_data Ground truth data for the variables that are used to
-#' define modeling targets. This data must follow the oracle output format.
+#' @param oracle_output_data Ground truth data for the variables that are used
+#' to define modeling targets. This data must follow the oracle output format.
 #' See 'Details'.
 #' @param ensemble_fun A character string specifying a ensemble method, either
 #' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
@@ -110,8 +110,9 @@ model_importance <- function(forecast_data,
                              ...) {
   # validate inputs
   validate_inputs(
-    forecast_data, oracle_output_data, ensemble_fun, weighted, training_window_length,
-    importance_algorithm, subset_wt, scoring_rule, na_action
+    forecast_data, oracle_output_data, ensemble_fun, weighted,
+    training_window_length, importance_algorithm, subset_wt, scoring_rule,
+    na_action
   )
 
   # validate input data: get a model_out_tbl format with a single output type
