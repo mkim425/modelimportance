@@ -13,8 +13,7 @@ RoxygenNote: 7.3.2
 Imports:
     hubUtils,
     dplyr,
-    hubExamples,
-    magrittr
+    hubExamples
 Depends: 
     R (>= 2.10)
 Suggests: 
