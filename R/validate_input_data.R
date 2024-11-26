@@ -41,12 +41,15 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
   # Check if there is exactly one column representing the forecast date
   columns_to_check <- c("forecast_date", "origin_date", "reference_date")
   if (length(intersect(colnames(valid_tbl), columns_to_check)) != 1) {
-    stop("The input 'forecast_data' must contain exactly one of the columns: ",
-         paste0("'", columns_to_check, "'", collapse = ", "), ".")
+    stop(
+      "The input 'forecast_data' must contain exactly one of the columns: ",
+      paste0("'", columns_to_check, "'", collapse = ", "), "."
+    )
   }
 
   # Ensure that target_end_date is 'Date' class.
-  oracle_output_data$target_end_date <- as.Date(oracle_output_data$target_end_date)
+  oracle_output_data$target_end_date <-
+    as.Date(oracle_output_data$target_end_date)
   # Check if all values in the target_end_date column of the forecast data are
   # present in the target data
   if (!all(valid_tbl$target_end_date %in% oracle_output_data$target_end_date)) {
