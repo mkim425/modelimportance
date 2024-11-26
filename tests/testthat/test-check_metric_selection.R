@@ -48,23 +48,43 @@ test_that("check_metric_selection() checks for valid scoring rule", {
   )
   expect_error(
     check_metric_selection("sample", "ae_point"),
-    "sample model output type is under development and not yet supported.
-         Please use a different output type."
+    "cdf and sample model output types are under development and not yet
+    supported. Please use a different output type."
   )
   expect_error(
     check_metric_selection("sample", "se_point"),
-    "sample model output type is under development and not yet supported.
-         Please use a different output type."
+    "cdf and sample model output types are under development and not yet
+    supported. Please use a different output type."
   )
   expect_error(
     check_metric_selection("sample", "wis"),
-    "sample model output type is under development and not yet supported.
-         Please use a different output type."
+    "cdf and sample model output types are under development and not yet
+    supported. Please use a different output type."
   )
   expect_error(
     check_metric_selection("sample", "logscore"),
-    "sample model output type is under development and not yet supported.
-         Please use a different output type."
+    "cdf and sample model output types are under development and not yet
+    supported. Please use a different output type."
+  )
+  expect_error(
+    check_metric_selection("cdf", "ae_point"),
+    "cdf and sample model output types are under development and not yet
+    supported. Please use a different output type."
+  )
+  expect_error(
+    check_metric_selection("cdf", "se_point"),
+    "cdf and sample model output types are under development and not yet
+    supported. Please use a different output type."
+  )
+  expect_error(
+    check_metric_selection("cdf", "wis"),
+    "cdf and sample model output types are under development and not yet
+    supported. Please use a different output type."
+  )
+  expect_error(
+    check_metric_selection("cdf", "logscore"),
+    "cdf and sample model output types are under development and not yet
+    supported. Please use a different output type."
   )
   expect_error(
     check_metric_selection("other", "ae_point"),
