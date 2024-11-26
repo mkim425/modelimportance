@@ -7,7 +7,7 @@ prediction accuracy}
 \usage{
 model_importance(
   forecast_data,
-  target_data,
+  oracle_output_data,
   ensemble_fun = c("simple_ensemble", "linear_pool"),
   weighted = FALSE,
   training_window_length = 0,
@@ -20,10 +20,11 @@ model_importance(
 }
 \arguments{
 \item{forecast_data}{A data.frame with the predictions that is or can be
-coerced to a model_out_tbl format.}
+coerced to a model_out_tbl format. Only one `output_type` is allowed in the
+data.frame}
 
-\item{target_data}{Ground truth data for the variables that are used to
-define modeling targets. This data must follow the oracle output format.
+\item{oracle_output_data}{Ground truth data for the variables that are used
+to define modeling targets. This data must follow the oracle output format.
 See 'Details'.}
 
 \item{ensemble_fun}{A character string specifying a ensemble method, either
@@ -76,9 +77,9 @@ contribution to ensemble prediction accuracy for each combination of
 model task.
 }
 \details{
-The `target_data` in the oracle output format should contain independent
-task ID columns (e.g. `location`, `target_date`, and `age_group`),
-`output_type` and `output_type_id` columns if the output is either `pmf` or
+The `oracle_output_data` in the oracle output format should contain
+independent task ID columns (e.g. `location`, `target_date`, and `age_group`)
+, `output_type` and `output_type_id` columns if the output is either `pmf` or
 `cdf`, and `oracle_value` column for the observed values.
 TBD for more details.
 
@@ -106,18 +107,20 @@ target_data <- hubExamples::forecast_target_ts |>
     location == "25"
   ) |>
   # Rename columns to match the oracle output format
-  rename(target_end_date = date,
-  oracle_value = observation)
+  rename(
+    target_end_date = date,
+    oracle_value = observation
+  )
 
 model_importance(
-  forecast_data = forecast_data, target_data = target_data,
+  forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble", weighted = FALSE,
   training_window_length = 0, importance_algorithm = "lomo",
   subset_wt = "equal", scoring_rule = "wis", na_action = "drop"
 )
 # Example with the additional argument in `...`.
 model_importance(
-  forecast_data = forecast_data, target_data = target_data,
+  forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble", weighted = FALSE,
   training_window_length = 0, importance_algorithm = "lomo",
   subset_wt = "equal", scoring_rule = "wis", na_action = "drop",

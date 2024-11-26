@@ -4,14 +4,14 @@
 \alias{validate_input_data}
 \title{Check the input forecast data structure}
 \usage{
-validate_input_data(forecast_data, target_data)
+validate_input_data(forecast_data, oracle_output_data)
 }
 \arguments{
 \item{forecast_data}{A data.frame with the predictions that is or can be
 coerced to a model_out_tbl format.}
 
-\item{target_data}{A data.frame with the target values. This data must follow
-the oracle output format.}
+\item{oracle_output_data}{A data.frame with the target values.
+This data must follow the oracle output format.}
 }
 \value{
 a model_out_tbl format that has a single output type
@@ -21,13 +21,23 @@ Check the input forecast data structure
 }
 \examples{
 \dontrun{
-library(hubUtils)
 library(dplyr)
-hub_path <- system.file("testhubs/flusight", package = "hubUtils")
-hub_con <- connect_hub(hub_path)
-hub_con |>
-  filter(output_type == "quantile") |>
-  collect() |>
-  validate_input_data()
+library(hubExamples)
+forecast_data <- hubExamples::forecast_outputs |>
+  dplyr::filter(
+    output_type \%in\% c("quantile"),
+    location == "25",
+    horizon == 1
+  )
+target_data <- hubExamples::forecast_target_ts |>
+  dplyr::filter(
+    date \%in\% unique(forecast_data$target_end_date),
+    location == "25"
+  ) |>
+  # Rename columns to match the oracle output format
+  rename(
+    target_end_date = date,
+    oracle_value = observation
+  )
 }
 }
