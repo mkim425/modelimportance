@@ -13,7 +13,7 @@ model_importance(
   training_window_length = 0,
   importance_algorithm = c("lomo", "lasomo"),
   subset_wt = c("equal", "perm_based"),
-  scoring_rule = c("ae_point", "se_point", "wis", "logscore"),
+  scoring_rule = c("ae_point", "se_point", "wis", "log_score"),
   na_action = c("worst", "average", "drop"),
   ...
 )
@@ -21,7 +21,7 @@ model_importance(
 \arguments{
 \item{forecast_data}{A data.frame with the predictions that is or can be
 coerced to a model_out_tbl format. Only one `output_type` is allowed in the
-data.frame}
+data.frame.}
 
 \item{oracle_output_data}{Ground truth data for the variables that are used
 to define modeling targets. This data must follow the oracle output format.
@@ -54,9 +54,22 @@ importance calculation; `c("lomo", "lasomo")`.
 to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.}
 
 \item{scoring_rule}{A character string specifying metric to use to calculate
-importance; `c("ae_point", "se_point", "wis", "logscore")`.
+importance; `c("ae_point", "se_point", "wis", "log_score")`.
 Specify one of them depending on which is available for the output type in
-the input data.}
+the input data. The following table shows the one-to-one mapping between
+`output_type` and the corresponding `scoring_rule`:
+\tabular{ll}{
+  \strong{Output Type} \tab \strong{Scoring Rule} \cr
+  median \tab ae_point \cr
+  mean \tab se_point \cr
+  quantile \tab wis \cr
+  pmf \tab log_score \cr
+}
+where `ae_point` is the absolute error, `se_point` is the squared error,
+`wis` is the weighted interval score, and `log_score` is the logarithmic
+score.
+This mapping ensures that the appropriate metric is used for each output
+type.}
 
 \item{na_action}{A character string specifying treatment for missing data;
 `c("worst," "average," "drop").` `"worst"` replaces missing values with

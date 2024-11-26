@@ -11,7 +11,7 @@ check_metric_selection(output_type, scoring_rule)
 output. Should be one of "mean", "median", "quantile", "pmf", or "sample".}
 
 \item{scoring_rule}{A character string specifying the scoring rule to use
-as input}
+as input. Should be one of "ae_point", "se_point", "wis", or "log_score".}
 }
 \value{
 An error is raised if any of the inputs is not valid.
