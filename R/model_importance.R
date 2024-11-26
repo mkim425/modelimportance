@@ -6,8 +6,9 @@
 #' model task.
 #'
 #' @param forecast_data A data.frame with the predictions that is or can be
-#' coerced to a model_out_tbl format.
-#' @param target_data Ground truth data for the variables that are used to
+#' coerced to a model_out_tbl format. Only one `output_type` is allowed in the
+#' data.frame
+#' @param oracle_output_data Ground truth data for the variables that are used to
 #' define modeling targets. This data must follow the oracle output format.
 #' See 'Details'.
 #' @param ensemble_fun A character string specifying a ensemble method, either
@@ -47,9 +48,9 @@
 #' @import hubExamples
 #' @export
 #' @details
-#' The `target_data` in the oracle output format should contain independent
-#' task ID columns (e.g. `location`, `target_date`, and `age_group`),
-#' `output_type` and `output_type_id` columns if the output is either `pmf` or
+#' The `oracle_output_data` in the oracle output format should contain
+#' independent task ID columns (e.g. `location`, `target_date`, and `age_group`)
+#' , `output_type` and `output_type_id` columns if the output is either `pmf` or
 #' `cdf`, and `oracle_value` column for the observed values.
 #' TBD for more details.
 #'
@@ -75,18 +76,20 @@
 #'     location == "25"
 #'   ) |>
 #'   # Rename columns to match the oracle output format
-#'   rename(target_end_date = date,
-#'   oracle_value = observation)
+#'   rename(
+#'     target_end_date = date,
+#'     oracle_value = observation
+#'   )
 #'
 #' model_importance(
-#'   forecast_data = forecast_data, target_data = target_data,
+#'   forecast_data = forecast_data, oracle_output_data = target_data,
 #'   ensemble_fun = "simple_ensemble", weighted = FALSE,
 #'   training_window_length = 0, importance_algorithm = "lomo",
 #'   subset_wt = "equal", scoring_rule = "wis", na_action = "drop"
 #' )
 #' # Example with the additional argument in `...`.
 #' model_importance(
-#'   forecast_data = forecast_data, target_data = target_data,
+#'   forecast_data = forecast_data, oracle_output_data = target_data,
 #'   ensemble_fun = "simple_ensemble", weighted = FALSE,
 #'   training_window_length = 0, importance_algorithm = "lomo",
 #'   subset_wt = "equal", scoring_rule = "wis", na_action = "drop",
@@ -94,7 +97,7 @@
 #' )
 #' }
 model_importance <- function(forecast_data,
-                             target_data,
+                             oracle_output_data,
                              ensemble_fun = c("simple_ensemble", "linear_pool"),
                              weighted = FALSE,
                              training_window_length = 0,
@@ -107,13 +110,13 @@ model_importance <- function(forecast_data,
                              ...) {
   # validate inputs
   validate_inputs(
-    forecast_data, target_data, ensemble_fun, weighted, training_window_length,
+    forecast_data, oracle_output_data, ensemble_fun, weighted, training_window_length,
     importance_algorithm, subset_wt, scoring_rule, na_action
   )
 
   # validate input data: get a model_out_tbl format with a single output type
   # and combine two datasets
-  valid_tbl <- validate_input_data(forecast_data, target_data)
+  valid_tbl <- validate_input_data(forecast_data, oracle_output_data)
 
   # validate that the selected metric is suitable for each output_type
   unique_output_type <- unique(valid_tbl$output_type)
@@ -126,7 +129,7 @@ model_importance <- function(forecast_data,
         c("forecast_date", "origin_date", "reference_date")
       )
     ) |>
-    pull() |>
+    dplyr::pull() |>
     unique()
 
   # Give a message for the user to check the forecast dates
