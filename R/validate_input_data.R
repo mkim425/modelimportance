@@ -37,15 +37,15 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
 
   # Check if NA exists in the target
   if (sum(is.na(valid_tbl$target)) != 0) {
-          stop("The target has a missing value.")
+    stop("The target has a missing value.")
   }
 
   # Check if the data contain a single target
   num_target <- valid_tbl$target |>
-          unique() |>
-          length()
+    unique() |>
+    length()
   if (num_target != 1) {
-          stop("The input data must contain a single target.")
+    stop("The input data must contain a single target.")
   }
 
   # Check if NA exists in the output type
