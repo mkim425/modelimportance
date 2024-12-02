@@ -62,8 +62,12 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
   }
 
   # Check if there is exactly one column representing the forecast date
-  columns_to_check <- c("forecast_date", "origin_date", "reference_date")
-  if (length(intersect(colnames(valid_tbl), columns_to_check)) != 1) {
+  possible_col_names <- c("forecast_date", "origin_date", "reference_date")
+  matching_name <- intersect(colnames(valid_tbl), possible_col_names)
+  if (length(matching_name) == 1) {
+    # standardize the column to a single unified name:'reference_date'
+    names(valid_tbl)[names(valid_tbl) == matching_name] <- "reference_date"
+  } else {
     stop(
       "The input 'forecast_data' must contain exactly one of the columns: ",
       paste0("'", columns_to_check, "'", collapse = ", "), "."
