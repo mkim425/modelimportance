@@ -70,7 +70,7 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
   } else {
     stop(
       "The input 'forecast_data' must contain exactly one of the columns: ",
-      paste0("'", columns_to_check, "'", collapse = ", "), "."
+      paste0("'", possible_col_names, "'", collapse = ", "), "."
     )
   }
 
