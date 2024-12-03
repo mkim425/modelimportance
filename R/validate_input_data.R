@@ -4,7 +4,8 @@
 #' coerced to a model_out_tbl format.
 #' @param oracle_output_data A data.frame with the target values.
 #' This data must follow the oracle output format.
-#' @return a model_out_tbl format that has a single output type
+#' @return a model_out_tbl format that contains forecast data and target data
+#' with a single output type.
 #' @export
 #' @import hubUtils
 #' @import dplyr
@@ -35,6 +36,19 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
     # Validate a `model_out_tbl` object
     hubUtils::validate_model_out_tbl()
 
+  # Check if NA exists in the target
+  if (sum(is.na(valid_tbl$target)) != 0) {
+    stop("The target has a missing value.")
+  }
+
+  # Check if the data contain a single target
+  num_target <- valid_tbl$target |>
+    unique() |>
+    length()
+  if (num_target != 1) {
+    stop("The input data must contain a single target.")
+  }
+
   # Check if NA exists in the output type
   if (sum(is.na(valid_tbl$output_type)) != 0) {
     stop("The output type has a missing value.")
@@ -49,11 +63,15 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
   }
 
   # Check if there is exactly one column representing the forecast date
-  columns_to_check <- c("forecast_date", "origin_date", "reference_date")
-  if (length(intersect(colnames(valid_tbl), columns_to_check)) != 1) {
+  possible_col_names <- c("forecast_date", "origin_date", "reference_date")
+  matching_name <- intersect(colnames(valid_tbl), possible_col_names)
+  if (length(matching_name) == 1) {
+    # standardize the column to a single unified name:'reference_date'
+    names(valid_tbl)[names(valid_tbl) == matching_name] <- "reference_date"
+  } else {
     stop(
       "The input 'forecast_data' must contain exactly one of the columns: ",
-      paste0("'", columns_to_check, "'", collapse = ", "), "."
+      paste0("'", possible_col_names, "'", collapse = ", "), "."
     )
   }
 
