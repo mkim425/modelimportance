@@ -19,7 +19,8 @@
 #'
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format. Only one `output_type` is allowed in the
-#' data.frame.
+#' data.frame, and it must be one of the following:
+#' `mean`, `median`, `quantile`, or `pmf`.
 #' @param oracle_output_data Ground truth data for the variables that are used
 #' to define modeling targets. This data must follow the oracle output format.
 #' See 'Details'.
@@ -132,6 +133,11 @@ model_importance <- function(forecast_data,
     There are a total of %d forecast dates.",
     min(forecast_date_list), max(forecast_date_list), length(forecast_date_list)
   ))
+
+  # list of data sets split by task
+  task_data_list <- split_data_by_task(valid_tbl)
+  # unique output_type
+  unique_output_type <- unique(valid_tbl$output_type)
 
   score_result <- forecast_data
   return(score_result)
