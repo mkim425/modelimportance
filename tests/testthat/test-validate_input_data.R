@@ -14,6 +14,41 @@ forecast_quantiles <- readRDS(
   testthat::test_path("testdata/flu_example_quantile_model_output.rds")
 )
 
+test_that("validate_input_data() requires a single target in a dataset", {
+  forecast_mix_target <- rbind(forecast_means, forecast_pmfs)
+  na_row <- forecast_means[1, ]
+  na_row$target <- NA
+  forecast_data_na <- rbind(na_row, forecast_means[2:7, ])
+
+  # test
+  expect_error(
+    validate_input_data(forecast_mix_target, target_data),
+    "The input data must contain a single target."
+  )
+
+  expect_error(
+    validate_input_data(forecast_data_na, target_data),
+    "The target has a missing value."
+  )
+
+  expect_equal(
+    validate_input_data(forecast_means, target_data) |>
+      dplyr::select(target) |>
+      unique() |>
+      as.character(),
+    unique(forecast_means$target)
+  )
+
+  expect_equal(
+    validate_input_data(forecast_pmfs, target_data) |>
+      dplyr::select(target) |>
+      unique() |>
+      as.character(),
+    unique(forecast_pmfs$target)
+  )
+})
+
+
 test_that("validate_input_data() requires a single output type in a dataset", {
   forecast_mix <- rbind(forecast_means, forecast_quantiles)
   na_row <- forecast_quantiles[1, ]
