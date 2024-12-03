@@ -14,7 +14,8 @@ coerced to a model_out_tbl format.}
 This data must follow the oracle output format.}
 }
 \value{
-a model_out_tbl format that has a single output type
+a model_out_tbl format that contains forecast data and target data
+with a single output type.
 }
 \description{
 Check the input forecast data structure
