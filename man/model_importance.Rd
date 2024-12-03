@@ -13,7 +13,6 @@ model_importance(
   training_window_length = 0,
   importance_algorithm = c("lomo", "lasomo"),
   subset_wt = c("equal", "perm_based"),
-  scoring_rule = c("ae_point", "se_point", "wis", "logscore"),
   na_action = c("worst", "average", "drop"),
   ...
 )
@@ -52,11 +51,6 @@ importance calculation; `c("lomo", "lasomo")`.
 
 \item{subset_wt}{A character string specifying method for assigning weight
 to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.}
-
-\item{scoring_rule}{A character string specifying metric to use to calculate
-importance; `c("ae_point", "se_point", "wis", "logscore")`.
-Specify one of them depending on which is available for the output type in
-the input data.}
 
 \item{na_action}{A character string specifying treatment for missing data;
 `c("worst," "average," "drop").` `"worst"` replaces missing values with
@@ -116,14 +110,14 @@ model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble", weighted = FALSE,
   training_window_length = 0, importance_algorithm = "lomo",
-  subset_wt = "equal", scoring_rule = "wis", na_action = "drop"
+  subset_wt = "equal", na_action = "drop"
 )
 # Example with the additional argument in `...`.
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble", weighted = FALSE,
   training_window_length = 0, importance_algorithm = "lomo",
-  subset_wt = "equal", scoring_rule = "wis", na_action = "drop",
+  subset_wt = "equal", na_action = "drop",
   agg_fun = median
 )
 }
