@@ -104,8 +104,7 @@ model_importance <- function(forecast_data,
   # validate inputs
   validate_inputs(
     forecast_data, oracle_output_data, ensemble_fun, weighted,
-    training_window_length, importance_algorithm, subset_wt, scoring_rule,
-    na_action
+    training_window_length, importance_algorithm, subset_wt, na_action
   )
 
   # validate input data: get a model_out_tbl format with a single output type
@@ -113,14 +112,7 @@ model_importance <- function(forecast_data,
   valid_tbl <- validate_input_data(forecast_data, oracle_output_data)
 
   # forecast_dates
-  forecast_date_list <- valid_tbl |>
-    dplyr::select(
-      dplyr::any_of(
-        c("forecast_date", "origin_date", "reference_date")
-      )
-    ) |>
-    dplyr::pull() |>
-    unique()
+  forecast_date_list <- unique(valid_tbl$reference_date)
 
   # Give a message for the user to check the forecast dates
   message(sprintf(
