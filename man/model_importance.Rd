@@ -20,7 +20,7 @@ model_importance(
 \arguments{
 \item{forecast_data}{A data.frame with the predictions that is or can be
 coerced to a model_out_tbl format. Only one `output_type` is allowed in the
-data.frame}
+data.frame.}
 
 \item{oracle_output_data}{Ground truth data for the variables that are used
 to define modeling targets. This data must follow the oracle output format.
@@ -69,6 +69,18 @@ A data.frame with columns
 Evaluate ensemble component model's importance based on a measure of their
 contribution to ensemble prediction accuracy for each combination of
 model task.
+
+For each `output_type`, the corresponding scoring rule applied to calculate
+the importance is as follows.
+\tabular{ll}{
+  \strong{Output Type} \tab \strong{Scoring Rule} \cr
+  median \tab ae_point \cr
+  mean \tab se_point \cr
+  quantile \tab wis \cr
+  pmf \tab log_score \cr
+}
+where `ae_point` represents the absolute error, `se_point` the squared error,
+`wis` the weighted interval score, and `log_score` the logarithmic score.
 }
 \details{
 The `oracle_output_data` in the oracle output format should contain
