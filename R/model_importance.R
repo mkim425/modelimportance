@@ -134,11 +134,6 @@ model_importance <- function(forecast_data,
     min(forecast_date_list), max(forecast_date_list), length(forecast_date_list)
   ))
 
-  # list of data sets split by task
-  task_data_list <- split_data_by_task(valid_tbl)
-  # unique output_type
-  unique_output_type <- unique(valid_tbl$output_type)
-
   score_result <- forecast_data
   return(score_result)
 }
