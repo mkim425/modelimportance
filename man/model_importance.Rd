@@ -20,7 +20,8 @@ model_importance(
 \arguments{
 \item{forecast_data}{A data.frame with the predictions that is or can be
 coerced to a model_out_tbl format. Only one `output_type` is allowed in the
-data.frame.}
+data.frame, and it must be one of the following:
+`mean`, `median`, `quantile`, or `pmf`.}
 
 \item{oracle_output_data}{Ground truth data for the variables that are used
 to define modeling targets. This data must follow the oracle output format.
