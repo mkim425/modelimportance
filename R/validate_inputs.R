@@ -25,10 +25,6 @@
 #' `"lasomo"` stands for leave all subsets of models out.
 #' @param subset_wt A character string specifying method for assigning weight
 #' to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.
-#' @param scoring_rule A character string specifying metric to use to calculate
-#' importance; `c("ae_point", "se_point", "wis", "logscore")`.
-#' Specify one of them depending on which is available for the output type in
-#' the input data.
 #' @param na_action A character string specifying treatment for missing data;
 #' `c("worst," "average," "drop").` `"worst"` replaces missing values with
 #' the smallest value from the other models. `"average"` replaces
@@ -42,9 +38,6 @@ validate_inputs <- function(forecast_data, target_data,
                             training_window_length = 0,
                             importance_algorithm = c("lomo", "lasomo"),
                             subset_wt = c("equal", "perm_based"),
-                            scoring_rule = c(
-                              "ae_point", "se_point", "wis", "logscore"
-                            ),
                             na_action = c("worst", "average", "drop")) {
   window_len <- training_window_length
   # validate inputs
@@ -65,6 +58,5 @@ validate_inputs <- function(forecast_data, target_data,
   ensemble_fun <- match.arg(ensemble_fun)
   importance_algorithm <- match.arg(importance_algorithm)
   subset_wt <- match.arg(subset_wt)
-  scoring_rule <- match.arg(scoring_rule)
   na_action <- match.arg(na_action)
 }
