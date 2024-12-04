@@ -7,7 +7,6 @@
 #' processed by the function `validate_input_data()`.
 #'
 #' @return A list of data sets, each corresponding to a single task.
-#' @export
 #'
 #' @examples \dontrun{
 #' library(dplyr)

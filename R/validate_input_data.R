@@ -6,7 +6,7 @@
 #' This data must follow the oracle output format.
 #' @return a model_out_tbl format that contains forecast data and target data
 #' with a single output type.
-#' @export
+#'
 #' @import hubUtils
 #' @import dplyr
 #' @examples \dontrun{
