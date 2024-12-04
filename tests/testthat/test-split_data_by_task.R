@@ -23,9 +23,12 @@ test_that("split_data_by_task() groups data correctly", {
     length(result),
     valid_tbl |>
       dplyr::select(all_of(split_cols)) |>
-      dplyr::reframe(across(everything(), as.character)) |>
-      dplyr::summarise(n_distinct(do.call(paste, c(., sep = "")))) |>
-      as.numeric()
+      dplyr::mutate(across(everything(), as.character)) |>
+      dplyr::rowwise() |>
+      dplyr::mutate(combined = paste(c_across(everything()), collapse = "")) |>
+      dplyr::pull(combined) |>
+      unique() |>
+      length()
   )
 
   # Each element of the list is a data frame
