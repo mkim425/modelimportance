@@ -36,11 +36,7 @@ split_data_by_task <- function(valid_tbl) {
 
   # List of data sets split by task
   datasets_by_task <- valid_tbl |>
-    dplyr::group_by(
-      dplyr::across(
-        dplyr::all_of(split_cols)
-      )
-    ) |>
+    dplyr::group_by(across(all_of(split_cols))) |>
     dplyr::group_split()
 
   return(datasets_by_task)
