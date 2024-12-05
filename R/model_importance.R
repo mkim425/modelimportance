@@ -5,9 +5,22 @@
 #' contribution to ensemble prediction accuracy for each combination of
 #' model task.
 #'
+#' For each `output_type`, the corresponding scoring rule applied to calculate
+#' the importance is as follows.
+#' \tabular{ll}{
+#'   \strong{Output Type} \tab \strong{Scoring Rule} \cr
+#'   median \tab ae_point \cr
+#'   mean \tab se_point \cr
+#'   quantile \tab wis \cr
+#'   pmf \tab log_score \cr
+#' }
+#' where `ae_point` represents the absolute error, `se_point` the squared error,
+#' `wis` the weighted interval score, and `log_score` the logarithmic score.
+#'
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format. Only one `output_type` is allowed in the
-#' data.frame
+#' data.frame, and it must be one of the following:
+#' `mean`, `median`, `quantile`, or `pmf`.
 #' @param oracle_output_data Ground truth data for the variables that are used
 #' to define modeling targets. This data must follow the oracle output format.
 #' See 'Details'.
@@ -32,10 +45,6 @@
 #' `"lasomo"` stands for leave all subsets of models out.
 #' @param subset_wt A character string specifying method for assigning weight
 #' to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.
-#' @param scoring_rule A character string specifying metric to use to calculate
-#' importance; `c("ae_point", "se_point", "wis", "logscore")`.
-#' Specify one of them depending on which is available for the output type in
-#' the input data.
 #' @param na_action A character string specifying treatment for missing data;
 #' `c("worst," "average," "drop").` `"worst"` replaces missing values with
 #' the smallest value from the other models. `"average"` replaces
@@ -85,14 +94,14 @@
 #'   forecast_data = forecast_data, oracle_output_data = target_data,
 #'   ensemble_fun = "simple_ensemble", weighted = FALSE,
 #'   training_window_length = 0, importance_algorithm = "lomo",
-#'   subset_wt = "equal", scoring_rule = "wis", na_action = "drop"
+#'   subset_wt = "equal", na_action = "drop"
 #' )
 #' # Example with the additional argument in `...`.
 #' model_importance(
 #'   forecast_data = forecast_data, oracle_output_data = target_data,
 #'   ensemble_fun = "simple_ensemble", weighted = FALSE,
 #'   training_window_length = 0, importance_algorithm = "lomo",
-#'   subset_wt = "equal", scoring_rule = "wis", na_action = "drop",
+#'   subset_wt = "equal", na_action = "drop",
 #'   agg_fun = median
 #' )
 #' }
@@ -103,35 +112,20 @@ model_importance <- function(forecast_data,
                              training_window_length = 0,
                              importance_algorithm = c("lomo", "lasomo"),
                              subset_wt = c("equal", "perm_based"),
-                             scoring_rule = c(
-                               "ae_point", "se_point", "wis", "logscore"
-                             ),
                              na_action = c("worst", "average", "drop"),
                              ...) {
   # validate inputs
   validate_inputs(
     forecast_data, oracle_output_data, ensemble_fun, weighted,
-    training_window_length, importance_algorithm, subset_wt, scoring_rule,
-    na_action
+    training_window_length, importance_algorithm, subset_wt, na_action
   )
 
   # validate input data: get a model_out_tbl format with a single output type
   # and combine two datasets
   valid_tbl <- validate_input_data(forecast_data, oracle_output_data)
 
-  # validate that the selected metric is suitable for each output_type
-  unique_output_type <- unique(valid_tbl$output_type)
-  check_metric_selection(unique_output_type, scoring_rule)
-
   # forecast_dates
-  forecast_date_list <- valid_tbl |>
-    dplyr::select(
-      dplyr::any_of(
-        c("forecast_date", "origin_date", "reference_date")
-      )
-    ) |>
-    dplyr::pull() |>
-    unique()
+  forecast_date_list <- unique(valid_tbl$reference_date)
 
   # Give a message for the user to check the forecast dates
   message(sprintf(

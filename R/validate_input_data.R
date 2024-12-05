@@ -4,8 +4,9 @@
 #' coerced to a model_out_tbl format.
 #' @param oracle_output_data A data.frame with the target values.
 #' This data must follow the oracle output format.
-#' @return a model_out_tbl format that has a single output type
-#' @export
+#' @return a model_out_tbl format that contains forecast data and target data
+#' with a single output type.
+#'
 #' @import hubUtils
 #' @import dplyr
 #' @examples \dontrun{
@@ -49,11 +50,15 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
   }
 
   # Check if there is exactly one column representing the forecast date
-  columns_to_check <- c("forecast_date", "origin_date", "reference_date")
-  if (length(intersect(colnames(valid_tbl), columns_to_check)) != 1) {
+  possible_col_names <- c("forecast_date", "origin_date", "reference_date")
+  matching_name <- intersect(colnames(valid_tbl), possible_col_names)
+  if (length(matching_name) == 1) {
+    # standardize the column to a single unified name:'reference_date'
+    names(valid_tbl)[names(valid_tbl) == matching_name] <- "reference_date"
+  } else {
     stop(
       "The input 'forecast_data' must contain exactly one of the columns: ",
-      paste0("'", columns_to_check, "'", collapse = ", "), "."
+      paste0("'", possible_col_names, "'", collapse = ", "), "."
     )
   }
 
