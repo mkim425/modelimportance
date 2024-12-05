@@ -36,19 +36,6 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
     # Validate a `model_out_tbl` object
     hubUtils::validate_model_out_tbl()
 
-  # Check if NA exists in the target
-  if (sum(is.na(valid_tbl$target)) != 0) {
-    stop("The target has a missing value.")
-  }
-
-  # Check if the data contain a single target
-  num_target <- valid_tbl$target |>
-    unique() |>
-    length()
-  if (num_target != 1) {
-    stop("The input data must contain a single target.")
-  }
-
   # Check if NA exists in the output type
   if (sum(is.na(valid_tbl$output_type)) != 0) {
     stop("The output type has a missing value.")
