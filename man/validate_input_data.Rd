@@ -2,7 +2,7 @@
 % Please edit documentation in R/validate_input_data.R
 \name{validate_input_data}
 \alias{validate_input_data}
-\title{Check the input forecast data structure}
+\title{Check the input forecast data structure and validate it.}
 \usage{
 validate_input_data(forecast_data, oracle_output_data)
 }
@@ -14,11 +14,10 @@ coerced to a model_out_tbl format.}
 This data must follow the oracle output format.}
 }
 \value{
-a model_out_tbl format that contains forecast data and target data
-with a single output type.
+a model_out_tbl format for forecast data
 }
 \description{
-Check the input forecast data structure
+Check the input forecast data structure and validate it.
 }
 \examples{
 \dontrun{
