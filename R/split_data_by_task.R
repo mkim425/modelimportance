@@ -10,12 +10,13 @@
 #'
 #' @examples \dontrun{
 #' library(dplyr)
+#' library(purrr)
 #' library(hubExamples)
 #' forecast_data <- hubExamples::forecast_outputs |>
 #'   dplyr::filter(
-#'     output_type %in% c("quantile"),
-#'     location == "25",
-#'     horizon == 1
+#'     output_type %in% c("mean"),
+#'     location %in% c("25", "48"),
+#'     horizon %in% c(1, 2)
 #'   )
 #' target_data <- hubExamples::forecast_target_ts |>
 #'   dplyr::filter(
@@ -28,16 +29,43 @@
 #'     oracle_value = observation
 #'   )
 #' valid_tbl <- validate_input_data(forecast_data, target_data)
-#' split_data_by_task(valid_tbl)
+#' split_data_by_task(valid_tbl, weighted = FALSE, training_window_length = 0)
+#' split_data_by_task(valid_tbl, weighted = TRUE, training_window_length = 1)
 #' }
-split_data_by_task <- function(valid_tbl) {
-  # Get columns to use for splitting data by task
-  split_cols <- c("horizon", "location", "target_end_date")
+split_data_by_task <- function(valid_tbl, weighted, training_window_length) {
+  # Use of a trained ensemble or not.
+  training_status <- ifelse(weighted, "trained", "untrained")
 
-  # List of data sets split by task
-  datasets_by_task <- valid_tbl |>
-    dplyr::group_by(across(all_of(split_cols))) |>
-    dplyr::group_split()
+  # Split data and make a list of data sets
+  if (training_status == "untrained") {
+    # Get columns to use for splitting data by task
+    split_cols <- c("horizon", "location", "target_end_date")
+    # List of data split by task
+    list_datasets <- valid_tbl |>
+      dplyr::group_by(across(all_of(split_cols))) |>
+      dplyr::group_split()
+  } else {
+    # List of reference dates
+    all_ref_dates <- sort(unique(valid_tbl$reference_date))
+    # Length of reference dates
+    len_ref_dates <- length(all_ref_dates)
+    if (len_ref_dates <= training_window_length) {
+      stop(
+        "The number of reference_date must greater than the training window
+        length."
+      )
+    } else {
+      # Create a list of data split by reference date including the training
+      list_datasets <- list()
+      for (i in 1:(len_ref_dates - training_window_length)) {
+        list_datasets[[i]] <- valid_tbl |>
+          dplyr::filter(
+            .data$reference_date <= all_ref_dates[i + training_window_length],
+            .data$reference_date >= all_ref_dates[i]
+          )
+      }
+    }
+  }
 
-  return(datasets_by_task)
+  return(list_datasets)
 }

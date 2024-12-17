@@ -4,7 +4,7 @@
 \alias{split_data_by_task}
 \title{Split the input data by a single task.}
 \usage{
-split_data_by_task(valid_tbl)
+split_data_by_task(valid_tbl, weighted, training_window_length)
 }
 \arguments{
 \item{valid_tbl}{A data.frame containing forecast data and target data,
@@ -20,12 +20,13 @@ combination of horizon, location, and target_end_date
 \examples{
 \dontrun{
 library(dplyr)
+library(purrr)
 library(hubExamples)
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
-    output_type \%in\% c("quantile"),
-    location == "25",
-    horizon == 1
+    output_type \%in\% c("mean"),
+    location \%in\% c("25", "48"),
+    horizon \%in\% c(1, 2)
   )
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
@@ -38,6 +39,7 @@ target_data <- hubExamples::forecast_target_ts |>
     oracle_value = observation
   )
 valid_tbl <- validate_input_data(forecast_data, target_data)
-split_data_by_task(valid_tbl)
+split_data_by_task(valid_tbl, weighted = FALSE, training_window_length = 0)
+split_data_by_task(valid_tbl, weighted = TRUE, training_window_length = 1)
 }
 }
