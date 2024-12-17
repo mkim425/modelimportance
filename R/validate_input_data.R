@@ -1,11 +1,10 @@
-#' Check the input forecast data structure
+#' Check the input forecast data structure and validate it.
 #'
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format.
 #' @param oracle_output_data A data.frame with the target values.
 #' This data must follow the oracle output format.
-#' @return a model_out_tbl format that contains forecast data and target data
-#' with a single output type.
+#' @return a model_out_tbl format for forecast data
 #'
 #' @import hubUtils
 #' @import dplyr
@@ -67,29 +66,11 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
     oracle_output_data$target_end_date
   )
   # Check if all values in the target_end_date column of the forecast data are
-  # present in the target data
+  # present in the oracle_output_data
   if (!all(valid_tbl$target_end_date %in% oracle_output_data$target_end_date)) {
     stop("All values in the 'target_end_date' column of the forecast data must
          present in the 'target_end_date' column of the target data.")
   }
-
-  # get task_id columns to use for joining forecast and target data
-  indep_task_id_cols <- c("location", "target_end_date", "age_group", "target")
-  if (unique(valid_tbl$output_type) %in% c("pmf", "cdf")) {
-    task_id_cols <- intersect(
-      colnames(oracle_output_data),
-      c(indep_task_id_cols, "output_type", "output_type_id")
-    )
-  } else {
-    task_id_cols <- intersect(
-      colnames(oracle_output_data),
-      c(indep_task_id_cols, "output_type")
-    )
-  }
-
-  # Combine forecast data and target data into a single data frame
-  valid_tbl <- valid_tbl |>
-    dplyr::left_join(oracle_output_data, by = task_id_cols)
 
   return(valid_tbl)
 }
