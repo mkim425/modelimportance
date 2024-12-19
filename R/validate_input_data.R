@@ -40,12 +40,18 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
     stop("The output type has a missing value.")
   }
 
-  # Check if the data contain a single output type
-  num_output_type <- valid_tbl$output_type |>
-    unique() |>
-    length()
-  if (num_output_type != 1) {
+  # Check the output type
+  unique_output_type <- unique(valid_tbl$output_type)
+  # The data must contain a single output type
+  if (length(unique_output_type) != 1) {
     stop("The input data must contain a single output type.")
+  }
+  # The output_type must be one of 'median', 'quantile', 'mean', or 'pmf'
+  if (!unique_output_type %in% c("median", "quantile", "mean", "pmf")) {
+    stop(
+      "The output type is not supported.
+      It must be one of 'median', 'mean', 'quantile', or 'pmf'."
+    )
   }
 
   # Check if there is exactly one column representing the forecast date
