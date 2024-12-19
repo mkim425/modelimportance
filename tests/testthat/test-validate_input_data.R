@@ -48,6 +48,18 @@ test_that("validate_input_data() requires a single output type in a dataset", {
   )
 })
 
+test_that("The output type must be one of specified types", {
+  forecast_mix <- rbind(forecast_means, forecast_quantiles)
+  forecast_mix$output_type <- "invalid"
+
+  # test
+  expect_error(
+    validate_input_data(forecast_mix, target_data),
+    "The output type is not supported.
+      It must be one of 'median', 'mean', 'quantile', or 'pmf'."
+  )
+})
+
 test_that("validate_input_data() requires exactly one forecast date column", {
   forecast_quantiles2 <- forecast_quantiles |>
     mutate(origin_date = reference_date)
