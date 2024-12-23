@@ -5,7 +5,13 @@
 #'
 #' @param valid_tbl A data.frame containing forecast data and target data,
 #' processed by the function `validate_input_data()`.
-#'
+#' @param weighted Boolean indicating whether model weighting should be done.
+#' If `FALSE`, all models are given equal weight.
+#' If `TRUE`, model weights are estimated.
+#' @param training_window_length An integer value representing the time interval
+#' of historical data used during the training process
+#' to estimate model weights.
+#' Default is `0`, meaning that no prior data is available for training.
 #' @return A list of data sets, each corresponding to a single task.
 #'
 #' @examples \dontrun{

@@ -9,6 +9,15 @@ split_data_by_task(valid_tbl, weighted, training_window_length)
 \arguments{
 \item{valid_tbl}{A data.frame containing forecast data and target data,
 processed by the function `validate_input_data()`.}
+
+\item{weighted}{Boolean indicating whether model weighting should be done.
+If `FALSE`, all models are given equal weight.
+If `TRUE`, model weights are estimated.}
+
+\item{training_window_length}{An integer value representing the time interval
+of historical data used during the training process
+to estimate model weights.
+Default is `0`, meaning that no prior data is available for training.}
 }
 \value{
 A list of data sets, each corresponding to a single task.
