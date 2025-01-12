@@ -1,4 +1,4 @@
-#' @title Quantify ensemble component model contributions to ensemble
+#' @title Quantify overall contributions of ensemble component model to ensemble
 #' prediction accuracy
 #' @description
 #' Evaluate ensemble component model's importance based on a measure of their
@@ -53,7 +53,7 @@
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
 #' @return A data.frame with columns
-#' `task_id`, `output_type`, `model`, `importance_score`.
+#' `task_id`, `output_type`, `model_id`, `importance_score`.
 #' @import hubExamples
 #' @export
 #' @details
@@ -63,7 +63,7 @@
 #' `cdf`, and `oracle_value` column for the observed values.
 #' TBD for more details.
 #'
-#' Additional argument in ... is `agg_fun`, which is a character string name
+#' Additional argument in `...` is `agg_fun`, which is a character string name
 #' for a function specifying aggregation method of component model outputs.
 #' Default is `mean`, meaning that equally (or weighted) mean is calculated
 #' across all component model outputs for each unique `output_type_id`.
@@ -121,7 +121,6 @@ model_importance <- function(forecast_data,
   )
 
   # validate input data: get a model_out_tbl format with a single output type
-  # and combine two datasets
   valid_tbl <- validate_input_data(forecast_data, oracle_output_data)
 
   # forecast_dates
@@ -132,6 +131,16 @@ model_importance <- function(forecast_data,
     "The input data has forecast from %s to %s.
     There are a total of %d forecast dates.",
     min(forecast_date_list), max(forecast_date_list), length(forecast_date_list)
+  ))
+
+  # model ids
+  model_id_list <- unique(valid_tbl$model_id)
+
+  # Give a message for the user to check the model IDs
+  message(paste(
+    "The available model IDs are:\n",
+    paste("\t", model_id_list, collapse = "\n"),
+    "\n(a total of", length(model_id_list), "models)\n"
   ))
 
   score_result <- forecast_data
