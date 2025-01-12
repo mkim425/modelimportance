@@ -2,5 +2,7 @@
 
 export(model_importance)
 import(dplyr)
+import(hubEnsembles)
+import(hubEvals)
 import(hubExamples)
 import(hubUtils)
