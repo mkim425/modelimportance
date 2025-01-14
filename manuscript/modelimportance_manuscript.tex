@@ -1,0 +1,438 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  article,
+  shortnames,
+  notitle]{jss}
+
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else  
+    % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\usepackage{orcidlink,thumbpdf,lmodern}
+
+\newcommand{\class}[1]{`\code{#1}'}
+\newcommand{\fct}[1]{\code{#1()}}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\makeatletter
+\@ifpackageloaded{tcolorbox}{}{\usepackage[skins,breakable]{tcolorbox}}
+\makeatother
+\makeatletter
+\@ifundefined{shadecolor}{\definecolor{shadecolor}{rgb}{.97, .97, .97}}{}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, frame hidden, interior hidden, borderline west={3pt}{0pt}{shadecolor}, breakable, enhanced, sharp corners]}{\end{tcolorbox}}\fi
+\makeatother
+
+\usepackage{bookmark}
+
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={: An  package for evaluating model importance within an ensemble},
+  pdfauthor={Minsu Kim; Nicholas G. Reich},
+  pdfkeywords={ensemble, forecast, prediction, model importance, Shapley
+value, R},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+%% -- Article metainformation (author, title, ...) -----------------------------
+
+%% Author information
+\author{Minsu Kim~\orcidlink{0009-0008-4637-3589}\\University of
+Massachusetts Amherst \And Nicholas G.
+Reich~\orcidlink{0000-0003-3503-9899}\\University of Massachusetts
+Amherst}
+\Plainauthor{Minsu Kim, Nicholas G. Reich} %% comma-separated
+
+\title{\pkg{modelimportance}: An \proglang{R} package for evaluating
+model importance within an ensemble}
+\Plaintitle{: An package for evaluating model importance within an
+ensemble} %% without formatting
+
+%% an abstract and keywords
+\Abstract{Ensemble forecasts are commonly used to support
+decision-making and policy planning across various fields because they
+often offer improved accuracy and stability compared to individual
+models. As each model has its own unique characteristics, understanding
+and measuring the value each constituent model adds to the overall
+accuracy of the ensemble is of great interest to building effective
+ensembles. The \proglang{R} package \pkg{modelimportance} provides tools
+to quantify how each component model contributes to the acccuracy of
+ensemble performance for different forecast types. It supports multiple
+functionalities; it allows users to specify which ensemble approach to
+implement and which model importance metric to use. Additionally, the
+software offers customizable options for handling missing values. These
+features enable the package to serve as a versatile tool for researchers
+and practitioners aiming to construct an effective ensemble model across
+a wide range of forecasting tasks.}
+
+%% at least one keyword must be supplied
+\Keywords{ensemble, forecast, prediction, model importance, Shapley
+value, R}
+\Plainkeywords{ensemble, forecast, prediction, model importance, Shapley
+value, R}
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{50}
+%% \Issue{9}
+%% \Month{June}
+%% \Year{2012}
+%% \Submitdate{2012-06-04}
+%% \Acceptdate{2012-06-04}
+%% \setcounter{page}{1}
+%% \Pages{1--xx}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+Minsu Kim\\
+E-mail: \email{minsu@umass.edu}\\
+\\~
+Nicholas G. Reich\\
+\\~
+
+}
+
+\begin{document}
+\maketitle
+
+
+\section{Introduction}\label{sec-intro}
+
+Ensemble forecasting is a method to produce a single, consolidated
+prediction by combining forecasts generated from different models. This
+technique leverages the strengths of individual models while mitigating
+their weaknesses, leading to more robust and accurate predictions
+\citep{gneiting2005weather, hastie01statisticallearning, lutz_applying_2019, viboud_rapidd_2018}.
+Specifically, ensembles aggregate diverse insights from various models
+and handle variance and bias more effectively by averaging out the
+biases and variations of individual models, which can reduce prediction
+errors and improve overall model performance. Due to these enhanced
+prediction accuracy and robustness, it is widely used across various
+domains such as weather forecasting
+\citep{Guerra_2020, gneiting2005weather}, financial modeling
+\citep{SUN2020101160, math11041054}, and infectious disease outbreak
+forecasting \citep{ray_prediction_2018, reich_accuracy_2019} to improve
+decision-making and achieve more reliable predictions. For example,
+throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub collected
+individual models developed by over 90 different research groups and
+built a probabilistic ensemble forecasting model for COVID-19 cases,
+hospitalizations, and deaths in the US based on those models'
+predictions, which served as the official short-term forecasts for the
+US Centers for Disease Control and Prevention (CDC) \citep{kim2024}.
+
+The quality of forecasts is assessed by evaluating their error, bias,
+sharpness, and/or calibration using different scoring metrics. The
+selection of the scoring metrics depends on the type of forecast, such
+as point forecasts and probabilistic forecasts, and their corresponding
+formats, such as median/mean, quantiles, and predictive cumulative
+distribution functions. The mean absolute error (MAE) and the mean
+squared error (MSE) are the commonly used measures for point forecast
+accuracy. They provide a direct assessment of the accuracy of specific
+forecasted values by calculating the average magnitude of errors.
+Probabilistic forecasts are typically assessed using proper scoring
+rules, which consider the uncertainty and variability in predictions,
+providing concise evaluations through numerical scores
+\citep{gneiting_strictly_2007}. Some examples include the weighted
+interval score (WIS) for the quantile-based forecasts and the continuous
+ranked probability score (CRPS) for the forecasts taking the form of
+predictive cumulative distribution functions
+\citep{bracher_evaluating_2021}.
+
+Several \proglang{R} packages have been developed for this purpose. To
+name a few, the \pkg{forecast} package \citep{Rpackage-forecast} is
+widely used for univariate time series forecasting and includes
+functions for accuracy measurement. The \pkg{Metrics}
+\citep{Rpackage-Metrics} and \pkg{MLmetrics} \citep{Rpackage-MLmetrics}
+provide a wide range of performance metrics specifically designed for
+evaluating machine learning models. The \pkg{scoringRules}
+\citep{Rpackage-scoringRules} package offers a comprehensive set of
+proper scoring rules for evaluating probabilistic forecasts and supports
+both univariate and multivariate settings. The \pkg{scoringutils}
+\citep{bosse2022evaluating} package adds to the functionality provided
+by \pkg{scoringRules}, offering additional features that make it more
+useful for certain tasks, such as summarizing, comparing, and
+visualizing forecast performance. Additionally, the \pkg{scoringutils}
+supports forecasts represented by predictive samples or quantiles of
+predictive distributions, allowing for the assessment of any forecast
+type, even when a closed-form expression for a parametric distribution
+is not available. These packages have been valuable to evaluate
+individual models as independent entities, using performance metrics
+selected for each specific situation or problem type. However, they do
+not measure the individual models' contributions to the enhanced
+predictive accuracy when used as part of an ensemble. Kim et al.
+\citep{kim2024} demonstrate that a model's individual performance does
+not necessarily correspond to its contribution as a component within an
+ensemble. Our developed package introduces this capability. The
+\pkg{modelimportance} package provides tools to evaluate the role of
+each model as an ensemble member within an ensemble model, rather than
+focusing on the individual predictive performance per se.
+
+In ensemble forecasting, certain models contribute more significantly to
+the overall predictions than others. Assessing the impact of each
+component model on ensemble predictions is methodologically similar to
+determining variable importance in traditional regression and machine
+learning models, where variable importance measures evaluate how much
+individual variables enhance the model's predictive performance.
+\proglang{R} packages that implement these functions include
+\pkg{randomForest} \citep{Rpackage-randomForest}, \pkg{caret}
+\citep{Rpackage-caret}, \pkg{xgboost} \citep{Rpackage-xgboost}, and
+\pkg{gbm} \citep{Rpackage-gbm}, each providing variable importance
+measures for different types of models: random forest models, general
+machine learning models, extreme gradient boosting models, and
+generalized boosted regression models, respectively. Similarly, the
+tools in the \pkg{modelimportance} package quantify the contribution of
+each component model within an ensemble to the ensemble model's
+predictive performance. They assign numerical scores to each model based
+on a selected metric that measures forecast accuracy, depending on the
+forecast type.
+
+These capabilities provide unique support for hub organizers, such as
+the CDC in the US and the European Centre for Disease Prevention and
+Control in the EU. By enabling precise evaluation of each model's
+contribution, the \pkg{modelimportance} package helps these
+organizations gather and utilize forecasts from various models to create
+more effective ensemble forecasts. This, in turn, facilitates better
+communication with the public and decision-makers and enhances the
+overall decision-making process. Specifically, \pkg{modelimportance} is
+incorporated into the `hubverse', which is a collection of open-source
+software and data tools developed to promote collaborative modeling hub
+efforts and reduce the effort required to set up and operate them
+\citep{hubverse_docs}. This package adheres to the model output formats
+specified by the hubverse convention, which enables seamless integration
+and interoperability with other forecasting tools and systems.
+
+The paper proceeds as follows. In Section 2, we address the model output
+formats proposed within the hubverse framework and the structure of
+forecasts, followed by a motivating example. Section 3 presents two
+algorithms implemented in \pkg{modelimportance} for calculating the
+model importance metric: leave-one-model-out and
+leave-all-subsets-of-models-out. We demonstrate the various
+functionalities \pkg{modelimportance} supports in Section 4 and give
+some examples in Section 5. We close this paper with some concluding
+remarks and a discussion of possible extensions.
+
+\section{Data}\label{sec-data}
+
+\subsection{Model output format}\label{subsec-model_output_format}
+
+Model outputs are structured in a tabular format designed specifically
+for predictions. In the hubverse standard, each row represents an
+individual prediction for a single task, and its details are described
+in multiple columns through which one can identify the model IDs, task
+characteristics, prediction representation type, and predicted values
+\citep{Shandross2024}. In Table~\ref{tbl-example-model_output}, for
+example, the \texttt{model\_id} column contains the uniquely identified
+name of the model that produced the prediction in each row. Task
+characteristics are represented by \texttt{reference\_date},
+\texttt{target}, \texttt{horizon}, \texttt{location}, and
+\texttt{target\_end\_date} columns, collectively referred to as the task
+ID columns. The type of prediction outputs is identified by the
+prediction representation type specified in the \texttt{output\_type}
+and \texttt{output\_type\_id} columns. This example illustrates
+short-term forecasts of incident influenza hospitalizations in the U.S.
+for Massachusetts (FIPS code 25), generated by the model
+`Flusight-baseline' on November 19, 2022. The forecasts are provided in
+seven quantiles (0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95) for each target
+end date.
+
+\begin{table}
+
+\centering{
+
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}{lllrllllr}
+\toprule
+model\_id & reference\_date & target & horizon & location & target\_end\_date & output\_type & output\_type\_id & value\\
+\midrule
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 0 & 25 & 2022-11-19 & quantile & 0.05 & 22\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 0 & 25 & 2022-11-19 & quantile & 0.1 & 31\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 0 & 25 & 2022-11-19 & quantile & 0.25 & 45\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 0 & 25 & 2022-11-19 & quantile & 0.5 & 51\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 0 & 25 & 2022-11-19 & quantile & 0.75 & 57\\
+\addlinespace
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 0 & 25 & 2022-11-19 & quantile & 0.9 & 71\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 0 & 25 & 2022-11-19 & quantile & 0.95 & 80\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 1 & 25 & 2022-11-26 & quantile & 0.05 & 5\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 1 & 25 & 2022-11-26 & quantile & 0.1 & 21\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 1 & 25 & 2022-11-26 & quantile & 0.25 & 38\\
+\bottomrule
+\end{tabular}}
+
+}
+
+\caption{\label{tbl-example-model_output}Example of the model output for
+incident influenza hospitalizations extracted from
+\texttt{forecast\_outputs} data in the \pkg{hubExamples} package.}
+
+\end{table}%
+
+\subsection{Structure of forecasts}\label{subsec-structure_of_forecasts}
+
+The output of the forecasting model can be represented in various types.
+Generally, quantitative forecasts can be categorized into either point
+forecasts or probabilistic forecasts. For a specific task, point
+forecasts, represented by a single predicted value, provide a clear and
+concise prediction, making them easy to interpret and communicate.
+Probabilistic forecasts, on the other hand, describe the likelihood of
+different outcomes, conveying the uncertainty inherent in the
+prediction. These forecasts are represented by a probability
+distribution over possible future values in various ways, such as
+probability mass functions (pmf), cumulative distribution functions
+(cdf), or probability quantiles (or intervals).
+
+
+  \bibliography{references.bib}
+
+
+
+\end{document}
