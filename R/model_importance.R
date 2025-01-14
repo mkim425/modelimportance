@@ -89,7 +89,7 @@
 #'     target_end_date = date,
 #'     oracle_value = observation
 #'   )
-#'
+#' # Example with the default arguments.
 #' model_importance(
 #'   forecast_data = forecast_data, oracle_output_data = target_data,
 #'   ensemble_fun = "simple_ensemble", weighted = FALSE,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/model_importance.R
 \name{model_importance}
 \alias{model_importance}
-\title{Quantify ensemble component model contributions to ensemble
+\title{Quantify overall contributions of ensemble component model to ensemble
 prediction accuracy}
 \usage{
 model_importance(
@@ -64,7 +64,7 @@ as `"simple_ensemble"`. See 'Details'.}
 }
 \value{
 A data.frame with columns
-`task_id`, `output_type`, `model`, `importance_score`.
+`task_id`, `output_type`, `model_id`, `importance_score`.
 }
 \description{
 Evaluate ensemble component model's importance based on a measure of their
@@ -90,7 +90,7 @@ independent task ID columns (e.g. `location`, `target_date`, and `age_group`)
 `cdf`, and `oracle_value` column for the observed values.
 TBD for more details.
 
-Additional argument in ... is `agg_fun`, which is a character string name
+Additional argument in `...` is `agg_fun`, which is a character string name
 for a function specifying aggregation method of component model outputs.
 Default is `mean`, meaning that equally (or weighted) mean is calculated
 across all component model outputs for each unique `output_type_id`.
@@ -118,7 +118,7 @@ target_data <- hubExamples::forecast_target_ts |>
     target_end_date = date,
     oracle_value = observation
   )
-
+# Example with the default arguments.
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble", weighted = FALSE,
