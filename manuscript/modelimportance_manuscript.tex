@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, borderline west={3pt}{0pt}{shadecolor}, sharp corners, enhanced, boxrule=0pt, frame hidden, interior hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, interior hidden, breakable, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, frame hidden, sharp corners]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -585,7 +585,68 @@ implement LOMO and LASOMO for a single prediction task, respectively.
 
 \section{Evaluating ensemble members}\label{evaluating-ensemble-members}
 
-\ldots{}
+In this section, we describe the functionalities of the main function
+\texttt{model\_importance()}, where multiple options are available to
+customize the evaluation framework (Table~\ref{tbl-arguments}).
+
+\begin{verbatim}
+model_importance(forecast_data, oracle_output_data, 
+        ensemble_fun, weighted, training_window_length,
+        importance_algorithm, subset_wt, na_action, ...)
+\end{verbatim}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2973}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2162}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2432}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2432}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Argument
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Possible Values
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Argument
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Possible Values
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\tabularnewline
+\caption{Description of the arguments for the
+\texttt{model\_importance()} function, including their purpose, possible
+values, and default settings.}\label{tbl-arguments}\tabularnewline
+\endlastfoot
+forecast\_data & Forecasts & Must be the model output format & N/A \\
+oracle\_output\_data & Ground truth data & Must be the oracle output
+format & N/A \\
+ensemble\_fun & Ensemble method & \texttt{simple\_ensemble},
+\texttt{linear\_pool} & \texttt{simple\_ensemble} \\
+training\_window\_length & Time interval of historical data used during
+the training process & Non-negative integer & 0 \\
+importance\_algorithm & Algorithm to calculate importance &
+\texttt{lomo}, \texttt{lasomo} & \texttt{lomo} \\
+subset\_wt & Method for assigning weight to subsets when using
+\texttt{lasomo} algorithm & \texttt{equal}, \texttt{perm\_based} &
+\texttt{equal} \\
+na\_action & Method to handle missing data & \texttt{worst},
+\texttt{average}, \texttt{drop} & \texttt{worst} \\
+\(\cdots\) & Optional arguments for \texttt{simple\_ensemble} & Varies &
+\texttt{agg\_fun}=\texttt{mean} \\
+\end{longtable}
 
 \section{Examples}\label{examples}
 
@@ -595,11 +656,27 @@ implement LOMO and LASOMO for a single prediction task, respectively.
 
 Multi-model ensemble forecasts often provide better accuracy and
 robustness than single models, and are widely used in decision-making
-and policy planning across a variety of domains. The contribution of
-each component model to the accuracy of the ensemble depends on its own
+and policy planning across various domains. The contribution of each
+component model to the accuracy of the ensemble depends on its own
 unique characteristics. The \pkg{modelimportance} package enables the
 quantification of the value that each component model adds to the
 ensemble performance in different evaluation contexts.
+
+The primary function of the package is \texttt{model\_importance()},
+which returns a data frame with component models and their importance
+metrics. It allows users to choose the ensemble approach and model
+importance algorithm, selecting between LOMO and LASOMO. Additionally,
+it provides customizable options for handling missing values. These
+features enable the package to serve as a versatile tool to aid
+collaborative efforts to construct an effective ensemble model across a
+wide range of forecasting tasks.
+
+There is a room to enhance the current version of this package.
+
+\(\vdots\)
+
+These extensions would aim to broaden the scope of applications in
+real-world forecasting tasks.
 
 
   \bibliography{references.bib}

@@ -191,9 +191,30 @@ Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to implement LO
 
 ## Evaluating ensemble members 
 
+In this section, we describe the functionalities of the main function `model_importance()`, where multiple options are available to customize the evaluation framework (@tbl-arguments).
 
-...
+```r
+model_importance(forecast_data, oracle_output_data, 
+        ensemble_fun, weighted, training_window_length,
+        importance_algorithm, subset_wt, na_action, ...)
+```
 
+
+
+
+
+
+| Argument  | Description | Possible Values | Default|
+|----------------------|----------------|------------------|------------------|
+|forecast_data| Forecasts | Must be the model output format| N/A |
+|oracle_output_data | Ground truth data | Must be the oracle output format| N/A|
+|ensemble_fun |Ensemble method | `simple_ensemble`, `linear_pool`|`simple_ensemble`|
+|training_window_length | Time interval of historical data used during the training process | Non-negative integer | 0 |
+|importance_algorithm| Algorithm to calculate importance| `lomo`, `lasomo`| `lomo`| 
+|subset_wt | Method for assigning weight to subsets when using `lasomo` algorithm| `equal`, `perm_based`| `equal` |
+|na_action | Method to handle missing data| `worst`, `average`, `drop`| `worst`|
+|$\cdots$ | Optional arguments for `simple_ensemble`| Varies | `agg_fun`=`mean`|
+: Description of the arguments for the `model_importance()` function, including their purpose, possible values, and default settings. {#tbl-arguments}
 
 
 ## Examples
@@ -201,4 +222,13 @@ Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to implement LO
 
 ## Summary and discussion
 
-Multi-model ensemble forecasts often provide better accuracy and robustness than single models, and are widely used in decision-making and policy planning across a variety of domains. The contribution of each component model to the accuracy of the ensemble depends on its own unique characteristics. The [modelimportance]{.pkg} package enables the quantification of the value that each component model adds to the ensemble performance in different evaluation contexts. 
+Multi-model ensemble forecasts often provide better accuracy and robustness than single models, and are widely used in decision-making and policy planning across various domains. The contribution of each component model to the accuracy of the ensemble depends on its own unique characteristics. The [modelimportance]{.pkg} package enables the quantification of the value that each component model adds to the ensemble performance in different evaluation contexts. 
+
+The primary function of the package is `model_importance()`, which returns a data frame with component models and their importance metrics. It allows users to choose the ensemble approach and model importance algorithm, selecting between LOMO and LASOMO. Additionally, it provides customizable options for handling missing values. These features enable the package to serve as a versatile tool to aid collaborative efforts to construct an effective ensemble model across a wide range of forecasting tasks.
+
+
+There is a room to enhance the current version of this package.
+
+$\vdots$
+
+These extensions would aim to broaden the scope of applications in real-world forecasting tasks.
