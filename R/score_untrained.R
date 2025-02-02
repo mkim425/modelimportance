@@ -95,6 +95,7 @@
 score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
                             ensemble_fun, importance_algorithm, subset_wt,
                             metric, ...) {
+  # Compute importance score when importance_algorithm is 'lomo'
   if (importance_algorithm == "lomo") {
     ens_all <- switch(ensemble_fun,
       "simple_ensemble" = hubEnsembles::simple_ensemble(single_task_data,
@@ -123,9 +124,10 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
         )
       )
     })
-    ensemble_data <- rbind(ens_all, ens_lomo)
+    ensemble_data <- rbind(ens_all, dplyr::bind_rows(ens_lomo))
     # score the ensemble forecasts
-    score_ens_all <- score_model_out(ensemble_data, oracle_output_data,
+    score_ens_all <- score_model_out(ensemble_data,
+      oracle_output_data |> rename(observation = oracle_value),
       metrics = metric
     )
   } else {
