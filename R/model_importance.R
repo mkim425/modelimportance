@@ -123,6 +123,12 @@ model_importance <- function(forecast_data,
   # validate input data: get a model_out_tbl format with a single output type
   valid_tbl <- validate_input_data(forecast_data, oracle_output_data)
 
+  # validate ensemble_fun when output_type is median
+  data_output_type <- unique(valid_tbl$output_type)
+  if (data_output_type == "median" && ensemble_fun == "linear pool") {
+    stop("Error: 'linear pool' cannot be used when output type is 'median'.")
+  }
+
   # forecast_dates
   forecast_date_list <- unique(valid_tbl$reference_date)
 
