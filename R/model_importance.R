@@ -125,7 +125,7 @@ model_importance <- function(forecast_data,
 
   # validate ensemble_fun when output_type is median
   data_output_type <- unique(valid_tbl$output_type)
-  if (data_output_type == "median" && ensemble_fun == "linear pool") {
+  if (data_output_type == "median" && ensemble_fun == "linear_pool") {
     stop("Error: 'linear pool' cannot be used when output type is 'median'.")
   }
 
