@@ -13,7 +13,9 @@ RoxygenNote: 7.3.2
 Imports:
     hubUtils,
     dplyr,
-    hubExamples
+    hubExamples,
+    hubEvals,
+    hubEnsembles
 Depends: 
     R (>= 2.10)
 Suggests: 
@@ -21,4 +23,6 @@ Suggests:
 Config/testthat/edition: 3
 Remotes:
     hubverse-org/hubUtils,
-    hubverse-org/hubExamples
+    hubverse-org/hubExamples,
+    hubverse-org/hubEvals,
+    hubverse-org/hubEnsembles
