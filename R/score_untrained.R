@@ -95,6 +95,9 @@
 score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
                             ensemble_fun, importance_algorithm, subset_wt,
                             metric, ...) {
+  # models in the single_task_data
+  models <- unique(single_task_data$model_id)
+  missing_model <- setdiff(model_id_list, single_task_data$model_id)
   # Compute importance score when importance_algorithm is 'lomo'
   if (importance_algorithm == "lomo") {
     ens_all <- switch(ensemble_fun,
@@ -107,12 +110,11 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
         model_id = "enseble-all"
       )
     )
-    # models in the single_task_data
-    models <- unique(single_task_data$model_id)
+
     # build ensemble forecasts by leaving one model out
     ens_lomo <- lapply(models, function(x) {
       single_task_data_lomo <- single_task_data |>
-        dplyr::filter(model_id != x)
+        dplyr::filter(.data$model_id != x)
       switch(ensemble_fun,
         "simple_ensemble" = hubEnsembles::simple_ensemble(single_task_data_lomo,
           weights = NULL,
@@ -127,11 +129,39 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
     ensemble_data <- rbind(ens_all, dplyr::bind_rows(ens_lomo))
     # score the ensemble forecasts
     score_ens_all <- score_model_out(ensemble_data,
-      oracle_output_data |> rename(observation = oracle_value),
+      oracle_output_data,
       metrics = metric
-    )
+    ) |>
+      rename(calculated_metric = any_of(
+        c("ae_point", "se_point", "wis", "log_score")
+      )) |>
+      left_join(ensemble_data, by = "model_id")
+    # calculate importance scores
+    df_importance <- score_ens_all |>
+      dplyr::mutate(
+        importance = .data$calculated_metric - first(.data$calculated_metric)
+      ) |>
+      dplyr::filter(.data$model_id != "enseble-all") |>
+      dplyr::mutate(model_id = gsub("ens.wo.", "", .data$model_id)) |>
+      dplyr::select(-.data$calculated_metric)
   } else {
-    score_ens_all <- NULL
+    df_importance <- NULL
   }
-  return(score_ens_all)
+  # Insert NAs for missing models
+  if (length(missing_model) > 0) {
+    # copy the first row of df_importance
+    new_rows <- df_importance[1, ]
+    # replicate the 1st row for the number of missing models
+    new_rows <- new_rows[rep(1, length(missing_model)), ]
+    # assign missing models to model_id
+    new_rows$model_id <- missing_model
+    # NA for all numeric columns, including 'importance'
+    new_rows <- new_rows |>
+      dplyr::mutate_if(is.numeric, ~NA)
+    # bind the new rows to df_importance
+    importance_scores <- bind_rows(df_importance, new_rows)
+  } else {
+    importance_scores <- df_importance
+  }
+  return(importance_scores)
 }
