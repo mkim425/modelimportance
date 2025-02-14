@@ -5,49 +5,25 @@
 #' contribution to the prediction accuracy of an untrained ensemble for each
 #' combination of model task.
 #'
+#' @inheritParams model_importance
 #' @param single_task_data A data.frame with the predictions for a single
 #' forecast task in a model_out_tbl format. The data must contain only one
 #' `output_type`, which must be one of the following:
 #' `mean`, `median`, `quantile`, or `pmf`.
-#' @param oracle_output_data Ground truth data for the variables that are used
-#' to define modeling targets. This data must follow the oracle output format.
 #' @param model_id_list A list of all component model IDs to be used in the
 #' ensemble. If a model is not present in the `single_task_data`, it means that
 #' the model did not submit predictions for the given task.
 #' This list is used to identify missing models in the ensemble.
-#' @param ensemble_fun A character string specifying a ensemble method, either
-#' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
-#' * When `"simple_ensemble"` is specified, the ensemble is generated using the
-#' optional `agg_fun` function in `...` (see 'Details'). It takes into account
-#' the weight option specified in `weighted`.
-#' * When `"linear_pool"` is specified, ensemble model outputs are created as
-#' a linear pool of component model outputs. This method supports only
-#' an `output_type` of `mean`, `quantile`, or `pmf`.
-#' @param importance_algorithm A character string specifying algorithm for model
-#' importance calculation; `c("lomo", "lasomo")`.
-#' `"lomo"` stands for leave-one-model-out and
-#' `"lasomo"` stands for leave all subsets of models out.
-#' @param subset_wt A character string specifying method for assigning weight
-#' to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.
 #' @param metric A character string specifying the metric to be used for scoring
 #' the model output. The metric is determined by the `output_type` and must be
 #' one of the following: `se_point`, `ae_point`, `wis`, or `log_score`.
-#' @param ... Optional arguments passed to `ensemble_fun` when it is specified
-#' as `"simple_ensemble"`. See 'Details'.
 #'
 #' @returns A data.frame with columns
 #' `task_id`, `output_type`, `model_id`, `task_level_importance`.
 #'
 #' @import hubEnsembles
 #' @import hubEvals
-#' @details
-#' Additional argument in `...` is `agg_fun`, which is a character string name
-#' for a function specifying aggregation method of component model outputs.
-#' Default is `mean`, meaning that equally (or weighted) mean is calculated
-#' across all component model outputs for each unique `output_type_id`.
-#' This can be `median` or a custom function (e.g., geometric_mean. Details
-#' can be found in
-#' https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
+#' @inherit model_importance details
 #'
 #' @examples \dontrun{
 #' library(dplyr)

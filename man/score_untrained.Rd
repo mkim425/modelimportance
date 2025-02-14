@@ -19,44 +19,51 @@ score_untrained(
 \arguments{
 \item{single_task_data}{A data.frame with the predictions for a single
 forecast task in a model_out_tbl format. The data must contain only one
-`output_type`, which must be one of the following:
-`mean`, `median`, `quantile`, or `pmf`.}
+\code{output_type}, which must be one of the following:
+\code{mean}, \code{median}, \code{quantile}, or \code{pmf}.}
 
 \item{oracle_output_data}{Ground truth data for the variables that are used
-to define modeling targets. This data must follow the oracle output format.}
+to define modeling targets. This data must follow the oracle output format.
+See 'Details'.}
 
 \item{model_id_list}{A list of all component model IDs to be used in the
-ensemble. If a model is not present in the `single_task_data`, it means that
+ensemble. If a model is not present in the \code{single_task_data}, it means that
 the model did not submit predictions for the given task.
 This list is used to identify missing models in the ensemble.}
 
 \item{ensemble_fun}{A character string specifying a ensemble method, either
-"simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
-* When `"simple_ensemble"` is specified, the ensemble is generated using the
-optional `agg_fun` function in `...` (see 'Details'). It takes into account
-the weight option specified in `weighted`.
-* When `"linear_pool"` is specified, ensemble model outputs are created as
+"simple_ensemble" or "linear_pool"; \code{c("simple_ensemble", "linear_pool")}.
+\itemize{
+\item When \code{"simple_ensemble"} is specified, the ensemble is generated using the
+optional \code{agg_fun} function in \code{...} (see 'Details').
+\item When \code{"linear_pool"} is specified, ensemble model outputs are created as
 a linear pool of component model outputs. This method supports only
-an `output_type` of `mean`, `quantile`, or `pmf`.}
+an \code{output_type} of \code{mean}, \code{quantile}, or \code{pmf}.
+}}
 
 \item{importance_algorithm}{A character string specifying algorithm for model
-importance calculation; `c("lomo", "lasomo")`.
-`"lomo"` stands for leave-one-model-out and
-`"lasomo"` stands for leave all subsets of models out.}
+importance calculation; \code{c("lomo", "lasomo")}.
+\code{"lomo"} stands for leave-one-model-out and
+\code{"lasomo"} stands for leave all subsets of models out.}
 
 \item{subset_wt}{A character string specifying method for assigning weight
-to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.}
+to subsets when using \code{lasomo} algorithm; \code{c("equal", "perm_based")}.
+\itemize{
+\item \code{"equal"} assigns equal weight to all subsets.
+\item \code{"perm_based"} assigns weight averaged over all possible permutations as in
+the Shapley value.
+}}
 
 \item{metric}{A character string specifying the metric to be used for scoring
-the model output. The metric is determined by the `output_type` and must be
-one of the following: `se_point`, `ae_point`, `wis`, or `log_score`.}
+the model output. The metric is determined by the \code{output_type} and must be
+one of the following: \code{se_point}, \code{ae_point}, \code{wis}, or \code{log_score}.}
 
-\item{...}{Optional arguments passed to `ensemble_fun` when it is specified
-as `"simple_ensemble"`. See 'Details'.}
+\item{...}{Optional arguments passed to \code{ensemble_fun} when it is specified
+as \code{"simple_ensemble"}. See 'Details'.}
 }
 \value{
 A data.frame with columns
-`task_id`, `output_type`, `model_id`, `task_level_importance`.
+\code{task_id}, \code{output_type}, \code{model_id}, \code{task_level_importance}.
 }
 \description{
 Evaluate the importance of ensemble component models by quantifying their
@@ -64,11 +71,17 @@ contribution to the prediction accuracy of an untrained ensemble for each
 combination of model task.
 }
 \details{
-Additional argument in `...` is `agg_fun`, which is a character string name
+The \code{oracle_output_data} in the oracle output format should contain
+independent task ID columns (e.g. \code{location}, \code{target_date}, and \code{age_group})
+, \code{output_type} and \code{output_type_id} columns if the output is either \code{pmf} or
+\code{cdf}, and \code{oracle_value} column for the observed values.
+TBD for more details.
+
+Additional argument in \code{...} is \code{agg_fun}, which is a character string name
 for a function specifying aggregation method of component model outputs.
-Default is `mean`, meaning that equally (or weighted) mean is calculated
-across all component model outputs for each unique `output_type_id`.
-This can be `median` or a custom function (e.g., geometric_mean. Details
+Default is \code{mean}, meaning that equally (or weighted) mean is calculated
+across all component model outputs for each unique \code{output_type_id}.
+This can be \code{median} or a custom function (e.g., geometric_mean. Details
 can be found in
 https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
 }
