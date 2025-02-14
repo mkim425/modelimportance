@@ -24,32 +24,37 @@
 #' @param oracle_output_data Ground truth data for the variables that are used
 #' to define modeling targets. This data must follow the oracle output format.
 #' See 'Details'.
-#' @param ensemble_fun A character string specifying a ensemble method, either
-#' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
-#' * When `"simple_ensemble"` is specified, the ensemble is generated using the
-#' optional `agg_fun` function in `...` (see 'Details'). It takes into account
-#' the weight option specified in `weighted`.
-#' * When `"linear_pool"` is specified, ensemble model outputs are created as
-#' a linear pool of component model outputs. This method supports only
-#' an `output_type` of `mean`, `quantile`, or `pmf`.
-#' @param weighted Boolean indicating whether model weighting should be done.
-#' If `FALSE`, all models are given equal weight.
-#' If `TRUE`, model weights are estimated.
-#' @param training_window_length An integer value representing the time interval
-#' of historical data used during the training process
-#' to estimate model weights.
-#' Default is `0`, meaning that no prior data is available for training.
 #' @param importance_algorithm A character string specifying algorithm for model
 #' importance calculation; `c("lomo", "lasomo")`.
 #' `"lomo"` stands for leave-one-model-out and
 #' `"lasomo"` stands for leave all subsets of models out.
 #' @param subset_wt A character string specifying method for assigning weight
 #' to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.
+#' * `"equal"` assigns equal weight to all subsets.
+#' * `"perm_based"` assigns weight averaged over all possible permutations as in
+#' the Shapley value.
+#' @param ensemble_fun A character string specifying a ensemble method, either
+#' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
+#' * When `"simple_ensemble"` is specified, the ensemble is generated using the
+#' optional `agg_fun` function in `...` (see 'Details').
+#' * When `"linear_pool"` is specified, ensemble model outputs are created as
+#' a linear pool of component model outputs. This method supports only
+#' an `output_type` of `mean`, `quantile`, or `pmf`.
+#' @param weighted Boolean indicating whether model weighting should be done
+#' when building an ensemble using the `ensemble_fun`.
+#' * If `FALSE`, all models are given equal weight.
+#' * If `TRUE`, model weights are estimated.
+#' @param training_window_length An integer value representing the time interval
+#' of historical data used during the training process
+#' to estimate model weights.
+#' Default is `0`, meaning that no prior data is available for training.
 #' @param na_action A character string specifying treatment for missing data;
-#' `c("worst," "average," "drop").` `"worst"` replaces missing values with
-#' the smallest value from the other models. `"average"` replaces
-#' missing values with the average value from the other models.
-#' `"drop"` removes missing values.
+#' `c("worst," "average," "drop").`
+#' * `"worst"` replaces missing values with the smallest value from the other
+#' models.
+#' * `"average"` replaces missing values with the average value from the other
+#' models.
+#' * `"drop"` removes missing values.
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
 #' @return A data.frame with columns
@@ -149,6 +154,12 @@ model_importance <- function(forecast_data,
     "\n(a total of", length(model_id_list), "models)\n"
   ))
 
+  # TO ADD: two functions to implement importance score calculation
+  # One is for untrained ensemble and the other is for trained ensemble.
+  # Each function will implement either lomo or lasomo algorithms for a single
+  # forecast task.
+  # The output will be a data frame with importance scores of component models
+  # along with task information given in the input forecast_data.
   score_result <- forecast_data
   return(score_result)
 }
