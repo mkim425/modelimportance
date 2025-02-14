@@ -78,5 +78,5 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
          present in the 'target_end_date' column of the target data.")
   }
 
-  return(valid_tbl)
+  valid_tbl
 }

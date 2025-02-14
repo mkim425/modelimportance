@@ -163,5 +163,5 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
   } else {
     importance_scores <- df_importance
   }
-  return(importance_scores)
+  importance_scores
 }

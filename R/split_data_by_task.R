@@ -73,5 +73,5 @@ split_data_by_task <- function(valid_tbl, weighted, training_window_length) {
     }
   }
 
-  return(list_datasets)
+  list_datasets
 }
