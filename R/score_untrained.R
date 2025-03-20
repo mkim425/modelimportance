@@ -71,8 +71,8 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       left_join(ensemble_data, by = "model_id")
     # calculate importance scores
     ensemble_all_value <- score_ens_all |>
-      dplyr::filter(model_id == "ensemble-all") |>
-      dplyr::pull(calculated_metric)
+      dplyr::filter(.data$model_id == "ensemble-all") |>
+      dplyr::pull(.data$calculated_metric)
     df_importance <- score_ens_all |>
       dplyr::mutate(
         importance = .data$calculated_metric - ensemble_all_value
@@ -85,17 +85,15 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
   }
   # Insert NAs for missing models
   if (length(missing_model) > 0) {
-    # copy the first row of df_importance
-    new_rows <- df_importance[1, ]
-    # replicate the 1st row for the number of missing models
-    new_rows <- new_rows[rep(1, length(missing_model)), ]
-    # assign missing models to model_id
-    new_rows$model_id <- missing_model
-    # NA for all numeric columns, including 'importance'
-    new_rows <- new_rows |>
-      dplyr::mutate_if(is.numeric, ~NA)
+    fixed_cols <- df_importance |>
+      select(-c(.data$model_id, .data$value, .data$importance)) |>
+      distinct()
+    missing_model_rows <- data.frame(
+      model_id = missing_model, fixed_cols,
+      value = NA, importance = NA
+    )
     # bind the new rows to df_importance
-    importance_scores <- bind_rows(df_importance, new_rows)
+    importance_scores <- bind_rows(df_importance, missing_model_rows)
   } else {
     importance_scores <- df_importance
   }
