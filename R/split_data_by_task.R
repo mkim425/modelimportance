@@ -10,11 +10,8 @@
 #' @return A list of data sets, each corresponding to a single task.
 
 split_data_by_task <- function(valid_tbl, weighted, training_window_length) {
-  # Use of a trained ensemble or not.
-  training_status <- ifelse(weighted, "trained", "untrained")
-
   # Split data and make a list of data sets
-  if (training_status == "untrained") {
+  if (weighted == "untrained") {
     # Get columns to use for splitting data by task
     split_cols <- c("horizon", "location", "target_end_date")
     # List of data split by task
