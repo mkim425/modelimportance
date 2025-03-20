@@ -29,29 +29,3 @@ A list of data sets, each corresponding to a single task.
 This function splits the input data by a single task with a
 combination of horizon, location, and target_end_date
 }
-\examples{
-\dontrun{
-library(dplyr)
-library(purrr)
-library(hubExamples)
-forecast_data <- hubExamples::forecast_outputs |>
-  dplyr::filter(
-    output_type \%in\% c("mean"),
-    location \%in\% c("25", "48"),
-    horizon \%in\% c(1, 2)
-  )
-target_data <- hubExamples::forecast_target_ts |>
-  dplyr::filter(
-    date \%in\% unique(forecast_data$target_end_date),
-    location == "25"
-  ) |>
-  # Rename columns to match the oracle output format
-  rename(
-    target_end_date = date,
-    oracle_value = observation
-  )
-valid_tbl <- validate_input_data(forecast_data, target_data)
-split_data_by_task(valid_tbl, weighted = FALSE, training_window_length = 0)
-split_data_by_task(valid_tbl, weighted = TRUE, training_window_length = 1)
-}
-}

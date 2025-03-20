@@ -19,25 +19,3 @@ a model_out_tbl format for forecast data
 \description{
 Check the input forecast data structure and validate it.
 }
-\examples{
-\dontrun{
-library(dplyr)
-library(hubExamples)
-forecast_data <- hubExamples::forecast_outputs |>
-  dplyr::filter(
-    output_type \%in\% c("quantile"),
-    location == "25",
-    horizon == 1
-  )
-target_data <- hubExamples::forecast_target_ts |>
-  dplyr::filter(
-    date \%in\% unique(forecast_data$target_end_date),
-    location == "25"
-  ) |>
-  # Rename columns to match the oracle output format
-  rename(
-    target_end_date = date,
-    oracle_value = observation
-  )
-}
-}
