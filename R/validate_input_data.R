@@ -8,26 +8,7 @@
 #'
 #' @import hubUtils
 #' @import dplyr
-#' @examples \dontrun{
-#' library(dplyr)
-#' library(hubExamples)
-#' forecast_data <- hubExamples::forecast_outputs |>
-#'   dplyr::filter(
-#'     output_type %in% c("quantile"),
-#'     location == "25",
-#'     horizon == 1
-#'   )
-#' target_data <- hubExamples::forecast_target_ts |>
-#'   dplyr::filter(
-#'     date %in% unique(forecast_data$target_end_date),
-#'     location == "25"
-#'   ) |>
-#'   # Rename columns to match the oracle output format
-#'   rename(
-#'     target_end_date = date,
-#'     oracle_value = observation
-#'   )
-#' }
+
 validate_input_data <- function(forecast_data, oracle_output_data) {
   valid_tbl <- forecast_data |>
     # Convert model output to a `model_out_tbl` class object
