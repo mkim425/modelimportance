@@ -79,11 +79,11 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
     ens_all <- switch(ensemble_fun,
       "simple_ensemble" = hubEnsembles::simple_ensemble(single_task_data,
         weights = NULL,
-        model_id = "enseble-all"
+        model_id = "ensemble-all"
       ),
       "linear_pool" = hubEnsembles::linear_pool(single_task_data,
         weights = NULL,
-        model_id = "enseble-all"
+        model_id = "ensemble-all"
       )
     )
 
@@ -117,7 +117,7 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       dplyr::mutate(
         importance = .data$calculated_metric - first(.data$calculated_metric)
       ) |>
-      dplyr::filter(.data$model_id != "enseble-all") |>
+      dplyr::filter(.data$model_id != "ensemble-all") |>
       dplyr::mutate(model_id = gsub("ens.wo.", "", .data$model_id)) |>
       dplyr::select(-.data$calculated_metric)
   } else {
