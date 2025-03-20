@@ -29,6 +29,7 @@ test_that("Compute when using 'linear pool' with 'mean' output type", {
   # replace with simple values for easy calculation
   dat <- mean_data_list[[16]]
   dat$value <- c(30, 12, 18)
+  # find index of target_data corresponding to dat
   idx <- with(
     target_data,
     target_end_date == unique(dat$target_end_date) &
