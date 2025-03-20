@@ -70,9 +70,12 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       )) |>
       left_join(ensemble_data, by = "model_id")
     # calculate importance scores
+    ensemble_all_value <- score_ens_all |>
+      dplyr::filter(model_id == "ensemble-all") |>
+      dplyr::pull(calculated_metric)
     df_importance <- score_ens_all |>
       dplyr::mutate(
-        importance = .data$calculated_metric - first(.data$calculated_metric)
+        importance = .data$calculated_metric - ensemble_all_value
       ) |>
       dplyr::filter(.data$model_id != "ensemble-all") |>
       dplyr::mutate(model_id = gsub("ens.wo.", "", .data$model_id)) |>
