@@ -30,8 +30,9 @@ split_data_by_task <- function(valid_tbl, weighted, training_window_length) {
       )
     } else {
       # Create a list of data split by reference date including the training
-      list_datasets <- list()
-      for (i in 1:(len_ref_dates - training_window_length)) {
+      n_dates <- len_ref_dates - training_window_length
+      list_datasets <- vector(mode = "list", length = n_dates)
+      for (i in seq_len(n_dates)) {
         list_datasets[[i]] <- valid_tbl |>
           dplyr::filter(
             .data$reference_date <= all_ref_dates[i + training_window_length],
