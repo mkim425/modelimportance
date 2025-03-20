@@ -24,50 +24,7 @@
 #' @import hubEnsembles
 #' @import hubEvals
 #' @inherit model_importance details
-#'
-#' @examples \dontrun{
-#' library(dplyr)
-#' library(hubEnsembles)
-#' library(hubEvals)
-#' forecast_data <- hubExamples::forecast_outputs |>
-#'   dplyr::filter(
-#'     output_type %in% c("mean"),
-#'     location == "25",
-#'     horizon == 1
-#'   )
-#' target_data <- hubExamples::forecast_target_ts |>
-#'   dplyr::filter(
-#'     date %in% unique(forecast_data$target_end_date),
-#'     location == "25"
-#'   ) |>
-#'   # Rename columns to match the oracle output format
-#'   rename(
-#'     target_end_date = date,
-#'     oracle_value = observation
-#'   )
-#'
-#' valid_tbl <- validate_input_data(forecast_means, target_data)
-#' all_models <- unique(valid_tbl$model_id)
-#' list_datasets <- split_data_by_task(
-#'   valid_tbl,
-#'   weighted = FALSE,
-#'   training_window_length = 0
-#' )
-#'
-#' # Example with the default arguments.
-#' score_untrained(
-#'   single_task_data = list_datasets[[1]], oracle_output_data = target_data,
-#'   model_id_list = all_models, ensemble_fun = "simple_ensemble",
-#'   importance_algorithm = "lomo", subset_wt = "equal", metric = "se_point"
-#' )
-#' # Example with the additional argument in `...`.
-#' score_untrained(
-#'   single_task_data = list_datasets[[1]], oracle_output_data = target_data,
-#'   model_id_list = all_models, ensemble_fun = "simple_ensemble",
-#'   importance_algorithm = "lomo", subset_wt = "equal", metric = "se_point",
-#'   agg_fun = median
-#' )
-#' }
+
 score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
                             ensemble_fun, importance_algorithm, subset_wt,
                             metric, ...) {
