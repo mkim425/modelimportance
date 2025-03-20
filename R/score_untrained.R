@@ -33,31 +33,21 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
   missing_model <- setdiff(model_id_list, single_task_data$model_id)
   # Compute importance score when importance_algorithm is 'lomo'
   if (importance_algorithm == "lomo") {
-    ens_all <- switch(ensemble_fun,
-      "simple_ensemble" = hubEnsembles::simple_ensemble(single_task_data,
-        weights = NULL,
-        model_id = "ensemble-all"
-      ),
-      "linear_pool" = hubEnsembles::linear_pool(single_task_data,
-        weights = NULL,
-        model_id = "ensemble-all"
-      )
+    # `ENS_FUN` is a function from hubEnsembles specified by `ensemble_fun` 
+    ENS_FUN <- getFromNamespace(ensemble_fun, ns = asNamespace("hubEnsembles"))
+    ens_all <- ENS_FUN(single_task_data,
+      weights = NULL,
+      model_id = "ensemble-all"
     )
 
     # build ensemble forecasts by leaving one model out
     ens_lomo <- lapply(models, function(x) {
       single_task_data_lomo <- single_task_data |>
-        dplyr::filter(.data$model_id != x)
-      switch(ensemble_fun,
-        "simple_ensemble" = hubEnsembles::simple_ensemble(single_task_data_lomo,
-          weights = NULL,
-          model_id = paste0("ens.wo.", x)
-        ),
-        "linear_pool" = hubEnsembles::linear_pool(single_task_data_lomo,
+        dplyr::filter(.data$model_id != x) |>
+        ENS_FUN(
           weights = NULL,
           model_id = paste0("ens.wo.", x)
         )
-      )
     })
     ensemble_data <- rbind(ens_all, dplyr::bind_rows(ens_lomo))
     # score the ensemble forecasts
