@@ -11,7 +11,7 @@
 
 split_data_by_task <- function(valid_tbl, weighted, training_window_length) {
   # Split data and make a list of data sets
-  if (weighted == "untrained") {
+  if (!weighted) {
     # Get columns to use for splitting data by task
     split_cols <- c("horizon", "location", "target_end_date")
     # List of data split by task
