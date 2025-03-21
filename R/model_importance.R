@@ -33,6 +33,7 @@
 #' * `"equal"` assigns equal weight to all subsets.
 #' * `"perm_based"` assigns weight averaged over all possible permutations as in
 #' the Shapley value.
+#' Ignored if `lomo` method is used. Default is `"equal"`, if not specified.
 #' @param ensemble_fun A character string specifying a ensemble method, either
 #' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
 #' * When `"simple_ensemble"` is specified, the ensemble is generated using the
