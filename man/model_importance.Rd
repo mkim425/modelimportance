@@ -60,6 +60,7 @@ to subsets when using \code{lasomo} algorithm; \code{c("equal", "perm_based")}.
 \item \code{"equal"} assigns equal weight to all subsets.
 \item \code{"perm_based"} assigns weight averaged over all possible permutations as in
 the Shapley value.
+Ignored if \code{lomo} method is used. Default is \code{"equal"}, if not specified.
 }}
 
 \item{na_action}{A character string specifying treatment for missing data;
