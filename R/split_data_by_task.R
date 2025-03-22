@@ -13,7 +13,12 @@ split_data_by_task <- function(valid_tbl, weighted, training_window_length) {
   # Split data and make a list of data sets
   if (!weighted) {
     # Get columns to use for splitting data by task
-    split_cols <- c("horizon", "location", "target_end_date")
+    ## commonly required columns
+    required_cols <- c(
+      "forecast_date", "model_id", "output_type", "output_type_id", "value"
+    )
+    ## task specific columns
+    split_cols <- setdiff(colnames(valid_tbl), required_cols)
     # List of data split by task
     list_datasets <- valid_tbl |>
       dplyr::group_by(across(all_of(split_cols))) |>
