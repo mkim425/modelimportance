@@ -85,6 +85,10 @@ Evaluate ensemble component model's importance based on a measure of their
 contribution to ensemble prediction accuracy for each combination of
 model task.
 
+This function requires that one column represent the forecast date (or
+a date from which each forecast originates or is made in reference to) and
+that it be named one of \code{forecast_date}, \code{origin_date}, and \code{reference_date}.
+
 For each \code{output_type}, the corresponding scoring rule applied to calculate
 the importance is as follows.
 \tabular{ll}{
