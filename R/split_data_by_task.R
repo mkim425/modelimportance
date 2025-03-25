@@ -15,7 +15,7 @@ split_data_by_task <- function(valid_tbl, weighted, training_window_length) {
     # Get columns to use for splitting data by task
     ## commonly required columns
     required_cols <- c(
-      "forecast_date", "model_id", "output_type", "output_type_id", "value"
+      "reference_date", "model_id", "output_type", "output_type_id", "value"
     )
     ## task specific columns
     split_cols <- setdiff(colnames(valid_tbl), required_cols)

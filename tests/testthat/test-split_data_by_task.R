@@ -11,15 +11,18 @@ forecast_quantiles <- readRDS(
 
 valid_tbl <- validate_input_data(forecast_quantiles, target_data)
 
-
+## commonly required columns
+required_cols <- c(
+        "reference_date", "model_id", "output_type", "output_type_id", "value"
+)
+## task specific columns
+split_cols <- setdiff(colnames(valid_tbl), required_cols)
 
 test_that("split_data_by_task() groups data correctly for untrained ensemble", {
   result <- split_data_by_task(valid_tbl,
     weighted = FALSE,
     training_window_length = 0
   )
-
-  split_cols <- c("horizon", "location", "target_end_date")
 
   # The result is a list
   expect_type(result, "list")
