@@ -2,7 +2,7 @@
 % Please edit documentation in R/model_importance.R
 \name{model_importance}
 \alias{model_importance}
-\title{Quantify ensemble component model contributions to ensemble
+\title{Quantify overall contributions of ensemble component model to ensemble
 prediction accuracy}
 \usage{
 model_importance(
@@ -19,82 +19,100 @@ model_importance(
 }
 \arguments{
 \item{forecast_data}{A data.frame with the predictions that is or can be
-coerced to a model_out_tbl format. Only one `output_type` is allowed in the
+coerced to a model_out_tbl format. Only one \code{output_type} is allowed in the
 data.frame, and it must be one of the following:
-`mean`, `median`, `quantile`, or `pmf`.}
+\code{mean}, \code{median}, \code{quantile}, or \code{pmf}.}
 
 \item{oracle_output_data}{Ground truth data for the variables that are used
 to define modeling targets. This data must follow the oracle output format.
 See 'Details'.}
 
 \item{ensemble_fun}{A character string specifying a ensemble method, either
-"simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
-* When `"simple_ensemble"` is specified, the ensemble is generated using the
-optional `agg_fun` function in `...` (see 'Details'). It takes into account
-the weight option specified in `weighted`.
-* When `"linear_pool"` is specified, ensemble model outputs are created as
+"simple_ensemble" or "linear_pool"; \code{c("simple_ensemble", "linear_pool")}.
+\itemize{
+\item When \code{"simple_ensemble"} is specified, the ensemble is generated using the
+optional \code{agg_fun} function in \code{...} (see 'Details').
+\item When \code{"linear_pool"} is specified, ensemble model outputs are created as
 a linear pool of component model outputs. This method supports only
-an `output_type` of `mean`, `quantile`, or `pmf`.}
+an \code{output_type} of \code{mean}, \code{quantile}, or \code{pmf}.
+}}
 
-\item{weighted}{Boolean indicating whether model weighting should be done.
-If `FALSE`, all models are given equal weight.
-If `TRUE`, model weights are estimated.}
+\item{weighted}{Boolean indicating whether model weighting should be done
+when building an ensemble using the \code{ensemble_fun}.
+\itemize{
+\item If \code{FALSE}, all models are given equal weight.
+\item If \code{TRUE}, model weights are estimated.
+}}
 
 \item{training_window_length}{An integer value representing the time interval
 of historical data used during the training process
 to estimate model weights.
-Default is `0`, meaning that no prior data is available for training.}
+Default is \code{0}, meaning that no prior data is available for training.}
 
 \item{importance_algorithm}{A character string specifying algorithm for model
-importance calculation; `c("lomo", "lasomo")`.
-`"lomo"` stands for leave-one-model-out and
-`"lasomo"` stands for leave all subsets of models out.}
+importance calculation; \code{c("lomo", "lasomo")}.
+\code{"lomo"} stands for leave-one-model-out and
+\code{"lasomo"} stands for leave all subsets of models out.}
 
 \item{subset_wt}{A character string specifying method for assigning weight
-to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.}
+to subsets when using \code{lasomo} algorithm; \code{c("equal", "perm_based")}.
+\itemize{
+\item \code{"equal"} assigns equal weight to all subsets.
+\item \code{"perm_based"} assigns weight averaged over all possible permutations as in
+the Shapley value.
+Ignored if \code{lomo} method is used. Default is \code{"equal"}, if not specified.
+}}
 
 \item{na_action}{A character string specifying treatment for missing data;
-`c("worst," "average," "drop").` `"worst"` replaces missing values with
-the smallest value from the other models. `"average"` replaces
-missing values with the average value from the other models.
-`"drop"` removes missing values.}
+\verb{c("worst," "average," "drop").}
+\itemize{
+\item \code{"worst"} replaces missing values with the smallest value from the other
+models.
+\item \code{"average"} replaces missing values with the average value from the other
+models.
+\item \code{"drop"} removes missing values.
+}}
 
-\item{...}{Optional arguments passed to `ensemble_fun` when it is specified
-as `"simple_ensemble"`. See 'Details'.}
+\item{...}{Optional arguments passed to \code{ensemble_fun} when it is specified
+as \code{"simple_ensemble"}. See 'Details'.}
 }
 \value{
 A data.frame with columns
-`task_id`, `output_type`, `model`, `importance_score`.
+\code{task_id}, \code{output_type}, \code{model_id}, \code{importance_score}.
 }
 \description{
 Evaluate ensemble component model's importance based on a measure of their
 contribution to ensemble prediction accuracy for each combination of
 model task.
 
-For each `output_type`, the corresponding scoring rule applied to calculate
+This function requires that one column represent the forecast date (or
+a date from which each forecast originates or is made in reference to) and
+that it be named one of \code{forecast_date}, \code{origin_date}, and \code{reference_date}.
+
+For each \code{output_type}, the corresponding scoring rule applied to calculate
 the importance is as follows.
 \tabular{ll}{
-  \strong{Output Type} \tab \strong{Scoring Rule} \cr
-  median \tab ae_point \cr
-  mean \tab se_point \cr
-  quantile \tab wis \cr
-  pmf \tab log_score \cr
+\strong{Output Type} \tab \strong{Scoring Rule} \cr
+median \tab ae_point \cr
+mean \tab se_point \cr
+quantile \tab wis \cr
+pmf \tab log_score \cr
 }
-where `ae_point` represents the absolute error, `se_point` the squared error,
-`wis` the weighted interval score, and `log_score` the logarithmic score.
+where \code{ae_point} represents the absolute error, \code{se_point} the squared error,
+\code{wis} the weighted interval score, and \code{log_score} the logarithmic score.
 }
 \details{
-The `oracle_output_data` in the oracle output format should contain
-independent task ID columns (e.g. `location`, `target_date`, and `age_group`)
-, `output_type` and `output_type_id` columns if the output is either `pmf` or
-`cdf`, and `oracle_value` column for the observed values.
+The \code{oracle_output_data} in the oracle output format should contain
+independent task ID columns (e.g. \code{location}, \code{target_date}, and \code{age_group})
+, \code{output_type} and \code{output_type_id} columns if the output is either \code{pmf} or
+\code{cdf}, and \code{oracle_value} column for the observed values.
 TBD for more details.
 
-Additional argument in ... is `agg_fun`, which is a character string name
+Additional argument in \code{...} is \code{agg_fun}, which is a character string name
 for a function specifying aggregation method of component model outputs.
-Default is `mean`, meaning that equally (or weighted) mean is calculated
-across all component model outputs for each unique `output_type_id`.
-This can be `median` or a custom function (e.g., geometric_mean. Details
+Default is \code{mean}, meaning that equally (or weighted) mean is calculated
+across all component model outputs for each unique \code{output_type_id}.
+This can be \code{median} or a custom function (e.g., geometric_mean. Details
 can be found in
 https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
 }
@@ -118,7 +136,7 @@ target_data <- hubExamples::forecast_target_ts |>
     target_end_date = date,
     oracle_value = observation
   )
-
+# Example with the default arguments.
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble", weighted = FALSE,
