@@ -6,6 +6,7 @@ target_data <- readRDS(
   testthat::test_path("testdata/flu_example_target_data.rds")
 ) |> mutate(target_end_date = as.Date(target_end_date))
 
+# Case1: output_type = "mean"
 forecast_mean <- readRDS(
   testthat::test_path("testdata/flu_example_mean_model_output.rds")
 )
