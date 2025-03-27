@@ -83,7 +83,13 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       value = NA, importance = NA
     )
     # bind the new rows to df_importance
-    importance_scores <- bind_rows(df_importance, missing_model_rows)
+    combined_df <- bind_rows(df_importance, missing_model_rows)
+    # reorder the columns
+    importance_scores <- data.frame(model_id = model_id_list) |>
+      left_join(
+        combined_df,
+        by = "model_id"
+      )
   } else {
     importance_scores <- df_importance
   }
