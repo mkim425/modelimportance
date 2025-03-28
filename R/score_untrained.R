@@ -37,7 +37,8 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
     ens_fun <- getFromNamespace(ensemble_fun, ns = asNamespace("hubEnsembles"))
     ens_all <- ens_fun(single_task_data,
       weights = NULL,
-      model_id = "ensemble-all"
+      model_id = "ensemble-all",
+      ...
     )
 
     # build ensemble forecasts by leaving one model out
@@ -46,7 +47,8 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
         dplyr::filter(.data$model_id != x) |>
         ens_fun(
           weights = NULL,
-          model_id = paste0("ens.wo.", x)
+          model_id = paste0("ens.wo.", x),
+          ...
         )
     })
     ensemble_data <- rbind(ens_all, dplyr::bind_rows(ens_lomo))
