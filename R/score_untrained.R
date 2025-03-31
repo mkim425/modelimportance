@@ -91,9 +91,13 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       left_join(
         combined_df,
         by = "model_id"
-      )
+      ) |>
+      select(-c(.data$output_type_id, .data$value)) |>
+      distinct()
   } else {
-    importance_scores <- df_importance
+    importance_scores <- df_importance |>
+      select(-c(.data$output_type_id, .data$value)) |>
+      distinct()
   }
   importance_scores
 }
