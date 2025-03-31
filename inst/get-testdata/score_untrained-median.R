@@ -49,11 +49,12 @@ for (i in seq_along(model_names)) {
   ens_df_simple <- bind_rows(ens_df_simple, sub_ens)
 }
 # evaluate each ensemble
-ens_df_simple <- ens_df_simple |>
-  # calculate squared error
-  mutate(ae = abs(value - target_data_median$oracle_value[idx])) |>
+ens_df_simple <- score_model_out(ens_df_simple,
+  target_data_median,
+  metrics = "ae_point"
+) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = ae - ae[1]) |>
+  mutate(importance = ae_point - ae_point[1]) |>
   filter(model_id != "ens_all")
 ens_df_simple$model_id <- sub("^ens_wo_", "", ens_df_simple$model_id)
 # expected importance scores with median output and linear pool
@@ -83,11 +84,12 @@ for (i in seq_along(model_names)) {
   ens_df_simple <- bind_rows(ens_df_simple, sub_ens)
 }
 # evaluate each ensemble
-ens_df_simple <- ens_df_simple |>
-  # calculate squared error
-  mutate(ae = abs(value - target_data_median$oracle_value[idx])) |>
+ens_df_simple <- score_model_out(ens_df_simple,
+  target_data_median,
+  metrics = "ae_point"
+) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = ae - ae[1]) |>
+  mutate(importance = ae_point - ae_point[1]) |>
   filter(model_id != "ens_all")
 ens_df_simple$model_id <- sub("^ens_wo_", "", ens_df_simple$model_id)
 # expected importance scores with median output and linear pool
@@ -102,7 +104,7 @@ exp_imp_median2 <- ens_df_simple |>
 
 ## Case 3: a missing data and 'simple_mean' ensemble
 # data with missing values
-sub_dat_median <- dat_median[c(1, 3, 4), ]
+sub_dat_median <- dat_median |> filter(model_id %in% model_id_list[c(1, 3)])
 # ensemble built from all models
 ens_df <- simple_ensemble(sub_dat_median, model_id = "ens_all")
 # construct ensembles without each model
@@ -115,11 +117,12 @@ for (i in seq_along(model_names)) {
   ens_df <- bind_rows(ens_df, sub_ens)
 }
 # evaluate each ensemble
-ens_df <- ens_df |>
-  # calculate squared error
-  mutate(ae = abs(value - target_data_median$oracle_value[idx])) |>
+ens_df <- score_model_out(ens_df,
+  target_data_median,
+  metrics = "ae_point"
+) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = ae - ae[1]) |>
+  mutate(importance = ae_point - ae_point[1]) |>
   filter(model_id != "ens_all")
 ens_df$model_id <- sub("^ens_wo_", "", ens_df$model_id)
 exp_imp_median3 <- data.frame(model_id = model_id_list) |>
@@ -145,5 +148,5 @@ saveRDS(exp_imp_median,
   file = "tests/testthat/testdata/exp_imp_median.rds"
 )
 saveRDS(target_data_median,
-  file = "tests/testthat/testdata/target_dat_median.rds"
+  file = "tests/testthat/testdata/target_median.rds"
 )

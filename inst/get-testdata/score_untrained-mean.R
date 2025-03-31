@@ -45,13 +45,15 @@ for (i in seq_along(model_names)) {
   ens_df <- bind_rows(ens_df, sub_ens)
 }
 # evaluate each ensemble
-ens_df <- ens_df |>
-  # calculate squared error
-  mutate(se = (value - target_data_mean$oracle_value[idx])^2) |>
+ens_df <- score_model_out(ens_df,
+  target_data_mean,
+  metrics = "se_point"
+) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = se - se[1]) |>
+  mutate(importance = se_point - se_point[1]) |>
   filter(model_id != "ens_all")
 ens_df$model_id <- sub("^ens_wo_", "", ens_df$model_id)
+
 # expected importance scores with mean output and linear pool
 exp_imp_mean1 <- ens_df |>
   select(model_id, importance) |>
@@ -79,14 +81,15 @@ for (i in seq_along(model_names)) {
   ens_df_simple <- bind_rows(ens_df_simple, sub_ens)
 }
 # evaluate each ensemble
-ens_df_simple <- ens_df_simple |>
-  # calculate squared error
-  mutate(se = (value - target_data_mean$oracle_value[idx])^2) |>
+ens_df_simple <- score_model_out(ens_df_simple,
+  target_data_mean,
+  metrics = "se_point"
+) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = se - se[1]) |>
+  mutate(importance = se_point - se_point[1]) |>
   filter(model_id != "ens_all")
 ens_df_simple$model_id <- sub("^ens_wo_", "", ens_df_simple$model_id)
-# expected importance scores with mean output and linear pool
+# expected importance scores with mean output and simple mean ensemble
 exp_imp_mean2 <- ens_df_simple |>
   select(model_id, importance) |>
   mutate(
@@ -113,14 +116,15 @@ for (i in seq_along(model_names)) {
   ens_df_simple <- bind_rows(ens_df_simple, sub_ens)
 }
 # evaluate each ensemble
-ens_df_simple <- ens_df_simple |>
-  # calculate squared error
-  mutate(se = (value - target_data_mean$oracle_value[idx])^2) |>
+ens_df_simple <- score_model_out(ens_df_simple,
+  target_data_mean,
+  metrics = "se_point"
+) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = se - se[1]) |>
+  mutate(importance = se_point - se_point[1]) |>
   filter(model_id != "ens_all")
 ens_df_simple$model_id <- sub("^ens_wo_", "", ens_df_simple$model_id)
-# expected importance scores with mean output and linear pool
+# expected importance scores with mean output and simple median ensemble
 exp_imp_mean3 <- ens_df_simple |>
   select(model_id, importance) |>
   mutate(
@@ -133,7 +137,7 @@ exp_imp_mean3 <- ens_df_simple |>
 
 ## Case 4: a missing data and 'simple_mean' ensemble
 # data with missing values
-sub_dat_mean <- dat_mean[c(1, 3, 4), ]
+sub_dat_mean <- dat_mean |> filter(model_id %in% model_id_list[c(1, 3)])
 # ensemble built from all models
 ens_df <- simple_ensemble(sub_dat_mean, model_id = "ens_all")
 # construct ensembles without each model
@@ -146,13 +150,15 @@ for (i in seq_along(model_names)) {
   ens_df <- bind_rows(ens_df, sub_ens)
 }
 # evaluate each ensemble
-ens_df <- ens_df |>
-  # calculate squared error
-  mutate(se = (value - target_data_mean$oracle_value[idx])^2) |>
+ens_df <- score_model_out(ens_df,
+  target_data_mean,
+  metrics = "se_point"
+) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = se - se[1]) |>
+  mutate(importance = se_point - se_point[1]) |>
   filter(model_id != "ens_all")
 ens_df$model_id <- sub("^ens_wo_", "", ens_df$model_id)
+# expected importance scores with mean output and simple mean ensemble
 exp_imp_mean4 <- data.frame(model_id = model_id_list) |>
   left_join(ens_df, by = "model_id") |>
   select(model_id, importance) |>
@@ -176,5 +182,5 @@ saveRDS(exp_imp_mean,
   file = "tests/testthat/testdata/exp_imp_mean.rds"
 )
 saveRDS(target_data_mean,
-  file = "tests/testthat/testdata/target_dat_mean.rds"
+  file = "tests/testthat/testdata/target_mean.rds"
 )
