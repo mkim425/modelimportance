@@ -23,6 +23,7 @@
 #'
 #' @import hubEnsembles
 #' @import hubEvals
+#' @importFrom utils getFromNamespace
 #' @inherit model_importance details
 
 score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
