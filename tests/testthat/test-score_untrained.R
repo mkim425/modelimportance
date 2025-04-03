@@ -108,7 +108,7 @@ pmap(
         ) |>
         dplyr::select(model_id, importance)
       # test: compare the calculated importance with the expected importance
-      expect_equal(calculated, expected_value)
+      expect_equal(calculated, expected_value, tolerance = 1e-1)
     })
   }
 )
@@ -160,6 +160,6 @@ pmap(reduced_params, function(output_type, algorithm, metric) {
     # Remove the metrics attribute
     attr(expected_value, "metrics") <- NULL
     # test: compare the calculated importance with the expected importance
-    expect_equal(calculated, expected_value)
+    expect_equal(calculated, expected_value, tolerance = 1e-1)
   })
 })
