@@ -4,25 +4,34 @@ library(hubEvals)
 library(purrr)
 
 # forecast data list
-data_list <- list(
-  dat_mean = readRDS(testthat::test_path("testdata/dat_mean.rds")),
-  dat_median = readRDS(testthat::test_path("testdata/dat_median.rds")),
-  dat_quantile = readRDS(testthat::test_path("testdata/dat_qntl.rds")),
-  dat_pmf = readRDS(testthat::test_path("testdata/dat_pmf.rds"))
+file_names <- c(
+  dat_mean = "dat_mean.rds",
+  dat_median = "dat_median.rds",
+  dat_quantile = "dat_qntl.rds",
+  dat_pmf = "dat_pmf.rds"
 )
+data_list <- map(file_names, ~ readRDS(testthat::test_path("testdata", .x)))
 # target data list
-target_data_list <- list(
-  target_mean = readRDS(testthat::test_path("testdata/target_mean.rds")),
-  target_median = readRDS(testthat::test_path("testdata/target_median.rds")),
-  target_quantile = readRDS(testthat::test_path("testdata/target_qntl.rds")),
-  target_pmf = readRDS(testthat::test_path("testdata/target_pmf.rds"))
+target_file_names <- c(
+  target_mean = "target_mean.rds",
+  target_median = "target_median.rds",
+  target_quantile = "target_qntl.rds",
+  target_pmf = "target_pmf.rds"
+)
+target_data_list <- map(
+  target_file_names,
+  ~ readRDS(testthat::test_path("testdata", .x))
 )
 # list of expected values for testing
-exp_imp_list <- list(
-  exp_imp_mean = readRDS(testthat::test_path("testdata/exp_imp_mean.rds")),
-  exp_imp_median = readRDS(testthat::test_path("testdata/exp_imp_median.rds")),
-  exp_imp_quantile = readRDS(testthat::test_path("testdata/exp_imp_qntl.rds")),
-  exp_imp_pmf = readRDS(testthat::test_path("testdata/exp_imp_pmf.rds"))
+exp_file_names <- c(
+  exp_imp_mean_lomo = "exp_imp_mean_untrained_lomo.rds",
+  exp_imp_median_lomo = "exp_imp_median_untrained_lomo.rds",
+  exp_imp_quantile_lomo = "exp_imp_qntl_untrained_lomo.rds",
+  exp_imp_pmf_lomo = "exp_imp_pmf_untrained_lomo.rds"
+)
+exp_imp_list <- map(
+  exp_file_names,
+  ~ readRDS(testthat::test_path("testdata", .x))
 )
 
 # combination of arguments
@@ -70,7 +79,7 @@ pmap(
         "target_", output_type
       )]]
       selected_expected_importance <- exp_imp_list[[paste0(
-        "exp_imp_", output_type
+        "exp_imp_", output_type, "_", algorithm
       )]]
       if (ens_fun != "linear_pool") {
         # calculate importance scores with the given arguments
@@ -133,7 +142,7 @@ pmap(reduced_params, function(output_type, algorithm, metric) {
       "target_", output_type
     )]]
     selected_expected_importance <- exp_imp_list[[paste0(
-      "exp_imp_", output_type
+      "exp_imp_", output_type, "_", algorithm
     )]]
     model_id_list <- unique(selected_data$model_id)
     sub_dat <- selected_data |> filter(model_id %in% model_id_list[c(1, 3)])
