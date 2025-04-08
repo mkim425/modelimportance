@@ -179,7 +179,7 @@ saveRDS(dat_mean,
   file = "tests/testthat/testdata/dat_mean.rds"
 )
 saveRDS(exp_imp_mean,
-  file = "tests/testthat/testdata/exp_imp_mean.rds"
+  file = "tests/testthat/testdata/exp_imp_mean_untrained_lomo.rds"
 )
 saveRDS(target_data_mean,
   file = "tests/testthat/testdata/target_mean.rds"

@@ -145,7 +145,7 @@ saveRDS(dat_median,
   file = "tests/testthat/testdata/dat_median.rds"
 )
 saveRDS(exp_imp_median,
-  file = "tests/testthat/testdata/exp_imp_median.rds"
+  file = "tests/testthat/testdata/exp_imp_median_untrained_lomo.rds"
 )
 saveRDS(target_data_median,
   file = "tests/testthat/testdata/target_median.rds"

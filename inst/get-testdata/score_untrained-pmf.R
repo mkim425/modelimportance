@@ -167,7 +167,7 @@ saveRDS(dat_pmf,
   file = "tests/testthat/testdata/dat_pmf.rds"
 )
 saveRDS(exp_imp_pmf,
-  file = "tests/testthat/testdata/exp_imp_pmf.rds"
+  file = "tests/testthat/testdata/exp_imp_pmf_untrained_lomo.rds"
 )
 saveRDS(target_data_pmf,
   file = "tests/testthat/testdata/target_pmf.rds"

@@ -162,7 +162,7 @@ saveRDS(dat_qntl,
   file = "tests/testthat/testdata/dat_qntl.rds"
 )
 saveRDS(exp_imp_qntl,
-  file = "tests/testthat/testdata/exp_imp_qntl.rds"
+  file = "tests/testthat/testdata/exp_imp_qntl_untrained_lomo.rds"
 )
 saveRDS(target_data_qntl,
   file = "tests/testthat/testdata/target_qntl.rds"
