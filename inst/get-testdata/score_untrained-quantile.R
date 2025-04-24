@@ -1,5 +1,5 @@
 ## Data for testing the score_untrained example: quantile output
-
+library(dplyr)
 ## target data
 target_data_qntl <- readRDS(
   testthat::test_path("testdata/flu_example_target_data.rds")

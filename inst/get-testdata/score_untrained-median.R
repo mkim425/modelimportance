@@ -1,5 +1,5 @@
 ## Data for testing the score_untrained example: median output
-
+library(dplyr)
 ## target data
 target_data_median <- readRDS(
   testthat::test_path("testdata/flu_example_target_data.rds")
