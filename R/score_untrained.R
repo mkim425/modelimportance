@@ -45,7 +45,7 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
     # build ensemble forecasts by leaving one model out
     ens_lomo <- lapply(models, function(x) {
       single_task_data |>
-        dplyr::filter(.data$model_id != x) |>
+        dplyr::filter(model_id != x) |>
         ens_fun(
           weights = NULL,
           model_id = paste0("ens.wo.", x),
@@ -64,22 +64,22 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       left_join(ensemble_data, by = "model_id")
     # calculate importance scores
     ensemble_all_value <- score_ens_all |>
-      dplyr::filter(.data$model_id == "ensemble-all") |>
-      dplyr::pull(.data$calculated_metric)
+      dplyr::filter(model_id == "ensemble-all") |>
+      dplyr::pull(calculated_metric)
     df_importance <- score_ens_all |>
       dplyr::mutate(
-        importance = .data$calculated_metric - ensemble_all_value
+        importance = calculated_metric - ensemble_all_value
       ) |>
-      dplyr::filter(.data$model_id != "ensemble-all") |>
-      dplyr::mutate(model_id = gsub("ens.wo.", "", .data$model_id)) |>
-      dplyr::select(-.data$calculated_metric)
+      dplyr::filter(model_id != "ensemble-all") |>
+      dplyr::mutate(model_id = gsub("ens.wo.", "", model_id)) |>
+      dplyr::select(-calculated_metric)
   } else {
     df_importance <- NULL
   }
   # Insert NAs for missing models
   if (length(missing_model) > 0) {
     fixed_cols <- df_importance |>
-      select(-c(.data$model_id, .data$value, .data$importance)) |>
+      select(-c(model_id, value, importance)) |>
       distinct()
     missing_model_rows <- data.frame(
       model_id = missing_model, fixed_cols,
@@ -93,11 +93,11 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
         combined_df,
         by = "model_id"
       ) |>
-      select(-c(.data$output_type_id, .data$value)) |>
+      select(-c(output_type_id, value)) |>
       distinct()
   } else {
     importance_scores <- df_importance |>
-      select(-c(.data$output_type_id, .data$value)) |>
+      select(-c(output_type_id, value)) |>
       distinct()
   }
   importance_scores
