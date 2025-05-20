@@ -23,6 +23,7 @@
 #'
 #' @import hubEnsembles
 #' @import hubEvals
+#' @importFrom utils getFromNamespace
 #' @inherit model_importance details
 
 score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
@@ -37,7 +38,8 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
     ens_fun <- getFromNamespace(ensemble_fun, ns = asNamespace("hubEnsembles"))
     ens_all <- ens_fun(single_task_data,
       weights = NULL,
-      model_id = "ensemble-all"
+      model_id = "ensemble-all",
+      ...
     )
 
     # build ensemble forecasts by leaving one model out
@@ -46,7 +48,8 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
         dplyr::filter(.data$model_id != x) |>
         ens_fun(
           weights = NULL,
-          model_id = paste0("ens.wo.", x)
+          model_id = paste0("ens.wo.", x),
+          ...
         )
     })
     ensemble_data <- rbind(ens_all, dplyr::bind_rows(ens_lomo))
@@ -69,23 +72,33 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       ) |>
       dplyr::filter(.data$model_id != "ensemble-all") |>
       dplyr::mutate(model_id = gsub("ens.wo.", "", .data$model_id)) |>
-      dplyr::select(-.data$calculated_metric)
+      dplyr::select(-"calculated_metric")
   } else {
     df_importance <- NULL
   }
   # Insert NAs for missing models
   if (length(missing_model) > 0) {
     fixed_cols <- df_importance |>
-      select(-c(.data$model_id, .data$value, .data$importance)) |>
+      select(-c("model_id", "value", "importance")) |>
       distinct()
     missing_model_rows <- data.frame(
       model_id = missing_model, fixed_cols,
       value = NA, importance = NA
     )
     # bind the new rows to df_importance
-    importance_scores <- bind_rows(df_importance, missing_model_rows)
+    combined_df <- bind_rows(df_importance, missing_model_rows)
+    # reorder the columns
+    importance_scores <- data.frame(model_id = model_id_list) |>
+      left_join(
+        combined_df,
+        by = "model_id"
+      ) |>
+      select(-c("output_type_id", "value")) |>
+      distinct()
   } else {
-    importance_scores <- df_importance
+    importance_scores <- df_importance |>
+      select(-c("output_type_id", "value")) |>
+      distinct()
   }
   importance_scores
 }

@@ -1,113 +1,174 @@
 library(dplyr)
 library(hubEnsembles)
 library(hubEvals)
-# data for testing
-target_data <- readRDS(
-  testthat::test_path("testdata/flu_example_target_data.rds")
-) |> mutate(target_end_date = as.Date(target_end_date))
+library(purrr)
 
-forecast_mean <- readRDS(
-  testthat::test_path("testdata/flu_example_mean_model_output.rds")
+# forecast data list
+file_names <- c(
+  dat_mean = "dat_mean.rds",
+  dat_median = "dat_median.rds",
+  dat_quantile = "dat_qntl.rds",
+  dat_pmf = "dat_pmf.rds"
 )
-valid_tbl_mean <- validate_input_data(forecast_mean, target_data)
-mean_data_list <- split_data_by_task(valid_tbl_mean,
-  weighted = FALSE,
-  training_window_length = 0
+data_list <- map(file_names, ~ readRDS(testthat::test_path("testdata", .x)))
+# target data list
+target_file_names <- c(
+  target_mean = "target_mean.rds",
+  target_median = "target_median.rds",
+  target_quantile = "target_qntl.rds",
+  target_pmf = "target_pmf.rds"
+)
+target_data_list <- map(
+  target_file_names,
+  ~ readRDS(testthat::test_path("testdata", .x))
+)
+# list of expected values for testing
+exp_file_names <- c(
+  exp_imp_mean_lomo = "exp_imp_mean_untrained_lomo.rds",
+  exp_imp_median_lomo = "exp_imp_median_untrained_lomo.rds",
+  exp_imp_quantile_lomo = "exp_imp_qntl_untrained_lomo.rds",
+  exp_imp_pmf_lomo = "exp_imp_pmf_untrained_lomo.rds"
+)
+exp_imp_list <- map(
+  exp_file_names,
+  ~ readRDS(testthat::test_path("testdata", .x))
 )
 
-forecast_median <- readRDS(
-  testthat::test_path("testdata/flu_example_median_model_output.rds")
+# combination of arguments
+output_type <- c("mean", "median", "quantile", "pmf")
+agg_fun <- c("mean", "median")
+algorithm <- c("lomo")
+
+params <- expand.grid(
+  output_type = output_type,
+  ens_fun = "simple_ensemble",
+  agg_fun = agg_fun,
+  algorithm = algorithm,
+  stringsAsFactors = FALSE
+) |>
+  rbind(data.frame(
+    output_type = output_type,
+    ens_fun = "linear_pool",
+    agg_fun = NA,
+    algorithm = algorithm
+  )) |>
+  mutate(metric = case_when(
+    output_type == "mean" ~ "se_point",
+    output_type == "median" ~ "ae_point",
+    output_type == "quantile" ~ "wis",
+    output_type == "pmf" ~ "log_score"
+  )) |>
+  filter(!(output_type == "median" & ens_fun == "linear_pool")) |>
+  arrange(output_type, ens_fun)
+
+## Test: score_untrained function works properly when ensemble function is
+## simple_ensemble and aggregation function is mean or median.
+pmap(
+  params,
+  function(output_type, ens_fun, agg_fun, algorithm, metric) {
+    test_that(paste(
+      "Testing if the function works properly with output type:", output_type,
+      "ensemble function:", ens_fun,
+      "aggregation function:", agg_fun,
+      "importance algorithm:", algorithm,
+      "metric:", metric
+    ), {
+      # get the data corresponding to the arguments
+      selected_data <- data_list[[paste0("dat_", output_type)]]
+      selected_target_data <- target_data_list[[paste0(
+        "target_", output_type
+      )]]
+      selected_expected_importance <- exp_imp_list[[paste0(
+        "exp_imp_", output_type, "_", algorithm
+      )]]
+      if (ens_fun != "linear_pool") {
+        # calculate importance scores with the given arguments
+        calculated <- score_untrained(
+          single_task_data = selected_data,
+          oracle_output_data = selected_target_data,
+          model_id_list = unique(selected_data$model_id),
+          ensemble_fun = ens_fun,
+          importance_algorithm = algorithm,
+          subset_wt = "equal",
+          metric = metric,
+          agg_fun = agg_fun
+        ) |>
+          dplyr::select(model_id, importance) |>
+          as.data.frame()
+      } else {
+        calculated <- score_untrained(
+          single_task_data = selected_data,
+          oracle_output_data = selected_target_data,
+          model_id_list = unique(selected_data$model_id),
+          ensemble_fun = ens_fun,
+          importance_algorithm = algorithm,
+          subset_wt = "equal",
+          metric = metric
+        ) |>
+          dplyr::select(model_id, importance) |>
+          as.data.frame()
+      }
+      # expected values
+      expected_value <- selected_expected_importance |>
+        filter(
+          ens_mthd == paste0(ens_fun, "-", agg_fun),
+          algorithm == algorithm,
+          test_purp == "properly assigned"
+        ) |>
+        dplyr::select(model_id, importance)
+      # test: compare the calculated importance with the expected importance
+      expect_equal(calculated, expected_value, tolerance = 1e-1)
+    })
+  }
 )
-valid_tbl_median <- validate_input_data(forecast_median, target_data)
-median_data_list <- split_data_by_task(valid_tbl_median,
-  weighted = FALSE,
-  training_window_length = 0
-)
 
 
-test_that("Compute when using 'linear pool' with 'mean' output type", {
-  # replace with simple values for easy calculation
-  dat <- mean_data_list[[16]]
-  dat$value <- c(30, 12, 18)
-  # find index of target_data corresponding to dat
-  idx <- with(
-    target_data,
-    target_end_date == unique(dat$target_end_date) &
-      output_type == unique(dat$output_type) &
-      location == unique(dat$location)
-  )
-  # replace the target oracle value with a simple value
-  target_data$oracle_value[idx] <- 10
-  # calculate the squared error of the ensembles
-  se_ensemble <- c(
-    # squared error of the ensemble built with all models
-    (mean(dat$value) - target_data$oracle_value[idx])^2,
-    # squared error of the ensemble built without the first model
-    (mean(dat$value[2:3]) - target_data$oracle_value[idx])^2,
-    # squared error of the ensemble built without the second model
-    (mean(dat$value[c(1, 3)]) - target_data$oracle_value[idx])^2,
-    # squared error of the ensemble built without the third model
-    (mean(dat$value[1:2]) - target_data$oracle_value[idx])^2
-  )
-  # calculate importance scores by subtracting the error of the ensemble-all
-  # from each of ensembles built without one model
-  expected_importance <- (se_ensemble - se_ensemble[1])[-1]
+## Test: check if the function assigns NAs for missing data
+## in the set-up of simple mean ensemble.
+reduced_params <- filter(
+  params,
+  ens_fun == "simple_ensemble", agg_fun == "mean"
+) |>
+  dplyr::select(output_type, algorithm, metric)
 
-  # test: compare the calculated importance with the expected importance
-  expect_equal(
-    score_untrained(
-      single_task_data = dat,
-      oracle_output_data = target_data,
-      model_id_list = unique(valid_tbl_mean$model_id),
-      ensemble_fun = "linear_pool",
-      importance_algorithm = "lomo",
+pmap(reduced_params, function(output_type, algorithm, metric) {
+  test_that(paste(
+    "Assign NAs for missing data with output type:", output_type,
+    "metric:", metric
+  ), {
+    # get the data corresponding to the arguments
+    selected_data <- data_list[[paste0("dat_", output_type)]]
+    selected_target_data <- target_data_list[[paste0(
+      "target_", output_type
+    )]]
+    selected_expected_importance <- exp_imp_list[[paste0(
+      "exp_imp_", output_type, "_", algorithm
+    )]]
+    model_id_list <- unique(selected_data$model_id)
+    sub_dat <- selected_data |> filter(model_id %in% model_id_list[c(1, 3)])
+    # calculate importance scores with mean output and simple mean ensemble
+    calculated <- score_untrained(
+      single_task_data = sub_dat,
+      oracle_output_data = selected_target_data,
+      model_id_list = unique(selected_data$model_id),
+      ensemble_fun = "simple_ensemble",
+      importance_algorithm = algorithm,
       subset_wt = "equal",
-      metric = "se_point"
-    ) |> dplyr::pull(importance),
-    expected_importance
-  )
-})
-
-test_that("Assign NAs for missing data", {
-  # This test is to check if the function assigns NAs for missing data
-  # in the set-up of linear pool ensemble for mean output type.
-  # replace with simple values for easy calculation
-  dat <- mean_data_list[[1]]
-  dat$value <- c(30, 18)
-  # find index of target_data corresponding to dat
-  idx <- with(
-    target_data,
-    target_end_date == unique(dat$target_end_date) &
-      output_type == unique(dat$output_type) &
-      location == unique(dat$location)
-  )
-  # replace the target oracle value with a simple value
-  target_data$oracle_value[idx] <- 10
-  # calculate the squared error of the ensembles
-  se_ensemble <- c(
-    # squared error of the ensemble built with all models
-    (mean(dat$value) - target_data$oracle_value[idx])^2,
-    # squared error of the ensemble built without the first model
-    (mean(dat$value[2]) - target_data$oracle_value[idx])^2,
-    # squared error of the ensemble built without the second model
-    (mean(dat$value[1]) - target_data$oracle_value[idx])^2,
-    # assign NA for missing data
-    NA
-  )
-  # calculate importance scores by subtracting the error of the ensemble-all
-  # from each of ensembles built without one model
-  expected_importance <- (se_ensemble - se_ensemble[1])[-1]
-  # test: compare the calculated importance with the expected importance
-  expect_equal(
-    score_untrained(
-      single_task_data = dat,
-      oracle_output_data = target_data,
-      model_id_list = unique(valid_tbl_mean$model_id),
-      ensemble_fun = "linear_pool",
-      importance_algorithm = "lomo",
-      subset_wt = "equal",
-      metric = "se_point"
-    ) |> dplyr::pull(importance),
-    expected_importance
-  )
+      metric = metric
+    ) |>
+      dplyr::select(model_id, importance) |>
+      as.data.frame()
+    # expected values
+    expected_value <- selected_expected_importance |>
+      filter(
+        ens_mthd == "simple_mean",
+        algorithm == algorithm,
+        test_purp == "missing data"
+      ) |>
+      dplyr::select(model_id, importance)
+    # Remove the metrics attribute
+    attr(expected_value, "metrics") <- NULL
+    # test: compare the calculated importance with the expected importance
+    expect_equal(calculated, expected_value, tolerance = 1e-1)
+  })
 })
