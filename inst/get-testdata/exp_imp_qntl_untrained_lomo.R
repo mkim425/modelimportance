@@ -47,8 +47,7 @@ exp_imp_qntl1 <- model_imp_scores |>
     ens_mthd = "linear_pool-NA",
     algorithm = "lomo",
     test_purp = "properly assigned"
-  ) |>
-  as.data.frame()
+  )
 
 ## Case 2: no missing data and 'simple_ensemble' using agg_fun = mean
 # create an ensemble using all models and store it in 'df_ensembles_simple'
@@ -86,8 +85,7 @@ exp_imp_qntl2 <- model_imp_scores |>
     ens_mthd = "simple_ensemble-mean",
     algorithm = "lomo",
     test_purp = "properly assigned"
-  ) |>
-  as.data.frame()
+  )
 
 ## Case 3: no missing data and 'simple_ensemble' using agg_fun = median
 # create an ensemble using all models and store it in 'df_ensembles_simple'
@@ -125,8 +123,7 @@ exp_imp_qntl3 <- model_imp_scores |>
     ens_mthd = "simple_ensemble-median",
     algorithm = "lomo",
     test_purp = "properly assigned"
-  ) |>
-  as.data.frame()
+  )
 
 ## Case 4: a missing data and 'simple_mean' ensemble
 # data with missing values
@@ -163,13 +160,12 @@ exp_imp_qntl4 <- data.frame(model_id = model_id_list) |>
     ens_mthd = "simple_mean",
     algorithm = "lomo",
     test_purp = "missing data"
-  ) |>
-  as.data.frame()
+  )
 
 # combine the expected importance scores
 exp_imp_qntl <- rbind(
   exp_imp_qntl1, exp_imp_qntl2, exp_imp_qntl3, exp_imp_qntl4
-)
+) |> as_tibble()
 
 # save data
 saveRDS(exp_imp_qntl,
