@@ -115,9 +115,13 @@ pmap(
           algorithm == algorithm,
           test_purp == "properly assigned"
         ) |>
-        dplyr::select(model_id, importance)
-      # test: compare the calculated importance with the expected importance
-      expect_equal(calculated, expected_value, tolerance = 1e-1)
+        dplyr::select(model_id, importance) |>
+        as.data.frame()
+      # test: compare the calculated importance with the expected importance,
+      # ignoring their attributes
+      expect_equal(calculated, expected_value,
+        tolerance = 1e-1, ignore_attr = TRUE
+      )
     })
   }
 )
@@ -165,10 +169,14 @@ pmap(reduced_params, function(output_type, algorithm, metric) {
         algorithm == algorithm,
         test_purp == "missing data"
       ) |>
-      dplyr::select(model_id, importance)
+      dplyr::select(model_id, importance) |>
+      as.data.frame()
     # Remove the metrics attribute
     attr(expected_value, "metrics") <- NULL
-    # test: compare the calculated importance with the expected importance
-    expect_equal(calculated, expected_value, tolerance = 1e-1)
+    # test: compare the calculated importance with the expected importance,
+    # ignoring their attributes
+    expect_equal(calculated, expected_value,
+      tolerance = 1e-1, ignore_attr = TRUE
+    )
   })
 })
