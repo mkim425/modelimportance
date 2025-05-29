@@ -102,7 +102,7 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
         get_modelsubset <- models[subset]
         # index of the subsets list that is identical to the current subset, S
         i <- Position(function(x) identical(x, subset), subsets)
-        if (subset_wt == "perm-based") {
+        if (subset_wt == "perm_based") {
           # calculate the weight given to this subset
           weight <- 1 / ((n - 1) * choose(n - 1, length(get_modelsubset)))
           # when the subset includes all indices, its weight is infinite
@@ -116,8 +116,9 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
         data_subset <- single_task_data |>
           filter(.data$model_id %in% get_modelsubset)
         # build an ensemble forecast using the models in the subset S
-        ensemble_forecast <- ens_fun(data_subset) |>
-          mutate(model_id = paste0("ensemble_", i))
+        ensemble_forecast <- ens_fun(data_subset,
+          model_id = paste0("ensemble_", i), ...
+        )
         # add index and weight to the ensemble forecast
         ens_dat <- ensemble_forecast |>
           mutate(subset_idx = i, subset_weight = weight)
@@ -126,7 +127,7 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
     )
     # score the ensemble forecasts
     score_ens_all <- score_model_out(
-      dat_all_ens |> select(-c(.data$subset_idx, .data$subset_weight)),
+      dat_all_ens |> select(-c("subset_idx", "subset_weight")),
       oracle_output_data,
       metrics = metric
     ) |>
@@ -173,23 +174,22 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       )
       # accumulate the scores calculated by subsets
       score <- sum(scores_by_subset)
-      # store the importance score for the jth model
-      data.frame(
-        model_id = models[j],
-        subset_wt = subset_wt
-      ) |>
-        # importance score for the jth model depending on the subset_wt option
-        mutate(
-          importance = ifelse(subset_wt == "perm-based", score,
-            score / (2^(n - 1) - 1)
-          )
+      # store the importance score for the jth model depending on the subset_wt option
+      if (subset_wt == "perm_based") {
+        data.frame(
+          model_id = models[j],
+          importance = score
         )
+      } else {
+        data.frame(
+          model_id = models[j],
+          importance = score / (2^(n - 1) - 1)
+        )
+      }
     })
     # add the scores column to the input dataset
     df_importance <- single_task_data |>
-      left_join(result, by = "model_id") |>
-      # remove the subset_wt column
-      select(-subset_wt)
+      left_join(result, by = "model_id")
   }
   # Insert NAs for missing models
   if (length(missing_model) > 0) {
