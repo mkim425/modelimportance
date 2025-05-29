@@ -120,7 +120,7 @@ exp_imp_mean_case4perm <- model_imp_scores |>
   mutate(
     ens_mthd = "simple_ensemble-mean",
     algorithm = "lasomo",
-    test_purp = "properly assigned",
+    test_purp = "missing data",
     subset_wt = "perm_based"
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)
@@ -131,7 +131,7 @@ exp_imp_mean_case4eq <- model_imp_scores |>
   mutate(
     ens_mthd = "simple_ensemble-mean",
     algorithm = "lasomo",
-    test_purp = "properly assigned",
+    test_purp = "missing data",
     subset_wt = "equal"
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)
