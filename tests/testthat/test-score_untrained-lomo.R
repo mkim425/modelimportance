@@ -1,3 +1,5 @@
+# Unit tests for `score_untrained()` with LOMO algorithm
+
 library(dplyr)
 library(hubEnsembles)
 library(hubEvals)
