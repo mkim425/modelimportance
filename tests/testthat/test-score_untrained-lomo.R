@@ -39,20 +39,17 @@ exp_imp_list <- map(
 # combination of arguments
 output_type <- c("mean", "median", "quantile", "pmf")
 agg_fun <- c("mean", "median")
-algorithm <- c("lomo")
 
 params <- expand.grid(
   output_type = output_type,
   ens_fun = "simple_ensemble",
   agg_fun = agg_fun,
-  algorithm = algorithm,
   stringsAsFactors = FALSE
 ) |>
   rbind(data.frame(
     output_type = output_type,
     ens_fun = "linear_pool",
-    agg_fun = NA,
-    algorithm = algorithm
+    agg_fun = NA
   )) |>
   mutate(metric = case_when(
     output_type == "mean" ~ "se_point",
@@ -72,7 +69,6 @@ pmap(
       "Testing if the function works properly with output type:", output_type,
       "ensemble function:", ens_fun,
       "aggregation function:", agg_fun,
-      "importance algorithm:", algorithm,
       "metric:", metric
     ), {
       # get the data corresponding to the arguments
@@ -81,7 +77,7 @@ pmap(
         "target_", output_type
       )]]
       selected_expected_importance <- exp_imp_list[[paste0(
-        "exp_imp_", output_type, "_", algorithm
+        "exp_imp_", output_type, "_lomo"
       )]]
       if (ens_fun != "linear_pool") {
         # calculate importance scores with the given arguments
@@ -90,7 +86,7 @@ pmap(
           oracle_output_data = selected_target_data,
           model_id_list = unique(selected_data$model_id),
           ensemble_fun = ens_fun,
-          importance_algorithm = algorithm,
+          importance_algorithm = "lomo",
           subset_wt = "equal",
           metric = metric,
           agg_fun = agg_fun
@@ -103,7 +99,7 @@ pmap(
           oracle_output_data = selected_target_data,
           model_id_list = unique(selected_data$model_id),
           ensemble_fun = ens_fun,
-          importance_algorithm = algorithm,
+          importance_algorithm = "lomo",
           subset_wt = "equal",
           metric = metric
         ) |>
@@ -114,7 +110,6 @@ pmap(
       expected_value <- selected_expected_importance |>
         filter(
           ens_mthd == paste0(ens_fun, "-", agg_fun),
-          algorithm == algorithm,
           test_purp == "properly assigned"
         ) |>
         dplyr::select(model_id, importance) |>
@@ -135,9 +130,9 @@ reduced_params <- filter(
   params,
   ens_fun == "simple_ensemble", agg_fun == "mean"
 ) |>
-  dplyr::select(output_type, algorithm, metric)
+  dplyr::select(output_type, metric)
 
-pmap(reduced_params, function(output_type, algorithm, metric) {
+pmap(reduced_params, function(output_type, metric) {
   test_that(paste(
     "Assign NAs for missing data with output type:", output_type,
     "metric:", metric
@@ -148,7 +143,7 @@ pmap(reduced_params, function(output_type, algorithm, metric) {
       "target_", output_type
     )]]
     selected_expected_importance <- exp_imp_list[[paste0(
-      "exp_imp_", output_type, "_", algorithm
+      "exp_imp_", output_type, "_lomo"
     )]]
     model_id_list <- unique(selected_data$model_id)
     sub_dat <- selected_data |> filter(model_id %in% model_id_list[c(1, 3)])
@@ -158,7 +153,7 @@ pmap(reduced_params, function(output_type, algorithm, metric) {
       oracle_output_data = selected_target_data,
       model_id_list = unique(selected_data$model_id),
       ensemble_fun = "simple_ensemble",
-      importance_algorithm = algorithm,
+      importance_algorithm = "lomo",
       subset_wt = "equal",
       metric = metric
     ) |>
@@ -168,7 +163,6 @@ pmap(reduced_params, function(output_type, algorithm, metric) {
     expected_value <- selected_expected_importance |>
       filter(
         ens_mthd == "simple_mean",
-        algorithm == algorithm,
         test_purp == "missing data"
       ) |>
       dplyr::select(model_id, importance) |>
