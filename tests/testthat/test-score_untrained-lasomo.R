@@ -10,13 +10,15 @@ library(future)
 # forecast data list
 file_names <- c(
   dat_mean = "dat_mean.rds",
-  dat_median = "dat_median.rds"
+  dat_median = "dat_median.rds",
+  dat_quantile = "dat_qntl.rds"
 )
 data_list <- map(file_names, ~ readRDS(testthat::test_path("testdata", .x)))
 # target data list
 target_file_names <- c(
   target_mean = "target_mean.rds",
-  target_median = "target_median.rds"
+  target_median = "target_median.rds",
+  target_quantile = "target_qntl.rds"
 )
 target_data_list <- map(
   target_file_names,
@@ -25,7 +27,8 @@ target_data_list <- map(
 # list of expected values for testing
 exp_file_names <- c(
   exp_imp_mean_lasomo = "exp_imp_mean_untrained_lasomo.rds",
-  exp_imp_median_lasomo = "exp_imp_median_untrained_lasomo.rds"
+  exp_imp_median_lasomo = "exp_imp_median_untrained_lasomo.rds",
+  exp_imp_quantile_lasomo = "exp_imp_qntl_untrained_lasomo.rds"
 )
 exp_imp_list <- map(
   exp_file_names,
@@ -33,7 +36,7 @@ exp_imp_list <- map(
 )
 
 # combination of arguments
-output_type <- c("mean", "median")
+output_type <- c("mean", "median", "quantile")
 agg_fun <- c("mean", "median")
 subset_weight <- c("equal", "perm_based")
 
@@ -44,7 +47,7 @@ params <- expand.grid(
   subset_weight = subset_weight,
   stringsAsFactors = FALSE
 ) |>
-  rbind(data.frame(
+  rbind(expand.grid(
     output_type = output_type,
     ens_fun = "linear_pool",
     agg_fun = NA,
@@ -57,7 +60,7 @@ params <- expand.grid(
     output_type == "pmf" ~ "log_score"
   )) |>
   filter(!(output_type == "median" & ens_fun == "linear_pool")) |>
-  arrange(output_type, ens_fun, agg_fun,  subset_weight)
+  arrange(output_type, ens_fun, agg_fun, subset_weight)
 
 ## Test: score_untrained function works properly when ensemble function is
 ## simple_ensemble and aggregation function is mean or median.
@@ -148,7 +151,11 @@ pmap(reduced_params, function(output_type, subset_weight, metric) {
       "exp_imp_", output_type, "_lasomo"
     )]]
     model_id_list <- unique(selected_data$model_id)
-    sub_dat <- selected_data |> filter(model_id %in% model_id_list[1:3])
+    if (output_type != "quantile") {
+      sub_dat <- selected_data |> filter(model_id %in% model_id_list[1:3])
+    } else {
+      sub_dat <- selected_data |> filter(model_id %in% model_id_list[c(1, 3)])
+    }
     # calculate importance scores with mean output and simple mean ensemble
     calculated <- score_untrained(
       single_task_data = sub_dat,
@@ -160,6 +167,7 @@ pmap(reduced_params, function(output_type, subset_weight, metric) {
       metric = metric
     ) |>
       dplyr::select(model_id, importance) |>
+      arrange(model_id) |>
       as.data.frame()
     # expected values
     expected_value <- selected_expected_importance |>
@@ -169,6 +177,7 @@ pmap(reduced_params, function(output_type, subset_weight, metric) {
         test_purp == "missing data"
       ) |>
       dplyr::select(model_id, importance) |>
+      arrange(model_id) |>
       as.data.frame()
     # Remove the metrics attribute
     attr(expected_value, "metrics") <- NULL
