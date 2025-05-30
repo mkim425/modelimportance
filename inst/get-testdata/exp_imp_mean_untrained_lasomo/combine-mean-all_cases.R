@@ -3,10 +3,10 @@
 ## for the untrained ensemble models with mean output in LASOMO
 
 file_names <- c(
-  "case1-no_missing-linear_pool.R",
-  "case2-no_missing-simple-agg_mean.R",
-  "case3-no_missing-simple-agg_median.R",
-  "case4-missing-simple-agg_mean.R"
+  "mean-case1-no_missing-linear_pool.R",
+  "mean-case2-no_missing-simple-agg_mean.R",
+  "mean-case3-no_missing-simple-agg_median.R",
+  "mean-case4-missing-simple-agg_mean.R"
 )
 root <- "./inst/get-testdata/exp_imp_mean_untrained_lasomo/"
 for (i in 1:4) source(paste0(root, file_names[i]))
