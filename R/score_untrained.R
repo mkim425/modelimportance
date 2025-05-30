@@ -77,7 +77,9 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       ) |>
       dplyr::filter(.data$model_id != "ensemble-all") |>
       dplyr::mutate(model_id = gsub("ens.wo.", "", .data$model_id)) |>
-      dplyr::select(-"calculated_metric")
+      dplyr::select(-"calculated_metric") |>
+      select(-c("output_type_id", "value")) |>
+      distinct()
   } else {
     # check if the necessary packages are installed
     if (!requireNamespace("furrr", quietly = TRUE)) {
@@ -127,6 +129,7 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
     )
     # score the ensemble forecasts
     score_ens_all <- score_model_out(
+      # remove subset info cols to avoid errors caused by the weight of NA
       dat_all_ens |> select(-c("subset_idx", "subset_weight")),
       oracle_output_data,
       metrics = metric
@@ -134,7 +137,12 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       rename(calculated_metric = any_of(
         c("ae_point", "se_point", "wis", "log_score")
       )) |>
-      left_join(dat_all_ens, by = "model_id")
+      left_join(
+        dat_all_ens |>
+          select(c("model_id", "subset_weight")) |>
+          distinct(),
+        by = "model_id"
+      )
 
     ## Environment for parallel computation
     # store the original plan
@@ -189,16 +197,17 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
     })
     # add the scores column to the input dataset
     df_importance <- single_task_data |>
+      select(-c("output_type_id", "value")) |>
+      distinct() |>
       left_join(result, by = "model_id")
   }
   # Insert NAs for missing models
   if (length(missing_model) > 0) {
     fixed_cols <- df_importance |>
-      select(-c("model_id", "value", "importance")) |>
+      select(-c("model_id", "importance")) |>
       distinct()
     missing_model_rows <- data.frame(
-      model_id = missing_model, fixed_cols,
-      value = NA, importance = NA
+      model_id = missing_model, fixed_cols, importance = NA
     )
     # bind the new rows to df_importance
     combined_df <- bind_rows(df_importance, missing_model_rows)
@@ -208,11 +217,9 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
         combined_df,
         by = "model_id"
       ) |>
-      select(-c("output_type_id", "value")) |>
       distinct()
   } else {
     importance_scores <- df_importance |>
-      select(-c("output_type_id", "value")) |>
       distinct()
   }
   importance_scores
