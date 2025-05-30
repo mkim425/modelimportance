@@ -9,12 +9,14 @@ library(future)
 
 # forecast data list
 file_names <- c(
-  dat_mean = "dat_mean.rds"
+  dat_mean = "dat_mean.rds",
+  dat_median = "dat_median.rds"
 )
 data_list <- map(file_names, ~ readRDS(testthat::test_path("testdata", .x)))
 # target data list
 target_file_names <- c(
-  target_mean = "target_mean.rds"
+  target_mean = "target_mean.rds",
+  target_median = "target_median.rds"
 )
 target_data_list <- map(
   target_file_names,
@@ -22,7 +24,8 @@ target_data_list <- map(
 )
 # list of expected values for testing
 exp_file_names <- c(
-  exp_imp_mean_lasomo = "exp_imp_mean_untrained_lasomo.rds"
+  exp_imp_mean_lasomo = "exp_imp_mean_untrained_lasomo.rds",
+  exp_imp_median_lasomo = "exp_imp_median_untrained_lasomo.rds"
 )
 exp_imp_list <- map(
   exp_file_names,
@@ -30,7 +33,7 @@ exp_imp_list <- map(
 )
 
 # combination of arguments
-output_type <- c("mean")
+output_type <- c("mean", "median")
 agg_fun <- c("mean", "median")
 subset_weight <- c("equal", "perm_based")
 
