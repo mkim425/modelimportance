@@ -79,9 +79,9 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
         set_k <- subsets[[k]]
         # index in 'subsets' list that include elements of set_k except for j
         k1 <- which(sapply(subsets, setequal, set_k[set_k != j]))
-        # se_point for the ensemble forecast including jth model
+        # ae_point for the ensemble forecast including jth model
         score_incl_j <- score_ens_all$ae_point[k]
-        # se_point for the ensemble forecast not including jth model
+        # ae_point for the ensemble forecast not including jth model
         score_not_incl_j <- score_ens_all$ae_point[k1]
         # get the subset weight for the current subset
         subset_weight <- score_ens_all[[col]][k1]
