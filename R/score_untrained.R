@@ -182,7 +182,7 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       )
       # accumulate the scores calculated by subsets
       score <- sum(scores_by_subset)
-      # store the importance score for the jth model depending on the subset_wt option
+      # store the score for the jth model depending on the subset_wt option
       if (subset_wt == "perm_based") {
         data.frame(
           model_id = models[j],
