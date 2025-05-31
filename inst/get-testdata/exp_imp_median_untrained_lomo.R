@@ -50,8 +50,7 @@ exp_imp_median1 <- model_imp_scores |>
     ens_mthd = "simple_ensemble-mean",
     algorithm = "lomo",
     test_purp = "properly assigned"
-  ) |>
-  as.data.frame()
+  )
 
 ## Case 2: no missing data and 'simple_ensemble' using agg_fun = median
 # ensemble built from all models
@@ -89,8 +88,7 @@ exp_imp_median2 <- model_imp_scores |>
     ens_mthd = "simple_ensemble-median",
     algorithm = "lomo",
     test_purp = "properly assigned"
-  ) |>
-  as.data.frame()
+  )
 
 ## Case 3: a missing data and 'simple_mean' ensemble
 # data with missing values
@@ -127,13 +125,12 @@ exp_imp_median3 <- data.frame(model_id = model_id_list) |>
     ens_mthd = "simple_mean",
     algorithm = "lomo",
     test_purp = "missing data"
-  ) |>
-  as.data.frame()
+  )
 
 # combine the expected importance scores
 exp_imp_median <- rbind(
   exp_imp_median1, exp_imp_median2, exp_imp_median3
-)
+) |> as_tibble()
 
 # save data
 saveRDS(exp_imp_median,

@@ -1,7 +1,11 @@
+# Unit tests for `score_untrained()` with LASOMO algorithm
+
 library(dplyr)
 library(hubEnsembles)
 library(hubEvals)
 library(purrr)
+library(furrr)
+library(future)
 
 # forecast data list
 file_names <- c(
@@ -24,10 +28,10 @@ target_data_list <- map(
 )
 # list of expected values for testing
 exp_file_names <- c(
-  exp_imp_mean_lomo = "exp_imp_mean_untrained_lomo.rds",
-  exp_imp_median_lomo = "exp_imp_median_untrained_lomo.rds",
-  exp_imp_quantile_lomo = "exp_imp_qntl_untrained_lomo.rds",
-  exp_imp_pmf_lomo = "exp_imp_pmf_untrained_lomo.rds"
+  exp_imp_mean_lasomo = "exp_imp_mean_untrained_lasomo.rds",
+  exp_imp_median_lasomo = "exp_imp_median_untrained_lasomo.rds",
+  exp_imp_quantile_lasomo = "exp_imp_qntl_untrained_lasomo.rds",
+  exp_imp_pmf_lasomo = "exp_imp_pmf_untrained_lasomo.rds"
 )
 exp_imp_list <- map(
   exp_file_names,
@@ -37,20 +41,20 @@ exp_imp_list <- map(
 # combination of arguments
 output_type <- c("mean", "median", "quantile", "pmf")
 agg_fun <- c("mean", "median")
-algorithm <- c("lomo")
+subset_weight <- c("equal", "perm_based")
 
 params <- expand.grid(
   output_type = output_type,
   ens_fun = "simple_ensemble",
   agg_fun = agg_fun,
-  algorithm = algorithm,
+  subset_weight = subset_weight,
   stringsAsFactors = FALSE
 ) |>
-  rbind(data.frame(
+  rbind(expand.grid(
     output_type = output_type,
     ens_fun = "linear_pool",
     agg_fun = NA,
-    algorithm = algorithm
+    subset_weight = subset_weight
   )) |>
   mutate(metric = case_when(
     output_type == "mean" ~ "se_point",
@@ -59,19 +63,19 @@ params <- expand.grid(
     output_type == "pmf" ~ "log_score"
   )) |>
   filter(!(output_type == "median" & ens_fun == "linear_pool")) |>
-  arrange(output_type, ens_fun)
+  arrange(output_type, ens_fun, agg_fun, subset_weight)
 
 ## Test: score_untrained function works properly when ensemble function is
 ## simple_ensemble and aggregation function is mean or median.
 pmap(
   params,
-  function(output_type, ens_fun, agg_fun, algorithm, metric) {
+  function(output_type, ens_fun, agg_fun, subset_weight, metric) {
     test_that(paste(
       "Testing if the function works properly with output type:", output_type,
-      "ensemble function:", ens_fun,
-      "aggregation function:", agg_fun,
-      "importance algorithm:", algorithm,
-      "metric:", metric
+      "/ensemble function:", ens_fun,
+      "/aggregation function:", agg_fun,
+      "/subset_weight:", subset_weight,
+      "/metric:", metric
     ), {
       # get the data corresponding to the arguments
       selected_data <- data_list[[paste0("dat_", output_type)]]
@@ -79,17 +83,17 @@ pmap(
         "target_", output_type
       )]]
       selected_expected_importance <- exp_imp_list[[paste0(
-        "exp_imp_", output_type, "_", algorithm
+        "exp_imp_", output_type, "_lasomo"
       )]]
+      # calculate importance scores with the given arguments
       if (ens_fun != "linear_pool") {
-        # calculate importance scores with the given arguments
         calculated <- score_untrained(
           single_task_data = selected_data,
           oracle_output_data = selected_target_data,
           model_id_list = unique(selected_data$model_id),
           ensemble_fun = ens_fun,
-          importance_algorithm = algorithm,
-          subset_wt = "equal",
+          importance_algorithm = "lasomo",
+          subset_wt = subset_weight,
           metric = metric,
           agg_fun = agg_fun
         ) |>
@@ -101,8 +105,8 @@ pmap(
           oracle_output_data = selected_target_data,
           model_id_list = unique(selected_data$model_id),
           ensemble_fun = ens_fun,
-          importance_algorithm = algorithm,
-          subset_wt = "equal",
+          importance_algorithm = "lasomo",
+          subset_wt = subset_weight,
           metric = metric
         ) |>
           dplyr::select(model_id, importance) |>
@@ -112,12 +116,16 @@ pmap(
       expected_value <- selected_expected_importance |>
         filter(
           ens_mthd == paste0(ens_fun, "-", agg_fun),
-          algorithm == algorithm,
+          subset_wt == subset_weight,
           test_purp == "properly assigned"
         ) |>
-        dplyr::select(model_id, importance)
-      # test: compare the calculated importance with the expected importance
-      expect_equal(calculated, expected_value, tolerance = 1e-1)
+        dplyr::select(model_id, importance) |>
+        as.data.frame()
+      # test: compare the calculated importance with the expected importance,
+      # ignoring their attributes
+      expect_equal(calculated, expected_value,
+        tolerance = 1e-1, ignore_attr = TRUE
+      )
     })
   }
 )
@@ -129,12 +137,13 @@ reduced_params <- filter(
   params,
   ens_fun == "simple_ensemble", agg_fun == "mean"
 ) |>
-  dplyr::select(output_type, algorithm, metric)
+  dplyr::select(output_type, subset_weight, metric)
 
-pmap(reduced_params, function(output_type, algorithm, metric) {
+pmap(reduced_params, function(output_type, subset_weight, metric) {
   test_that(paste(
     "Assign NAs for missing data with output type:", output_type,
-    "metric:", metric
+    "/subset_weight:", subset_weight,
+    "/metric:", metric
   ), {
     # get the data corresponding to the arguments
     selected_data <- data_list[[paste0("dat_", output_type)]]
@@ -142,33 +151,44 @@ pmap(reduced_params, function(output_type, algorithm, metric) {
       "target_", output_type
     )]]
     selected_expected_importance <- exp_imp_list[[paste0(
-      "exp_imp_", output_type, "_", algorithm
+      "exp_imp_", output_type, "_lasomo"
     )]]
     model_id_list <- unique(selected_data$model_id)
-    sub_dat <- selected_data |> filter(model_id %in% model_id_list[c(1, 3)])
+    # obtain a subset of the data as if there are missing values.
+    if (output_type %in% c("mean", "median")) {
+      sub_dat <- selected_data |> filter(model_id %in% model_id_list[1:3])
+    } else {
+      sub_dat <- selected_data |> filter(model_id %in% model_id_list[c(1, 3)])
+    }
     # calculate importance scores with mean output and simple mean ensemble
     calculated <- score_untrained(
       single_task_data = sub_dat,
       oracle_output_data = selected_target_data,
       model_id_list = unique(selected_data$model_id),
       ensemble_fun = "simple_ensemble",
-      importance_algorithm = algorithm,
-      subset_wt = "equal",
+      importance_algorithm = "lasomo",
+      subset_wt = subset_weight,
       metric = metric
     ) |>
       dplyr::select(model_id, importance) |>
+      arrange(model_id) |>
       as.data.frame()
     # expected values
     expected_value <- selected_expected_importance |>
       filter(
-        ens_mthd == "simple_mean",
-        algorithm == algorithm,
+        ens_mthd == "simple_ensemble-mean",
+        subset_wt == subset_weight,
         test_purp == "missing data"
       ) |>
-      dplyr::select(model_id, importance)
+      dplyr::select(model_id, importance) |>
+      arrange(model_id) |>
+      as.data.frame()
     # Remove the metrics attribute
     attr(expected_value, "metrics") <- NULL
-    # test: compare the calculated importance with the expected importance
-    expect_equal(calculated, expected_value, tolerance = 1e-1)
+    # test: compare the calculated importance with the expected importance,
+    # ignoring their attributes
+    expect_equal(calculated, expected_value,
+      tolerance = 1e-1, ignore_attr = TRUE
+    )
   })
 })

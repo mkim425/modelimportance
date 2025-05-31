@@ -3,3 +3,5 @@
 ^README\.Rmd$
 ^\.github$
 ^LICENSE\.md$
+^inst/ongoing-work$
+^\.lintr$

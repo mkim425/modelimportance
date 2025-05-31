@@ -32,6 +32,8 @@
 #' importance calculation; `c("lomo", "lasomo")`.
 #' `"lomo"` stands for leave-one-model-out and
 #' `"lasomo"` stands for leave all subsets of models out.
+#' For `"lasomo"`, `'furrr'` and `'future'` packages need to be installed for
+#' parallel execution.
 #' @param subset_wt A character string specifying method for assigning weight
 #' to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.
 #' * `"equal"` assigns equal weight to all subsets.
