@@ -11,14 +11,16 @@ library(future)
 file_names <- c(
   dat_mean = "dat_mean.rds",
   dat_median = "dat_median.rds",
-  dat_quantile = "dat_qntl.rds"
+  dat_quantile = "dat_qntl.rds",
+  dat_pmf = "dat_pmf.rds"
 )
 data_list <- map(file_names, ~ readRDS(testthat::test_path("testdata", .x)))
 # target data list
 target_file_names <- c(
   target_mean = "target_mean.rds",
   target_median = "target_median.rds",
-  target_quantile = "target_qntl.rds"
+  target_quantile = "target_qntl.rds",
+  target_pmf = "target_pmf.rds"
 )
 target_data_list <- map(
   target_file_names,
@@ -28,7 +30,8 @@ target_data_list <- map(
 exp_file_names <- c(
   exp_imp_mean_lasomo = "exp_imp_mean_untrained_lasomo.rds",
   exp_imp_median_lasomo = "exp_imp_median_untrained_lasomo.rds",
-  exp_imp_quantile_lasomo = "exp_imp_qntl_untrained_lasomo.rds"
+  exp_imp_quantile_lasomo = "exp_imp_qntl_untrained_lasomo.rds",
+  exp_imp_pmf_lasomo = "exp_imp_pmf_untrained_lasomo.rds"
 )
 exp_imp_list <- map(
   exp_file_names,
@@ -36,7 +39,7 @@ exp_imp_list <- map(
 )
 
 # combination of arguments
-output_type <- c("mean", "median", "quantile")
+output_type <- c("mean", "median", "quantile", "pmf")
 agg_fun <- c("mean", "median")
 subset_weight <- c("equal", "perm_based")
 
@@ -82,8 +85,8 @@ pmap(
       selected_expected_importance <- exp_imp_list[[paste0(
         "exp_imp_", output_type, "_lasomo"
       )]]
+      # calculate importance scores with the given arguments
       if (ens_fun != "linear_pool") {
-        # calculate importance scores with the given arguments
         calculated <- score_untrained(
           single_task_data = selected_data,
           oracle_output_data = selected_target_data,
@@ -151,7 +154,8 @@ pmap(reduced_params, function(output_type, subset_weight, metric) {
       "exp_imp_", output_type, "_lasomo"
     )]]
     model_id_list <- unique(selected_data$model_id)
-    if (output_type != "quantile") {
+    # obtain a subset of the data as if there are missing values.
+    if (output_type %in% c("mean", "median")) {
       sub_dat <- selected_data |> filter(model_id %in% model_id_list[1:3])
     } else {
       sub_dat <- selected_data |> filter(model_id %in% model_id_list[c(1, 3)])
