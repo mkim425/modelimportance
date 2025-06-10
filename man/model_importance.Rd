@@ -52,7 +52,9 @@ Default is \code{0}, meaning that no prior data is available for training.}
 \item{importance_algorithm}{A character string specifying algorithm for model
 importance calculation; \code{c("lomo", "lasomo")}.
 \code{"lomo"} stands for leave-one-model-out and
-\code{"lasomo"} stands for leave all subsets of models out.}
+\code{"lasomo"} stands for leave all subsets of models out.
+For \code{"lasomo"}, \code{'furrr'} and \code{'future'} packages need to be installed for
+parallel execution.}
 
 \item{subset_wt}{A character string specifying method for assigning weight
 to subsets when using \code{lasomo} algorithm; \code{c("equal", "perm_based")}.
