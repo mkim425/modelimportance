@@ -8,3 +8,7 @@ if (requireNamespace("future", quietly = TRUE)) {
     future::plan(future::multisession)
   }
 }
+
+if (Sys.getenv("GITHUB_ACTIONS") == "true") {
+  future::plan("sequential")
+}
