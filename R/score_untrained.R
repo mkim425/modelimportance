@@ -147,10 +147,17 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
     ## Environment for parallel computation
     # store the original plan
     original_plan <- future::plan()
+    os <- Sys.info()[["sysname"]]
+    ci <- tolower(Sys.getenv("CI", "false")) == "true"
     # set parallel plan with a conservative number of workers
-    future::plan(future::multisession,
-      workers = min(4, parallel::detectCores() - 1)
-    )
+    if (ci && os == "Darwin") {
+      future::plan(future::sequential)
+      message("CI macOS – using sequential")
+    } else {
+      future::plan(future::multisession,
+        workers = min(4, parallel::detectCores() - 1)
+      )
+    }
     # restore the original plan on exit
     on.exit(future::plan(original_plan), add = TRUE)
 
