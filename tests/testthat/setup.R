@@ -1,5 +1,8 @@
 if (requireNamespace("future", quietly = TRUE)) {
-  if (Sys.getenv("CI") == "true" && Sys.info()["sysname"] == "Darwin") {
+  os <- Sys.info()[["sysname"]]
+  ci <- tolower(Sys.getenv("CI", "false")) == "true"
+
+  if (ci) {
     future::plan(future::sequential)
   } else {
     future::plan(future::multisession)
