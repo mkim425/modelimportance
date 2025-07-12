@@ -31,7 +31,7 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
                             ensemble_fun, importance_algorithm, subset_wt,
                             metric, ...) {
   # check if the necessary packages are installed
-  if (is(plan(), "sequential")) {
+  if (is(future::plan(), "sequential")) {
     message(
       "Note: This function uses 'furrr' and 'future' for parallelization.\n",
       "To enable parallel execution, please set future::plan(multisession)."
