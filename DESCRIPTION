@@ -16,14 +16,14 @@ Imports:
     dplyr (>= 1.1.4),
     hubExamples (>= 0.1.0),
     hubEvals (>= 0.0.0.9001),
-    hubEnsembles (>= 0.1.9)
-Depends: 
-    R (>= 2.10)
-Suggests: 
-    testthat (>= 3.0.0),
+    hubEnsembles (>= 0.1.9),
     purrr (>= 1.0.4),
     furrr (>= 0.3.1),
     future (>= 1.49.0)
+Depends: 
+    R (>= 2.10)
+Suggests: 
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Remotes:
     hubverse-org/hubUtils,

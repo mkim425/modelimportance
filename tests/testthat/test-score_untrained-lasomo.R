@@ -6,6 +6,7 @@ library(hubEvals)
 library(purrr)
 library(furrr)
 library(future)
+future::plan("sequential") # Set up sequential plan for testing
 
 # forecast data list
 file_names <- c(
