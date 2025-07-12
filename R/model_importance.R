@@ -81,8 +81,14 @@
 #' across all component model outputs for each unique `output_type_id`.
 #' This can be `median` or a custom function (e.g., geometric_mean. Details
 #' can be found in
-#' https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
+#' https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html).
+#'
+#' This function uses the `furrr` and `future` for parallelization.
+#' To enable parallel execution, please set a parallel backend, e.g., via
+#' `future::plan()`.
+#'
 #' @examples \dontrun{
+#' future::plan(future::multisession)
 #' library(dplyr)
 #' library(hubExamples)
 #' forecast_data <- hubExamples::forecast_outputs |>
