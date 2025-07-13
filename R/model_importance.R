@@ -1,9 +1,13 @@
-#' @title Quantify ensemble component model contributions to ensemble
+#' @title Quantify overall contributions of ensemble component model to ensemble
 #' prediction accuracy
 #' @description
 #' Evaluate ensemble component model's importance based on a measure of their
 #' contribution to ensemble prediction accuracy for each combination of
 #' model task.
+#'
+#' This function requires that one column represent the forecast date (or
+#' a date from which each forecast originates or is made in reference to) and
+#' that it be named one of `forecast_date`, `origin_date`, and `reference_date`.
 #'
 #' For each `output_type`, the corresponding scoring rule applied to calculate
 #' the importance is as follows.
@@ -24,36 +28,44 @@
 #' @param oracle_output_data Ground truth data for the variables that are used
 #' to define modeling targets. This data must follow the oracle output format.
 #' See 'Details'.
-#' @param ensemble_fun A character string specifying a ensemble method, either
-#' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
-#' * When `"simple_ensemble"` is specified, the ensemble is generated using the
-#' optional `agg_fun` function in `...` (see 'Details'). It takes into account
-#' the weight option specified in `weighted`.
-#' * When `"linear_pool"` is specified, ensemble model outputs are created as
-#' a linear pool of component model outputs. This method supports only
-#' an `output_type` of `mean`, `quantile`, or `pmf`.
-#' @param weighted Boolean indicating whether model weighting should be done.
-#' If `FALSE`, all models are given equal weight.
-#' If `TRUE`, model weights are estimated.
-#' @param training_window_length An integer value representing the time interval
-#' of historical data used during the training process
-#' to estimate model weights.
-#' Default is `0`, meaning that no prior data is available for training.
 #' @param importance_algorithm A character string specifying algorithm for model
 #' importance calculation; `c("lomo", "lasomo")`.
 #' `"lomo"` stands for leave-one-model-out and
 #' `"lasomo"` stands for leave all subsets of models out.
+#' For `"lasomo"`, `'furrr'` and `'future'` packages need to be installed for
+#' parallel execution.
 #' @param subset_wt A character string specifying method for assigning weight
 #' to subsets when using `lasomo` algorithm; `c("equal", "perm_based")`.
+#' * `"equal"` assigns equal weight to all subsets.
+#' * `"perm_based"` assigns weight averaged over all possible permutations as in
+#' the Shapley value.
+#' Ignored if `lomo` method is used. Default is `"equal"`, if not specified.
+#' @param ensemble_fun A character string specifying a ensemble method, either
+#' "simple_ensemble" or "linear_pool"; `c("simple_ensemble", "linear_pool")`.
+#' * When `"simple_ensemble"` is specified, the ensemble is generated using the
+#' optional `agg_fun` function in `...` (see 'Details').
+#' * When `"linear_pool"` is specified, ensemble model outputs are created as
+#' a linear pool of component model outputs. This method supports only
+#' an `output_type` of `mean`, `quantile`, or `pmf`.
+#' @param weighted Boolean indicating whether model weighting should be done
+#' when building an ensemble using the `ensemble_fun`.
+#' * If `FALSE`, all models are given equal weight.
+#' * If `TRUE`, model weights are estimated.
+#' @param training_window_length An integer value representing the time interval
+#' of historical data used during the training process
+#' to estimate model weights.
+#' Default is `0`, meaning that no prior data is available for training.
 #' @param na_action A character string specifying treatment for missing data;
-#' `c("worst," "average," "drop").` `"worst"` replaces missing values with
-#' the smallest value from the other models. `"average"` replaces
-#' missing values with the average value from the other models.
-#' `"drop"` removes missing values.
+#' `c("worst," "average," "drop").`
+#' * `"worst"` replaces missing values with the smallest value from the other
+#' models.
+#' * `"average"` replaces missing values with the average value from the other
+#' models.
+#' * `"drop"` removes missing values.
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
 #' @return A data.frame with columns
-#' `task_id`, `output_type`, `model`, `importance_score`.
+#' `task_id`, `output_type`, `model_id`, `importance_score`.
 #' @import hubExamples
 #' @export
 #' @details
@@ -63,7 +75,7 @@
 #' `cdf`, and `oracle_value` column for the observed values.
 #' TBD for more details.
 #'
-#' Additional argument in ... is `agg_fun`, which is a character string name
+#' Additional argument in `...` is `agg_fun`, which is a character string name
 #' for a function specifying aggregation method of component model outputs.
 #' Default is `mean`, meaning that equally (or weighted) mean is calculated
 #' across all component model outputs for each unique `output_type_id`.
@@ -89,7 +101,7 @@
 #'     target_end_date = date,
 #'     oracle_value = observation
 #'   )
-#'
+#' # Example with the default arguments.
 #' model_importance(
 #'   forecast_data = forecast_data, oracle_output_data = target_data,
 #'   ensemble_fun = "simple_ensemble", weighted = FALSE,
@@ -121,8 +133,13 @@ model_importance <- function(forecast_data,
   )
 
   # validate input data: get a model_out_tbl format with a single output type
-  # and combine two datasets
   valid_tbl <- validate_input_data(forecast_data, oracle_output_data)
+
+  # validate ensemble_fun when output_type is median
+  data_output_type <- unique(valid_tbl$output_type)
+  if (data_output_type == "median" && ensemble_fun == "linear_pool") {
+    stop("Error: 'linear pool' cannot be used when output type is 'median'.")
+  }
 
   # forecast_dates
   forecast_date_list <- unique(valid_tbl$reference_date)
@@ -134,6 +151,22 @@ model_importance <- function(forecast_data,
     min(forecast_date_list), max(forecast_date_list), length(forecast_date_list)
   ))
 
+  # model ids
+  model_id_list <- unique(valid_tbl$model_id)
+
+  # Give a message for the user to check the model IDs
+  message(paste(
+    "The available model IDs are:\n",
+    paste("\t", model_id_list, collapse = "\n"),
+    "\n(a total of", length(model_id_list), "models)\n"
+  ))
+
+  # TO ADD: two functions to implement importance score calculation
+  # One is for untrained ensemble and the other is for trained ensemble.
+  # Each function will implement either lomo or lasomo algorithms for a single
+  # forecast task.
+  # The output will be a data frame with importance scores of component models
+  # along with task information given in the input forecast_data.
   score_result <- forecast_data
   return(score_result)
 }

@@ -10,11 +10,20 @@ forecast_quantiles <- readRDS(
 )
 
 valid_tbl <- validate_input_data(forecast_quantiles, target_data)
-result <- split_data_by_task(valid_tbl)
 
-split_cols <- c("horizon", "location", "target_end_date")
+## commonly required columns
+required_cols <- c(
+  "reference_date", "model_id", "output_type", "output_type_id", "value"
+)
+## task specific columns
+split_cols <- setdiff(colnames(valid_tbl), required_cols)
 
-test_that("split_data_by_task() groups data correctly", {
+test_that("split_data_by_task() groups data correctly for untrained ensemble", {
+  result <- split_data_by_task(valid_tbl,
+    weighted = FALSE,
+    training_window_length = 0
+  )
+
   # The result is a list
   expect_type(result, "list")
 
@@ -48,4 +57,33 @@ test_that("split_data_by_task() groups data correctly", {
       }
     )
   ))
+})
+
+test_that("split_data_by_task() groups data correctly for trained ensemble", {
+  training_window_length <- 2
+  result <- split_data_by_task(valid_tbl,
+    weighted = TRUE,
+    training_window_length
+  )
+
+  # The result is a list
+  expect_type(result, "list")
+
+  # Each element of the list is a data frame
+  expect_true(all(sapply(result, is.data.frame)))
+
+  # Check the number of dataset splits
+  expect_equal(
+    length(result),
+    length(unique(valid_tbl$reference_date)) - training_window_length
+  )
+})
+
+test_that("split_data_by_task() throws an error", {
+  training_window_length <- 5
+  expect_error(
+    split_data_by_task(valid_tbl, weighted = TRUE, training_window_length),
+    "The number of reference_date must greater than the training window
+        length."
+  )
 })

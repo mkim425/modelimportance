@@ -9,16 +9,24 @@ Description: More about what it does (maybe more than one line)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
-    hubUtils,
-    dplyr,
-    hubExamples
+    hubUtils (>= 0.4.0),
+    dplyr (>= 1.1.4),
+    hubExamples (>= 0.1.0),
+    hubEvals (>= 0.0.0.9001),
+    hubEnsembles (>= 0.1.9)
 Depends: 
     R (>= 2.10)
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    purrr (>= 1.0.4),
+    furrr (>= 0.3.1),
+    future (>= 1.49.0)
 Config/testthat/edition: 3
 Remotes:
     hubverse-org/hubUtils,
-    hubverse-org/hubExamples
+    hubverse-org/hubExamples,
+    hubverse-org/hubEvals,
+    hubverse-org/hubEnsembles

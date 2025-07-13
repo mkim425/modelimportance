@@ -4,11 +4,23 @@
 \alias{split_data_by_task}
 \title{Split the input data by a single task.}
 \usage{
-split_data_by_task(valid_tbl)
+split_data_by_task(valid_tbl, weighted, training_window_length)
 }
 \arguments{
 \item{valid_tbl}{A data.frame containing forecast data and target data,
-processed by the function `validate_input_data()`.}
+processed by the function \code{validate_input_data()}.}
+
+\item{weighted}{Boolean indicating whether model weighting should be done
+when building an ensemble using the \code{ensemble_fun}.
+\itemize{
+\item If \code{FALSE}, all models are given equal weight.
+\item If \code{TRUE}, model weights are estimated.
+}}
+
+\item{training_window_length}{An integer value representing the time interval
+of historical data used during the training process
+to estimate model weights.
+Default is \code{0}, meaning that no prior data is available for training.}
 }
 \value{
 A list of data sets, each corresponding to a single task.
@@ -16,28 +28,4 @@ A list of data sets, each corresponding to a single task.
 \description{
 This function splits the input data by a single task with a
 combination of horizon, location, and target_end_date
-}
-\examples{
-\dontrun{
-library(dplyr)
-library(hubExamples)
-forecast_data <- hubExamples::forecast_outputs |>
-  dplyr::filter(
-    output_type \%in\% c("quantile"),
-    location == "25",
-    horizon == 1
-  )
-target_data <- hubExamples::forecast_target_ts |>
-  dplyr::filter(
-    date \%in\% unique(forecast_data$target_end_date),
-    location == "25"
-  ) |>
-  # Rename columns to match the oracle output format
-  rename(
-    target_end_date = date,
-    oracle_value = observation
-  )
-valid_tbl <- validate_input_data(forecast_data, target_data)
-split_data_by_task(valid_tbl)
-}
 }
