@@ -30,6 +30,14 @@
 score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
                             ensemble_fun, importance_algorithm, subset_wt,
                             metric, ...) {
+  # check if the necessary packages are installed
+  if (is(future::plan(), "sequential")) {
+    message(
+      "Note: This function uses 'furrr' and 'future' for parallelization.\n",
+      "To enable parallel execution, please set future::plan(multisession)."
+    )
+  }
+
   # models in the single_task_data
   models <- unique(single_task_data$model_id)
   missing_model <- setdiff(model_id_list, single_task_data$model_id)
@@ -46,7 +54,7 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       ...
     )
     # build ensemble forecasts by leaving one model out
-    ens_lomo <- lapply(models, function(x) {
+    ens_lomo <- furrr::future_map(models, function(x) {
       single_task_data |>
         dplyr::filter(.data$model_id != x) |>
         ens_fun(
@@ -81,16 +89,6 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       select(-c("output_type_id", "value")) |>
       distinct()
   } else {
-    # check if the necessary packages are installed
-    if (!requireNamespace("furrr", quietly = TRUE)) {
-      stop("Please install `furrr` package for parallel execution in `lasomo`
-           algorithm.")
-    }
-    if (!requireNamespace("future", quietly = TRUE)) {
-      stop("Please install `future` package for parallel execution in `lasomo`
-           algorithm.")
-    }
-
     # number of models
     n <- length(models)
     # Power set of {1,2,...,n} not including the empty set.
@@ -143,16 +141,6 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
           distinct(),
         by = "model_id"
       )
-
-    ## Environment for parallel computation
-    # store the original plan
-    original_plan <- future::plan()
-    # set parallel plan with a conservative number of workers
-    future::plan(future::multisession,
-      workers = min(4, parallel::detectCores() - 1)
-    )
-    # restore the original plan on exit
-    on.exit(future::plan(original_plan), add = TRUE)
 
     ## parallel computation
     # calculate importance scores
