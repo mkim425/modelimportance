@@ -180,6 +180,7 @@ model_importance <- function(forecast_data,
   # The output will be a data frame with importance scores of component models
   # along with task information given in the input forecast_data.
   # -------------------------------------------------------------------------
+  ## Implement importance score calculation
   # check if the necessary packages are installed
   if (is(future::plan(), "sequential")) {
     message(
@@ -196,10 +197,10 @@ model_importance <- function(forecast_data,
     group_split()
 
   if (!weighted) {
+    # Call the function to calculate importance scores for untrained ensemble
     score_result <- furrr::future_map_dfr(
       df_list_by_task,
       function(single_task_data) {
-        # Call the function to calculate importance scores for untrained ensemble
         score_untrained(
           single_task_data, oracle_output_data, model_id_list,
           ensemble_fun, importance_algorithm, subset_wt,
@@ -208,7 +209,23 @@ model_importance <- function(forecast_data,
       }
     )
   } else {
+    # Call the function to calculate importance scores for trained ensemble
     score_result <- forecast_data
   }
-  return(score_result)
+
+  # NA handling
+  if (na_action == "worst") {
+    importance_result <- score_result |>
+      group_by(location, horizon, target_end_date) |>
+      mutate_at(vars(importance), ~ replace_na(., min(., na.rm = TRUE)))
+  } else if (na_action == "average") {
+    importance_result <- score_result |>
+      group_by(location, horizon, target_end_date) |>
+      mutate_at(vars(importance), ~ replace_na(., mean(., na.rm = TRUE)))
+  } else if (na_action == "drop") {
+    importance_result <- score_result |>
+      filter(!is.na(importance))
+  }
+
+  return(importance_result)
 }
