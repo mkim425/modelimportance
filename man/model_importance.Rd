@@ -116,10 +116,15 @@ Default is \code{mean}, meaning that equally (or weighted) mean is calculated
 across all component model outputs for each unique \code{output_type_id}.
 This can be \code{median} or a custom function (e.g., geometric_mean. Details
 can be found in
-https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html)
+https://hubverse-org.github.io/hubEnsembles/articles/hubEnsembles.html).
+
+This function uses the \code{furrr} and \code{future} for parallelization.
+To enable parallel execution, please set a parallel backend, e.g., via
+\code{future::plan()}.
 }
 \examples{
 \dontrun{
+future::plan(future::multisession)
 library(dplyr)
 library(hubExamples)
 forecast_data <- hubExamples::forecast_outputs |>
