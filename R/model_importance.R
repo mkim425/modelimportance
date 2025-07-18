@@ -189,12 +189,10 @@ model_importance <- function(forecast_data,
     )
   }
 
-  # get model id list, including all models in the forecast data
-  model_id_list <- unique(valid_tbl$model_id)
   # Group by single task
-  df_list_by_task <- valid_tbl |>
-    group_by(location, horizon, target_end_date) |>
-    group_split()
+  df_list_by_task <- split_data_by_task(
+    valid_tbl, weighted, training_window_length
+  )
 
   if (!weighted) {
     # Call the function to calculate importance scores for untrained ensemble
@@ -217,14 +215,26 @@ model_importance <- function(forecast_data,
   if (na_action == "worst") {
     importance_result <- score_result |>
       group_by(location, horizon, target_end_date) |>
-      mutate_at(vars(importance), ~ replace_na(., min(., na.rm = TRUE)))
+      mutate(across(
+        importance,
+        ~ coalesce(., min(., na.rm = TRUE))
+      )) |>
+      group_by(model_id) |>
+      summarise(mean_importance = mean(importance), .groups = "drop")
   } else if (na_action == "average") {
     importance_result <- score_result |>
       group_by(location, horizon, target_end_date) |>
-      mutate_at(vars(importance), ~ replace_na(., mean(., na.rm = TRUE)))
-  } else if (na_action == "drop") {
+      mutate(across(
+        importance,
+        ~ coalesce(., mean(., na.rm = TRUE))
+      )) |>
+      group_by(model_id) |>
+      summarise(mean_importance = mean(importance), .groups = "drop")
+  } else {
     importance_result <- score_result |>
-      filter(!is.na(importance))
+      filter(!is.na(importance)) |>
+      group_by(model_id) |>
+      summarise(mean_importance = mean(importance), .groups = "drop")
   }
 
   return(importance_result)
