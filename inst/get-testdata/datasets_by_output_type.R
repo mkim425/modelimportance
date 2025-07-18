@@ -21,6 +21,10 @@ dat_mean1 <- mean_data_list[[16]]
 dat_mean <- rbind(dat_mean1, dat_mean1[1:2, ])
 dat_mean$model_id <- c(dat_mean1$model_id, "fake-mod1", "fake-mod2")
 dat_mean$value <- c(30, 12, 18, 6, 6)
+# another data frame on different location
+dat_mean2 <- mean_data_list[[15]]
+dat_mean2$value <- c(22, 15, 8)
+multiple_dat_mean <- rbind(dat_mean, dat_mean2)
 # find index of target_data corresponding to dat
 idx <- with(
   target_data_mean,
@@ -28,15 +32,31 @@ idx <- with(
     output_type == unique(dat_mean$output_type) &
     location == unique(dat_mean$location)
 )
+idx2 <- with(
+  target_data_mean,
+  target_end_date == unique(dat_mean2$target_end_date) &
+    output_type == unique(dat_mean2$output_type) &
+    location == unique(dat_mean2$location)
+)
 # replace the target oracle value with a simple value
 target_data_mean$oracle_value[idx] <- 10
+target_data_mean$oracle_value[idx2] <- 10
 # save data
 saveRDS(dat_mean, file = "tests/testthat/testdata/dat_mean.rds")
+saveRDS(multiple_dat_mean,
+  file = "tests/testthat/testdata/multiple_dat_mean.rds"
+)
 saveRDS(
   target_data_mean |> filter(
-    target_end_date == unique(dat_mean$target_end_date) &
+    target_end_date %in% c(
+      unique(dat_mean$target_end_date),
+      unique(dat_mean2$target_end_date)
+    ) &
       output_type == unique(dat_mean$output_type) &
-      location == unique(dat_mean$location)
+      location %in% c(
+        unique(dat_mean$location),
+        unique(dat_mean2$location)
+      )
   ),
   file = "tests/testthat/testdata/target_mean.rds"
 )
