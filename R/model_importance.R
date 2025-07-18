@@ -152,13 +152,19 @@ model_importance <- function(forecast_data,
 
   # Give a message for the user to check the forecast dates
   message(sprintf(
-    "The input data has forecast from %s to %s.
-    There are a total of %d forecast dates.",
+    "The input data has forecast from %s to %s: a total of %d forecast dates.",
     min(forecast_date_list), max(forecast_date_list), length(forecast_date_list)
   ))
 
   # model ids
   model_id_list <- unique(valid_tbl$model_id)
+  # corresponding metric to the output type
+  metric <- case_when(
+    unique(valid_tbl$output_type) == "median" ~ "ae_point",
+    unique(valid_tbl$output_type) == "mean" ~ "se_point",
+    unique(valid_tbl$output_type) == "quantile" ~ "wis",
+    unique(valid_tbl$output_type) == "pmf" ~ "log_score"
+  )
 
   # Give a message for the user to check the model IDs
   message(paste(
@@ -173,6 +179,36 @@ model_importance <- function(forecast_data,
   # forecast task.
   # The output will be a data frame with importance scores of component models
   # along with task information given in the input forecast_data.
-  score_result <- forecast_data
+  # -------------------------------------------------------------------------
+  # check if the necessary packages are installed
+  if (is(future::plan(), "sequential")) {
+    message(
+      "Note: This function uses 'furrr' and 'future' for parallelization.\n",
+      "To enable parallel execution, please set future::plan(multisession)."
+    )
+  }
+
+  # get model id list, including all models in the forecast data
+  model_id_list <- unique(valid_tbl$model_id)
+  # Group by single task
+  df_list_by_task <- valid_tbl |>
+    group_by(location, horizon, target_end_date) |>
+    group_split()
+
+  if (!weighted) {
+    score_result <- furrr::future_map_dfr(
+      df_list_by_task,
+      function(single_task_data) {
+        # Call the function to calculate importance scores for untrained ensemble
+        score_untrained(
+          single_task_data, oracle_output_data, model_id_list,
+          ensemble_fun, importance_algorithm, subset_wt,
+          metric, ...
+        )
+      }
+    )
+  } else {
+    score_result <- forecast_data
+  }
   return(score_result)
 }
