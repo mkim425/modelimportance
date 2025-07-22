@@ -185,20 +185,19 @@ saveRDS(dat_pmf,
   file = "tests/testthat/testdata/dat_pmf.rds"
 )
 saveRDS(multiple_dat_pmf,
-        file = "tests/testthat/testdata/multiple_dat_pmf.rds"
+  file = "tests/testthat/testdata/multiple_dat_pmf.rds"
 )
 saveRDS(
-        target_data_pmf |> filter(
-                target_end_date %in% c(
-                        unique(dat_pmf$target_end_date),
-                        unique(dat_pmf2$target_end_date)
-                ) &
-                        output_type == unique(dat_pmf$output_type) &
-                        location %in% c(
-                                unique(dat_pmf$location),
-                                unique(dat_pmf2$location)
-                        )
-        ),
-        file = "tests/testthat/testdata/target_pmf.rds"
+  target_data_pmf |> filter(
+    target_end_date %in% c(
+      unique(dat_pmf$target_end_date),
+      unique(dat_pmf2$target_end_date)
+    ) &
+      output_type == unique(dat_pmf$output_type) &
+      location %in% c(
+        unique(dat_pmf$location),
+        unique(dat_pmf2$location)
+      )
+  ),
+  file = "tests/testthat/testdata/target_pmf.rds"
 )
-
