@@ -152,13 +152,19 @@ model_importance <- function(forecast_data,
 
   # Give a message for the user to check the forecast dates
   message(sprintf(
-    "The input data has forecast from %s to %s.
-    There are a total of %d forecast dates.",
+    "The input data has forecast from %s to %s: a total of %d forecast dates.",
     min(forecast_date_list), max(forecast_date_list), length(forecast_date_list)
   ))
 
   # model ids
   model_id_list <- unique(valid_tbl$model_id)
+  # corresponding metric to the output type
+  metric <- case_when(
+    unique(valid_tbl$output_type) == "median" ~ "ae_point",
+    unique(valid_tbl$output_type) == "mean" ~ "se_point",
+    unique(valid_tbl$output_type) == "quantile" ~ "wis",
+    unique(valid_tbl$output_type) == "pmf" ~ "log_score"
+  )
 
   # Give a message for the user to check the model IDs
   message(paste(
@@ -173,6 +179,64 @@ model_importance <- function(forecast_data,
   # forecast task.
   # The output will be a data frame with importance scores of component models
   # along with task information given in the input forecast_data.
-  score_result <- forecast_data
-  return(score_result)
+  # -------------------------------------------------------------------------
+  ## Implement importance score calculation
+  # check if the necessary packages are installed
+  if (is(future::plan(), "sequential")) {
+    message(
+      "Note: This function uses 'furrr' and 'future' for parallelization.\n",
+      "To enable parallel execution, please set future::plan(multisession)."
+    )
+  }
+
+  # Group by single task
+  df_list_by_task <- split_data_by_task(
+    valid_tbl, weighted, training_window_length
+  )
+
+  if (!weighted) {
+    # Call the function to calculate importance scores for untrained ensemble
+    score_result <- furrr::future_map_dfr(
+      df_list_by_task,
+      function(single_task_data) {
+        score_untrained(
+          single_task_data, oracle_output_data, model_id_list,
+          ensemble_fun, importance_algorithm, subset_wt,
+          metric, ...
+        )
+      }
+    )
+  } else {
+    # TO DO:
+    # Call the function to calculate importance scores for trained ensemble
+    score_result <- forecast_data
+  }
+
+  # NA handling
+  if (na_action == "worst") {
+    importance_result <- score_result |>
+      group_by(location, horizon, target_end_date) |>
+      mutate(across(
+        importance,
+        ~ coalesce(., min(., na.rm = TRUE))
+      )) |>
+      group_by(model_id) |>
+      summarise(mean_importance = mean(importance), .groups = "drop")
+  } else if (na_action == "average") {
+    importance_result <- score_result |>
+      group_by(location, horizon, target_end_date) |>
+      mutate(across(
+        importance,
+        ~ coalesce(., mean(., na.rm = TRUE))
+      )) |>
+      group_by(model_id) |>
+      summarise(mean_importance = mean(importance), .groups = "drop")
+  } else {
+    importance_result <- score_result |>
+      filter(!is.na(importance)) |>
+      group_by(model_id) |>
+      summarise(mean_importance = mean(importance), .groups = "drop")
+  }
+
+  return(importance_result)
 }
