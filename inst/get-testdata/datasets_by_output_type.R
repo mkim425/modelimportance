@@ -21,6 +21,10 @@ dat_mean1 <- mean_data_list[[16]]
 dat_mean <- rbind(dat_mean1, dat_mean1[1:2, ])
 dat_mean$model_id <- c(dat_mean1$model_id, "fake-mod1", "fake-mod2")
 dat_mean$value <- c(30, 12, 18, 6, 6)
+# another data frame on different target_end_date
+dat_mean2 <- mean_data_list[[15]]
+dat_mean2$value <- c(22, 15, 8)
+multiple_dat_mean <- rbind(dat_mean, dat_mean2)
 # find index of target_data corresponding to dat
 idx <- with(
   target_data_mean,
@@ -28,15 +32,31 @@ idx <- with(
     output_type == unique(dat_mean$output_type) &
     location == unique(dat_mean$location)
 )
+idx2 <- with(
+  target_data_mean,
+  target_end_date == unique(dat_mean2$target_end_date) &
+    output_type == unique(dat_mean2$output_type) &
+    location == unique(dat_mean2$location)
+)
 # replace the target oracle value with a simple value
 target_data_mean$oracle_value[idx] <- 10
+target_data_mean$oracle_value[idx2] <- 10
 # save data
 saveRDS(dat_mean, file = "tests/testthat/testdata/dat_mean.rds")
+saveRDS(multiple_dat_mean,
+  file = "tests/testthat/testdata/multiple_dat_mean.rds"
+)
 saveRDS(
   target_data_mean |> filter(
-    target_end_date == unique(dat_mean$target_end_date) &
+    target_end_date %in% c(
+      unique(dat_mean$target_end_date),
+      unique(dat_mean2$target_end_date)
+    ) &
       output_type == unique(dat_mean$output_type) &
-      location == unique(dat_mean$location)
+      location %in% c(
+        unique(dat_mean$location),
+        unique(dat_mean2$location)
+      )
   ),
   file = "tests/testthat/testdata/target_mean.rds"
 )
@@ -60,6 +80,10 @@ dat_median1 <- median_data_list[[16]]
 dat_median <- rbind(dat_median1, dat_median1[1:2, ])
 dat_median$model_id <- c(dat_median1$model_id, "fake-mod1", "fake-mod2")
 dat_median$value <- c(30, 12, 18, 6, 6)
+# another data frame on different target_end_date
+dat_median2 <- median_data_list[[15]]
+dat_median2$value <- c(22, 15, 8)
+multiple_dat_median <- rbind(dat_median, dat_median2)
 # find index of target_data corresponding to dat
 idx <- with(
   target_data_median,
@@ -67,21 +91,36 @@ idx <- with(
     output_type == unique(dat_median$output_type) &
     location == unique(dat_median$location)
 )
+idx2 <- with(
+  target_data_median,
+  target_end_date == unique(dat_median2$target_end_date) &
+    output_type == unique(dat_median2$output_type) &
+    location == unique(dat_median2$location)
+)
 # replace the target oracle value with a simple value
 target_data_median$oracle_value[idx] <- 10
+target_data_median$oracle_value[idx2] <- 10
 # save data
 saveRDS(dat_median,
   file = "tests/testthat/testdata/dat_median.rds"
 )
+saveRDS(multiple_dat_median,
+  file = "tests/testthat/testdata/multiple_dat_median.rds"
+)
 saveRDS(
   target_data_median |> filter(
-    target_end_date == unique(dat_median$target_end_date) &
+    target_end_date %in% c(
+      unique(dat_median$target_end_date),
+      unique(dat_median2$target_end_date)
+    ) &
       output_type == unique(dat_median$output_type) &
-      location == unique(dat_median$location)
+      location %in% c(
+        unique(dat_median$location),
+        unique(dat_median2$location)
+      )
   ),
   file = "tests/testthat/testdata/target_median.rds"
 )
-
 ##### quantile output ########################################
 # target data
 target_data_qntl <- readRDS(
@@ -98,19 +137,31 @@ qntl_data_list <- split_data_by_task(valid_tbl_qntl,
   training_window_length = 0
 )
 dat_qntl <- qntl_data_list[[16]]
+# another data frame on different target_end_date
+dat_qntl2 <- qntl_data_list[[15]] |> filter(model_id != "PSI-DICE")
+multiple_dat_qntl <- rbind(dat_qntl, dat_qntl2)
 # save data
 saveRDS(dat_qntl,
   file = "tests/testthat/testdata/dat_qntl.rds"
 )
+saveRDS(multiple_dat_qntl,
+  file = "tests/testthat/testdata/multiple_dat_qntl.rds"
+)
+
 saveRDS(
   target_data_qntl |> filter(
-    target_end_date == unique(dat_qntl$target_end_date) &
+    target_end_date %in% c(
+      unique(dat_qntl$target_end_date),
+      unique(dat_qntl2$target_end_date)
+    ) &
       output_type == unique(dat_qntl$output_type) &
-      location == unique(dat_qntl$location)
+      location %in% c(
+        unique(dat_qntl$location),
+        unique(dat_qntl2$location)
+      )
   ),
   file = "tests/testthat/testdata/target_qntl.rds"
 )
-
 ##### pmf output ########################################
 # target data
 target_data_pmf <- readRDS(
@@ -126,15 +177,27 @@ pmf_data_list <- split_data_by_task(valid_tbl_pmf,
   training_window_length = 0
 )
 dat_pmf <- pmf_data_list[[16]]
+# another data frame on different target_end_date
+dat_pmf2 <- pmf_data_list[[15]] |> filter(model_id != "PSI-DICE")
+multiple_dat_pmf <- rbind(dat_pmf, dat_pmf2)
 # save data
 saveRDS(dat_pmf,
   file = "tests/testthat/testdata/dat_pmf.rds"
 )
+saveRDS(multiple_dat_pmf,
+  file = "tests/testthat/testdata/multiple_dat_pmf.rds"
+)
 saveRDS(
   target_data_pmf |> filter(
-    target_end_date == unique(dat_pmf$target_end_date) &
+    target_end_date %in% c(
+      unique(dat_pmf$target_end_date),
+      unique(dat_pmf2$target_end_date)
+    ) &
       output_type == unique(dat_pmf$output_type) &
-      location == unique(dat_pmf$location)
+      location %in% c(
+        unique(dat_pmf$location),
+        unique(dat_pmf2$location)
+      )
   ),
   file = "tests/testthat/testdata/target_pmf.rds"
 )
