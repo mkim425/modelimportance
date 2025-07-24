@@ -49,20 +49,23 @@ library(lubridate)
 library(here)
 library(ggplot2)
 library(kableExtra)
+options(tibble.width = Inf)
 ```
 
 
 ## Introduction {#sec:intro}
 
-Ensemble forecasting is a method to produce a single, consolidated prediction by combining forecasts generated from different models. This technique leverages the strengths of individual models while mitigating their weaknesses, leading to more robust and accurate predictions [@gneiting2005weather; @hastie01statisticallearning; @lutz_applying_2019; @viboud_rapidd_2018].
-Specifically, ensembles aggregate diverse insights from various models and handle variance and bias more effectively by averaging out the biases and variations of individual models, which can reduce prediction errors and improve overall model performance. Due to these enhanced prediction accuracy and robustness, it is widely used across various domains such as weather forecasting [@Guerra_2020; @gneiting2005weather], financial modeling [@SUN2020101160; @math11041054], and infectious disease outbreak forecasting [@ray_prediction_2018; @reich_accuracy_2019] to improve decision-making and achieve more reliable predictions. For example, throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub collected individual models developed by over 90 different research groups and built a probabilistic ensemble forecasting model for COVID-19 cases, hospitalizations, and deaths in the US based on those models’ predictions, which served as the official short-term forecasts for the US Centers for Disease Control and Prevention (CDC) [@kim2024].
+Ensemble forecasting is a method to produce a single, consolidated prediction by combining forecasts generated from different models. This technique it utilizes each model’s strengths to counterbalance their individual weaknesses, leading to more robust and accurate predictions [@gneiting2005weather; @hastie01statisticallearning; @lutz_applying_2019; @viboud_rapidd_2018].
+Specifically, ensembles aggregate diverse insights from various models and effectively handle individual models models biases and variances by averaging them out, which can reduce prediction errors and improve overall model performance. These enhanced prediction accuracy and robustness enable ensemble forecasting to be widely used across various domains such as weather forecasting [@Guerra_2020; @gneiting2005weather], financial modeling [@SUN2020101160; @math11041054], and infectious disease outbreak forecasting [@ray_prediction_2018; @reich_accuracy_2019] to improve decision-making and achieve more reliable predictions. For example, throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub collected individual models developed by over 90 different research groups and built a probabilistic ensemble forecasting model for COVID-19 cases, hospitalizations, and deaths in the US based on those models’ predictions, which served as the official short-term forecasts for the US Centers for Disease Control and Prevention (CDC) [@kim2024].
 
 The quality of forecasts is assessed by evaluating their error, bias, sharpness, and/or calibration using different scoring metrics.
 The selection of the scoring metrics depends on the type of forecast, such as point forecasts and probabilistic forecasts, and their corresponding formats, such as median/mean, quantiles, and predictive cumulative distribution functions. 
-The mean absolute error (MAE) and the mean squared error (MSE) are the commonly used measures for point forecast accuracy. They provide a direct assessment of the accuracy of specific forecasted values by calculating the average magnitude of errors. 
+In the case of point forecasts, accuracy is commonly measured by the mean absolute error (MAE) and the mean squared error (MSE), which are direct assessment tools that calculate the average magnitude of forecast errors. 
 Probabilistic forecasts are typically assessed using proper scoring rules, which consider the uncertainty and variability in predictions, providing concise evaluations through numerical scores [@gneiting_strictly_2007].  Some examples include the weighted interval score (WIS) for the quantile-based forecasts and the continuous ranked probability score (CRPS) for the forecasts taking the form of predictive cumulative distribution functions [@bracher_evaluating_2021]. 
 
-Several [R]{.proglang} packages have been developed for this purpose. To name a few, the [forecast]{.pkg} package [@Rpackage-forecast] is widely used for univariate time series forecasting and includes functions for accuracy measurement. The [Metrics]{.pkg} [@Rpackage-Metrics] and [MLmetrics]{.pkg} [@Rpackage-MLmetrics] provide a wide range of performance metrics specifically designed for evaluating machine learning models. The [scoringRules]{.pkg} [@Rpackage-scoringRules] package offers a comprehensive set of proper scoring rules for evaluating probabilistic forecasts and supports both univariate and multivariate settings. The [scoringutils]{.pkg} [@bosse2022evaluating] package adds to the functionality provided by [scoringRules]{.pkg}, offering additional features that make it more useful for certain tasks, such as summarizing, comparing, and visualizing forecast performance. Additionally, the [scoringutils]{.pkg} supports forecasts represented by predictive samples or quantiles of predictive distributions, allowing for the assessment of any forecast type, even when a closed-form expression for a parametric distribution is not available.
+Several [R]{.proglang} packages have been developed for this purpose. To name a few, the [forecast]{.pkg} package [@Rpackage-forecast] is widely used for univariate time series forecasting and includes functions for accuracy measurement. The [Metrics]{.pkg} [@Rpackage-Metrics] and [MLmetrics]{.pkg} [@Rpackage-MLmetrics] provide a wide range of performance metrics specifically designed for evaluating machine learning models. The [scoringRules]{.pkg} [@Rpackage-scoringRules] package offers a comprehensive set of proper scoring rules for evaluating probabilistic forecasts and supports both univariate and multivariate settings. 
+The [scoringutils]{.pkg} [@bosse2022evaluating] package offers additional features to the functionality provided by
+[scoringRules]{.pkg}, which makes it more useful for certain tasks, such as summarizing, comparing, and visualizing forecast performance. Additionally, the [scoringutils]{.pkg} supports forecasts represented by predictive samples or quantiles of predictive distributions, allowing for the assessment of any forecast type, even when a closed-form expression for a parametric distribution is not available.
 These packages have been valuable to evaluate individual models as independent entities, using performance metrics selected for each specific situation or problem type. However, they do not measure the individual models' contributions to the enhanced predictive accuracy when used as part of an ensemble. 
 Kim et al. [@kim2024] demonstrate that a model's individual performance does not necessarily correspond to its contribution as a component within an ensemble.
 Our developed package introduces this capability.
@@ -71,7 +74,7 @@ The [modelimportance]{.pkg} package provides tools to evaluate the role of each 
 In ensemble forecasting, certain models contribute more significantly to the overall predictions than others. Assessing the impact of each component model on ensemble predictions is methodologically similar to determining variable importance in traditional regression and machine learning models, where variable importance measures evaluate how much individual variables enhance the model's predictive performance. [R]{.proglang} packages that implement these functions include [randomForest]{.pkg} [@Rpackage-randomForest], [caret]{.pkg} [@Rpackage-caret], [xgboost]{.pkg} [@Rpackage-xgboost], and [gbm]{.pkg} [@Rpackage-gbm], each providing variable importance measures for different types of models: random forest models, general machine learning models, extreme gradient boosting models, and generalized boosted regression models, respectively.
 Similarly, the tools in the [modelimportance]{.pkg} package quantify the contribution of each component model within an ensemble to the ensemble model’s predictive performance. They assign numerical scores to each model based on a selected metric that measures forecast accuracy, depending on the forecast type. 
 
-These capabilities provide unique support for hub organizers, such as the CDC in the US and the European Centre for Disease Prevention and Control in the EU. By enabling precise evaluation of each model's contribution, the [modelimportance]{.pkg} package helps these organizations gather and utilize forecasts from various models to create more effective ensemble forecasts. This, in turn, facilitates better communication with the public and decision-makers and enhances the overall decision-making process. Specifically, [modelimportance]{.pkg} is incorporated into the `hubverse', which is a collection of open-source software and data tools developed to promote collaborative modeling hub efforts and reduce the effort required to set up and operate them [@hubverse_docs]. This package adheres to the model output formats specified by the hubverse convention, which enables seamless integration and interoperability with other forecasting tools and systems.
+These capabilities provide unique support for hub organizers, such as the CDC in the US and the European Centre for Disease Prevention and Control in the EU. These organizations can create more effective ensemble forecasts by gathering and utilizing forecasts from various models based on the precise evaluation of each model's contribution via the [modelimportance]{.pkg} package. This, in turn, facilitates better communication with the public and decision-makers and enhances the overall decision-making process. Specifically, [modelimportance]{.pkg} is incorporated into the `hubverse', which is a collection of open-source software and data tools developed to promote collaborative modeling hub efforts and reduce the effort required to set up and operate them [@hubverse_docs]. This package adheres to the model output formats specified by the hubverse convention, which enables seamless integration and interoperability with other forecasting tools and systems.
 
 The paper proceeds as follows. In Section 2, we address the model output formats proposed within the hubverse framework and the structure of forecasts, followed by a motivating example. Section 3 presents two algorithms implemented in [modelimportance]{.pkg} for calculating the model importance metric: leave-one-model-out and leave-all-subsets-of-models-out. We demonstrate the various functionalities [modelimportance]{.pkg} supports in Section 4 and give some examples in Section 5. We close this paper with some concluding remarks and a discussion of possible extensions.   
 
@@ -104,14 +107,13 @@ forecast_data |>
 
 ### Structure of forecasts {#subsec:structure_of_forecasts}
 
-The output of the forecasting model can be represented in various types. Generally, quantitative forecasts can be categorized into either point forecasts or probabilistic forecasts. 
+The forecasting model supports multiple output types. Generally, quantitative forecasts can be categorized into either point forecasts or probabilistic forecasts. 
 For a specific task, point forecasts, represented by a single predicted value, provide a clear and concise prediction, making them easy to interpret and communicate. 
 Probabilistic forecasts, on the other hand, describe the likelihood of different outcomes, conveying the uncertainty inherent in the prediction. These forecasts are represented by a probability distribution over possible future values in various ways, such as probability mass functions (pmf), cumulative distribution functions (cdf), or probability quantiles (or intervals). 
 
 The `output_type` and `output_type_id` columns in the model output format, as defined by the hubverse convention, specify the forecast structure. 
-For example, `output_type` may be 'mean' or 'median' for point forecasts, and 'pmf', 'cdf', or 'quantile' for probabilistic forecasts. The `output_type_id` column provides additional details for probabilistic forecasts; for instance, when the `output_type` is 'quantile', the `output_type_id` identifies specific quantile levels, as illustrated in @tbl-example-model_output.
+The `output_type` column takes the character value 'mean' or 'median' for point forecasts, and 'pmf', 'cdf', or 'quantile' for probabilistic forecasts. The `output_type_id` column provides additional details for probabilistic forecasts; for instance, when the `output_type` is 'quantile', the `output_type_id` identifies specific quantile levels, as illustrated in @tbl-example-model_output. In the case of point forecasts, `output_type_id` column has 'NA'. 
 Different output types correspond to different scoring rules for evaluating a model's prediction performance. @tbl-pair-output-scoringrule presents the output types and their associated scoring rules supported by the [modelimportance]{.pkg} package.
-
 
 
 ```{r}
@@ -147,7 +149,7 @@ For example, when evaluating model 1 within an ensemble of three models ($n=3$),
 
 On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays a role of ${\cal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to.
 For example, using the earlier setup of three forecast models, LASOMO considers three subsets, $\{2\}$, $\{3\}$, and $\{2, 3\}$, to calculate the importance score of model 1 (excluding all subsets that include model 1). The ensemble forecasts $F^{\{2\}}, F^{\{3\}}$, and $F^{\{2,3\}}$ are then compared to $F^{\{1,2\}}, F^{\{1,3\}}$, and $F^{\{1,2,3\}}$, respectively. The performance differences attributable to model 1's inclusion are aggregated, which results in the importance score of model 1. We note that the subsets may have different weights during the aggregating process. 
-The [modelimportance]{.pkg} package considers two cases: all subsets may have uniform weights, or weights may be assigned based on the size of the subsets, similar to the concept of Shapley values. This flexibility allows for different approaches to account for the contribution of each model depending on the desired evaluation framework.
+The [modelimportance]{.pkg} package offers two weighting options for subsets: one assigns equal (uniform) weights to all subsets, and the other assigns weights based on their size, similar to the concept of Shapley values. Users can choose one to evaluate the contribution of each model in a manner suited to their preferred framework.
 
 \begin{algorithm}[bh!]
 \caption{Importance score using leave one model out (LOMO) algorithm} 
@@ -212,9 +214,9 @@ Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to implement LO
 In this section, we describe the functionalities of the main function `model_importance()`, where multiple options are available to customize the evaluation framework (@tbl-arguments).
 
 ```r
-model_importance(forecast_data, oracle_output_data, ensemble_fun, weighted,
-                 training_window_length, importance_algorithm, subset_wt, 
-                 na_action, ...)
+> model_importance(forecast_data, oracle_output_data, ensemble_fun, weighted,
+                   training_window_length, importance_algorithm, subset_wt, 
+                   na_action, ...)
 ```
 
 
@@ -299,14 +301,39 @@ In each specific prediction task, if a model has any missing predictions, the `"
 
 The examples in this section illustrate the use of the `model_importance()` function to evaluate the importance of component models within an ensemble, using various combinations of the arguments described in Section \ref{sec:main-function}.
 
-### Evaluation using untrained ensemble in LOMO algorithm for  quantile-based forecasts  {#sec:untrained-lomo-qntl}
 
-```{r tidy = FALSE, include=FALSE}
+### Evaluation using untrained ensemble in LOMO algorithm for mean forecasts  {#sec:untrained-lomo-mean}
 
+```r
+> forecast_data
+``` 
+\small
+```{r tidy = FALSE}
+#| echo: false
+forecast_data <- hubExamples::forecast_outputs |>
+  dplyr::filter(
+    output_type %in% c("mean"),
+    target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
+  ) |>
+  mutate(
+    model_id = dplyr::recode(model_id,
+      "Flusight-baseline" = "model A",
+      "MOBS-GLEAM_FLUH" = "model B",
+      "PSI-DICE" = "model C"
+    ),
+    value = ifelse(value > 100, value / 50, value) |> round()
+  ) |>
+  filter(
+    !(model_id == "model B" & location == "25" & target_end_date == as.Date("2022-11-26")),
+    !(model_id == "model C" & location == "48" & target_end_date == as.Date("2022-12-10"))
+  )
+
+print(forecast_data, width = Inf)
 ```
 
+\normalsize
+### Evaluation using untrained ensemble in LASOMO algorithm for quantile-based forecasts  {#sec:untrained-lasomo-qntl}
 
-### Evaluation using untrained ensemble in LASOMO algorithm for mean forecasts  {#sec:untrained-lasomo-mean}
 
 
 ### Evaluation using trained ensemble in LOMO algorithm for quantile-based forecasts  {#sec:trained-lomo-qntl}
