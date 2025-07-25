@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, sharp corners, enhanced, frame hidden, interior hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, sharp corners, enhanced, interior hidden, frame hidden, breakable]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -690,10 +690,27 @@ results in the exclusion of the model from the evaluation for that task.
 The examples in this section illustrate the use of the
 \texttt{model\_importance()} function to evaluate the importance of
 component models within an ensemble, using various combinations of the
-arguments described in Section \ref{sec:main-function}.
+arguments described in Section \ref{sec:main-function}. We use some
+example forecast and target data from the \pkg{hubExamples} package,
+which provides sample datasets for multiple modeling hubs in the
+hubverse format.
 
 \subsection{Evaluation using untrained ensemble in LOMO algorithm for
 mean forecasts}\label{sec:untrained-lomo-mean}
+
+The forecast data used here contains forecasts of weekly incident
+influenza hospitalizations in the US for Massachusetts (FIPS code 25)
+and Texas (FIPS code 48), generated on November 19, 2022. These
+forecasts are for two target end dates, November 26, 2022 (horizon 1),
+and December 10, 2022 (horizon 3), and were produced by three models:
+`Flusight-baseline', `MOBS-GLEAM\_FLUH', and `PSI-DICE'. The output type
+is \texttt{mean} and the \texttt{output\_type\_id} column has
+\texttt{NA}s as no further specification is required for this output
+type. We have modified the example data slightly: the forecast values
+were rounded to the nearest integer and some forecasts have been removed
+to demonstrate the handling of missing values. Therefore,
+`MOBS-GLEAM\_FLUH'\,'s forecast for Massachusetts on November 26, 2022,
+and 'PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 
 \begin{verbatim}
 > forecast_data
@@ -703,44 +720,161 @@ mean forecasts}\label{sec:untrained-lomo-mean}
 
 \begin{verbatim}
 # A tibble: 10 x 9
-   model_id reference_date target          horizon location target_end_date
-   <chr>    <date>         <chr>             <int> <chr>    <date>         
- 1 model A  2022-11-19     wk inc flu hosp       1 25       2022-11-26     
- 2 model A  2022-11-19     wk inc flu hosp       3 25       2022-12-10     
- 3 model A  2022-11-19     wk inc flu hosp       1 48       2022-11-26     
- 4 model A  2022-11-19     wk inc flu hosp       3 48       2022-12-10     
- 5 model B  2022-11-19     wk inc flu hosp       3 25       2022-12-10     
- 6 model B  2022-11-19     wk inc flu hosp       1 48       2022-11-26     
- 7 model B  2022-11-19     wk inc flu hosp       3 48       2022-12-10     
- 8 model C  2022-11-19     wk inc flu hosp       1 25       2022-11-26     
- 9 model C  2022-11-19     wk inc flu hosp       3 25       2022-12-10     
-10 model C  2022-11-19     wk inc flu hosp       1 48       2022-11-26     
-   output_type output_type_id value
-   <chr>       <chr>          <dbl>
- 1 mean        <NA>              51
- 2 mean        <NA>              53
- 3 mean        <NA>              21
- 4 mean        <NA>              21
- 5 mean        <NA>              47
- 6 mean        <NA>              21
- 7 mean        <NA>              14
- 8 mean        <NA>              92
- 9 mean        <NA>               3
-10 mean        <NA>              24
+   model_id          reference_date target          horizon location
+   <chr>             <date>         <chr>             <int> <chr>   
+ 1 Flusight-baseline 2022-11-19     wk inc flu hosp       1 25      
+ 2 Flusight-baseline 2022-11-19     wk inc flu hosp       3 25      
+ 3 Flusight-baseline 2022-11-19     wk inc flu hosp       1 48      
+ 4 Flusight-baseline 2022-11-19     wk inc flu hosp       3 48      
+ 5 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 25      
+ 6 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       1 48      
+ 7 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 48      
+ 8 PSI-DICE          2022-11-19     wk inc flu hosp       1 25      
+ 9 PSI-DICE          2022-11-19     wk inc flu hosp       3 25      
+10 PSI-DICE          2022-11-19     wk inc flu hosp       1 48      
+   target_end_date output_type output_type_id value
+   <date>          <chr>       <chr>          <dbl>
+ 1 2022-11-26      mean        <NA>              51
+ 2 2022-12-10      mean        <NA>              53
+ 3 2022-11-26      mean        <NA>            1052
+ 4 2022-12-10      mean        <NA>            1053
+ 5 2022-12-10      mean        <NA>              47
+ 6 2022-11-26      mean        <NA>            1073
+ 7 2022-12-10      mean        <NA>             701
+ 8 2022-11-26      mean        <NA>              92
+ 9 2022-12-10      mean        <NA>             159
+10 2022-11-26      mean        <NA>            1222
 \end{verbatim}
 
 \normalsize
 
-\subsection{Evaluation using untrained ensemble in LASOMO algorithm for
-quantile-based forecasts}\label{sec:untrained-lasomo-qntl}
+The corresponding target data contains the observed hospitalization
+counts for these dates and locations.
+
+\begin{verbatim}
+> target_data
+\end{verbatim}
+
+\small
+
+\begin{verbatim}
+# A tibble: 4 x 3
+  target_end_date location oracle_value
+  <date>          <chr>           <dbl>
+1 2022-11-26      25                221
+2 2022-11-26      48               1929
+3 2022-12-10      25                578
+4 2022-12-10      48               1781
+\end{verbatim}
+
+\normalsize
+
+We can evaluate the importance of each model in the ensemble using the
+\texttt{model\_importance()} function. The following code evaluates the
+importance of each model in the simple mean ensemble using the LOMO
+algorithm, without training the ensemble (\texttt{weighted\ =\ FALSE}).
+The \texttt{na\_action} argument is set to \texttt{"drop"}, which
+represents that any missing values in the forecasts will be excluded
+from the evaluation.
+
+\begin{verbatim}
+> model_importance(
+        forecast_data = forecast_data, oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble", weighted = FALSE,
+        importance_algorithm = "lomo", na_action = "drop"
+        )
+\end{verbatim}
+
+This call generates both the result and informative messages,
+summarizing the input data, including the number of dates on which
+forecasts were produced and the number of models with ids as follows.
+
+\small
+
+\begin{verbatim}
+The input data has forecast from 2022-11-19 to 2022-11-19: a total of 1 forecast date(s).
+The available model IDs are:
+     Flusight-baseline
+     MOBS-GLEAM_FLUH
+     PSI-DICE 
+(a total of 3 models)
+\end{verbatim}
+
+\normalsize
+
+The function output is a data frame containing model IDs and their
+corresponding importance scores in the \texttt{mean\_importance} column,
+ordered from most to least importance. The column name
+\texttt{mean\_importance} indicates the average of task-specific
+importance scores.
+
+\small
+
+\begin{verbatim}
+# A tibble: 3 x 2
+  model_id          mean_importance
+  <chr>                       <dbl>
+1 Flusight-baseline          69149.
+2 PSI-DICE                   44303.
+3 MOBS-GLEAM_FLUH          -113477.
+\end{verbatim}
+
+\normalsize
+
+Another approach to handling missing values is to use the
+\texttt{"worst"} option for \texttt{na\_action}, which replaces missing
+values with the worst (i.e., minimum) score among the other models for
+the same task.
+
+\begin{verbatim}
+> model_importance(
+        forecast_data = forecast_data, oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble", weighted = FALSE,
+        importance_algorithm = "lomo", na_action = "worst"
+        )
+\end{verbatim}
+
+\small
+
+\begin{verbatim}
+# A tibble: 3 x 2
+  model_id          mean_importance
+  <chr>                       <dbl>
+1 Flusight-baseline          69149.
+2 PSI-DICE                  -38581.
+3 MOBS-GLEAM_FLUH           -86535.
+\end{verbatim}
+
+\normalsize
+
+Replacing missing values with the average score returns a different
+result, as shown below.
+
+\begin{verbatim}
+> model_importance(
+        forecast_data = forecast_data, oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble", weighted = FALSE,
+        importance_algorithm = "lomo", na_action = "worst"
+        )
+\end{verbatim}
+
+\small
+
+\begin{verbatim}
+# A tibble: 3 x 2
+  model_id          mean_importance
+  <chr>                       <dbl>
+1 Flusight-baseline          69149.
+2 PSI-DICE                   40971.
+3 MOBS-GLEAM_FLUH           -85003.
+\end{verbatim}
+
+\normalsize
+
+The conservative strategy ensures that missing forecasts are penalized.
 
 \subsection{Evaluation using trained ensemble in LOMO algorithm for
 quantile-based forecasts}\label{sec:trained-lomo-qntl}
-
-TO DO
-
-\subsection{Evaluation using trained ensemble in LOMO algorithm for mean
-forecasts}\label{sec:trained-lasomo-mean}
 
 TO DO
 

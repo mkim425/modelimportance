@@ -49,6 +49,7 @@ library(lubridate)
 library(here)
 library(ggplot2)
 library(kableExtra)
+library(modelimportance)
 options(tibble.width = Inf)
 ```
 
@@ -299,10 +300,16 @@ In each specific prediction task, if a model has any missing predictions, the `"
 
 ## Examples {#sec:examples}
 
-The examples in this section illustrate the use of the `model_importance()` function to evaluate the importance of component models within an ensemble, using various combinations of the arguments described in Section \ref{sec:main-function}.
+The examples in this section illustrate the use of the `model_importance()` function to evaluate the importance of component models within an ensemble, using various combinations of the arguments described in Section \ref{sec:main-function}. We use some example forecast and target data from the [hubExamples]{.pkg} package, which provides sample datasets for multiple modeling hubs in the hubverse format. 
+
 
 
 ### Evaluation using untrained ensemble in LOMO algorithm for mean forecasts  {#sec:untrained-lomo-mean}
+
+The forecast data used here contains forecasts of weekly incident influenza hospitalizations in the US for Massachusetts (FIPS code 25) and Texas (FIPS code 48), generated on November 19, 2022. 
+These forecasts are for two target end dates, November 26, 2022 (horizon 1), and  December 10, 2022 (horizon 3), and were produced by three models: 'Flusight-baseline', 'MOBS-GLEAM_FLUH', and 'PSI-DICE'. The output type is `mean` and the `output_type_id` column has `NA`s as no further specification is required for this output type. 
+We have modified the example data slightly: the forecast values were rounded to the nearest integer and some forecasts have been removed to demonstrate the handling of missing values. Therefore, 'MOBS-GLEAM_FLUH''s forecast for Massachusetts on November 26, 2022, and 'PSI-DICE's forecast for Texas on December 10, 2022, are missing.
+
 
 ```r
 > forecast_data
@@ -315,24 +322,143 @@ forecast_data <- hubExamples::forecast_outputs |>
     output_type %in% c("mean"),
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
   ) |>
-  mutate(
-    model_id = dplyr::recode(model_id,
-      "Flusight-baseline" = "model A",
-      "MOBS-GLEAM_FLUH" = "model B",
-      "PSI-DICE" = "model C"
-    ),
-    value = ifelse(value > 100, value / 50, value) |> round()
-  ) |>
+  mutate(value = round(value)) |> 
   filter(
-    !(model_id == "model B" & location == "25" & target_end_date == as.Date("2022-11-26")),
-    !(model_id == "model C" & location == "48" & target_end_date == as.Date("2022-12-10"))
+    !(model_id == "MOBS-GLEAM_FLUH" & location == "25" & target_end_date == as.Date("2022-11-26")),
+    !(model_id == "PSI-DICE" & location == "48" & target_end_date == as.Date("2022-12-10"))
   )
 
 print(forecast_data, width = Inf)
 ```
 
 \normalsize
-### Evaluation using untrained ensemble in LASOMO algorithm for quantile-based forecasts  {#sec:untrained-lasomo-qntl}
+
+The corresponding target data contains the observed hospitalization counts for these dates and locations.
+
+```r
+> target_data
+``` 
+\small
+```{r}
+#| echo: false
+target_data <- hubExamples::forecast_target_ts |>
+  dplyr::filter(
+    date %in% unique(forecast_data$target_end_date),
+    location %in% unique(forecast_data$location)
+  ) |>
+  # Rename columns to match the oracle output format
+  rename(
+    target_end_date = date,
+    oracle_value = observation
+  )
+
+print(target_data, width = Inf)
+```
+
+
+\normalsize
+
+We can evaluate the importance of each model in the ensemble using the `model_importance()` function. 
+The following code evaluates the importance of each model in the simple mean ensemble using the LOMO algorithm, without training the ensemble (`weighted = FALSE`). The `na_action` argument is set to `"drop"`, which represents that any missing values in the forecasts will be excluded from the evaluation. 
+
+```r
+> model_importance(
+        forecast_data = forecast_data, oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble", weighted = FALSE,
+        importance_algorithm = "lomo", na_action = "drop"
+        )
+```
+
+This call generates both the result and informative messages, summarizing the input data, including the number of dates on which forecasts were produced and the number of models with ids as follows.
+
+\small
+```r
+The input data has forecast from 2022-11-19 to 2022-11-19: a total of 1 forecast date(s).
+The available model IDs are:
+ 	 Flusight-baseline
+	 MOBS-GLEAM_FLUH
+	 PSI-DICE 
+(a total of 3 models)
+```
+\normalsize
+
+The function output is a data frame containing model IDs and their corresponding importance scores in the `mean_importance` column, ordered from most to least importance.
+The column name `mean_importance` indicates the average of task-specific importance scores.
+
+
+\small
+```{r}
+#| echo: false
+model_importance(
+        forecast_data = forecast_data, oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble", weighted = FALSE,
+        importance_algorithm = "lomo",
+        na_action = "drop"
+) |> arrange(desc(mean_importance))
+```
+\normalsize
+The results show that the model 'Flusight-baseline' has the highest importance score, followed by 'PSI-DICE' and 'MOBS-GLEAM_FLUH'.
+
+Another approach to handling missing values is to use the `"worst"` option for `na_action`, which replaces missing values with the worst (i.e., minimum) score among the other models for the same task.
+
+```r
+> model_importance(
+        forecast_data = forecast_data, oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble", weighted = FALSE,
+        importance_algorithm = "lomo", na_action = "worst"
+        )
+```
+
+\small 
+```{r}
+#| echo: false
+model_importance(
+        forecast_data = forecast_data, oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble", weighted = FALSE,
+        importance_algorithm = "lomo", na_action = "worst"
+) |> arrange(desc(mean_importance))
+```
+
+\normalsize
+
+Replacing missing values with the average score returns a different result, as shown below.
+
+
+```r
+> model_importance(
+        forecast_data = forecast_data, oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble", weighted = FALSE,
+        importance_algorithm = "lomo", na_action = "worst"
+        )
+```
+
+\small 
+```{r}
+#| echo: false
+model_importance(
+        forecast_data = forecast_data, oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble", weighted = FALSE,
+        importance_algorithm = "lomo", na_action = "average"
+) |> arrange(desc(mean_importance))
+```
+
+
+\normalsize
+
+
+The conservative strategy ensures that missing forecasts are penalized.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -340,9 +466,6 @@ print(forecast_data, width = Inf)
 
 TO DO
 
-### Evaluation using trained ensemble in LOMO algorithm for mean forecasts  {#sec:trained-lasomo-mean}
-
-TO DO
 
 
 ## Summary and discussion {#sec:discussion}
