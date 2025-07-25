@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, sharp corners, enhanced, interior hidden, frame hidden, breakable]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, breakable, frame hidden, enhanced, interior hidden, sharp corners]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -821,6 +821,9 @@ importance scores.
 
 \normalsize
 
+The results show that the model `Flusight-baseline' has the highest
+importance score, followed by `PSI-DICE' and `MOBS-GLEAM\_FLUH'.
+
 Another approach to handling missing values is to use the
 \texttt{"worst"} option for \texttt{na\_action}, which replaces missing
 values with the worst (i.e., minimum) score among the other models for
@@ -890,19 +893,24 @@ ensemble performance in different evaluation contexts.
 
 The primary function of the package is \texttt{model\_importance()},
 which returns a data frame with component models and their importance
-metrics. It allows users to choose the ensemble approach and model
-importance algorithm, selecting between LOMO and LASOMO. Additionally,
-it provides customizable options for handling missing values. These
+metrics. Users can choose the various ensemble methods to apply and
+model importance algorithm between LOMO and LASOMO. Additionally,
+customizable options are available for handling missing values. These
 features enable the package to serve as a versatile tool to aid
 collaborative efforts to construct an effective ensemble model across a
 wide range of forecasting tasks.
 
-There is a room to enhance the current version of this package.
-
-\(\vdots\)
-
-These extensions would aim to broaden the scope of applications in
-real-world forecasting tasks.
+There is a room to enhance the current version of this package. Although
+this package supports four different output types (`mean', `median',
+`quantile, and 'pmf'), other output types are widely used in practice.
+For example, `sample' output type is commonly used in the US Flu
+Scenario Modeling Hub \citep{FluSMH}. This format includes multiple
+simulated values (samples) from the forecast distribution. The
+\texttt{output\_type\_id} is specified for each sample, which typically
+indexes the samples or indicates their source, depending on the context.
+The package can be extended to support this output type, which is under
+consideration for future releases. These extensions would aim to broaden
+the scope of applications in real-world forecasting tasks.
 
 
   \bibliography{references.bib}
