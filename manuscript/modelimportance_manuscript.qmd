@@ -355,6 +355,7 @@ target_data <- hubExamples::forecast_target_ts |>
 print(target_data, width = Inf)
 ```
 
+Overall, the forecasts tend to have larger prediction errors for the target end date of December 10, 2022, compared to November 26, 2022, which is expected due to increased uncertainty at  longer horizons. Additionally, the forecasts for Massachusetts are relatively more accurate compared to those for Texas, which tend to have higher errors.
 
 \normalsize
 
@@ -398,6 +399,9 @@ model_importance(
 ```
 \normalsize
 The results show that the model 'Flusight-baseline' has the highest importance score, followed by 'PSI-DICE' and 'MOBS-GLEAM_FLUH'.
+That is, 'Flusight-baseline' contributes the most to improving the ensemble's predictive performance, whereas MOBS-GLEAM_FLUH, which has a negative score, detracts from the ensemble’s performance.
+The low importance score of 'MOBS-GLEAM_FLUH' is mainly due to a substantially larger prediction error for Texas on the target end date of December 10, 2022, compared to other models, while its missing forecast for Massachusetts for November 26, 2022, was not factored into the evaluation. This single large error significantly affected its contribution score.
+
 
 Another approach to handling missing values is to use the `"worst"` option for `na_action`, which replaces missing values with the worst (i.e., minimum) score among the other models for the same task.
 
@@ -421,14 +425,19 @@ model_importance(
 
 \normalsize
 
-Replacing missing values with the average score returns a different result, as shown below.
+The results show that the importance scores of 'Flusight-baseline' is unchanged because it has no missing forecast. 
+We observe that the importance score of 'PSI-DICE', which was previously positive, has now decreased to a negative value when compared to the evaluation using the `"drop"` option for `na_action`. Moreover, 'MOBS-GLEAM_FLUH' still ranks the lowest, but the importance score has increased. 
+This change is related to the varying forecast accuracy across different tasks.
+For the target end date of November 26, 2022, in Massachusetts, most forecasts are relatively accurate. Thus, even if the 'MOBS-GLEAM_FLUH' is assigned the worst value of importance score for its missing forecast, including this value in the averaging is not detrimental to the overall importance metric; rather, it is more beneficial than excluding it. In contrast, for the target end date of December 10, 2022, in Texas, the forecasts have much larger errors across the board, and assigning the worst value of importance score to the missing forecast of 'PSI-DICE' in this task has a detrimental effect on averaging importance scores. This is because the scale of the importance scores is influenced by the magnitude of the prediction errors: for tasks with small errors, the scores remain moderate, while tasks with large errors can yield importance scores of much greater magnitude.
+
+It is also possible to impute the missing scores with intermediate values by assigning the average importance scores of other models in the same task. This strategy may offer a more balanced trade-off by mitigating the influence of the missing data without overly penalizing or overlooking them. 
 
 
 ```r
 > model_importance(
         forecast_data = forecast_data, oracle_output_data = target_data,
         ensemble_fun = "simple_ensemble", weighted = FALSE,
-        importance_algorithm = "lomo", na_action = "worst"
+        importance_algorithm = "lomo", na_action = "average"
         )
 ```
 
@@ -446,23 +455,11 @@ model_importance(
 \normalsize
 
 
-The conservative strategy ensures that missing forecasts are penalized.
+In this simple example with only three models, the ranking of the importance scores remains unchanged. However, in more complex scenarios with a larger number of models, the choice of `na_action` can impact the importance scores and their interpretation. More extensive application can be found in @kim2024.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-### Evaluation using trained ensemble in LOMO algorithm for quantile-based forecasts  {#sec:trained-lomo-qntl}
+### Evaluation using trained ensemble in LASOMO algorithm for quantile-based forecasts  {#sec:trained-lomo-qntl}
 
 TO DO
 

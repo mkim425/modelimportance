@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, breakable, frame hidden, enhanced, interior hidden, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[interior hidden, enhanced, breakable, sharp corners, frame hidden, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -767,6 +767,12 @@ counts for these dates and locations.
 4 2022-12-10      48               1781
 \end{verbatim}
 
+Overall, the forecasts tend to have larger prediction errors for the
+target end date of December 10, 2022, compared to November 26, 2022,
+which is expected due to increased uncertainty at longer horizons.
+Additionally, the forecasts for Massachusetts are relatively more
+accurate compared to those for Texas, which tend to have higher errors.
+
 \normalsize
 
 We can evaluate the importance of each model in the ensemble using the
@@ -822,7 +828,15 @@ importance scores.
 \normalsize
 
 The results show that the model `Flusight-baseline' has the highest
-importance score, followed by `PSI-DICE' and `MOBS-GLEAM\_FLUH'.
+importance score, followed by `PSI-DICE' and `MOBS-GLEAM\_FLUH'. That
+is, `Flusight-baseline' contributes the most to improving the ensemble's
+predictive performance, whereas MOBS-GLEAM\_FLUH, which has a negative
+score, detracts from the ensemble's performance. The low importance
+score of `MOBS-GLEAM\_FLUH' is mainly due to a substantially larger
+prediction error for Texas on the target end date of December 10, 2022,
+compared to other models, while its missing forecast for Massachusetts
+for November 26, 2022, was not factored into the evaluation. This single
+large error significantly affected its contribution score.
 
 Another approach to handling missing values is to use the
 \texttt{"worst"} option for \texttt{na\_action}, which replaces missing
@@ -850,14 +864,39 @@ the same task.
 
 \normalsize
 
-Replacing missing values with the average score returns a different
-result, as shown below.
+The results show that the importance scores of `Flusight-baseline' is
+unchanged because it has no missing forecast. We observe that the
+importance score of `PSI-DICE', which was previously positive, has now
+decreased to a negative value when compared to the evaluation using the
+\texttt{"drop"} option for \texttt{na\_action}. Moreover,
+`MOBS-GLEAM\_FLUH' still ranks the lowest, but the importance score has
+increased. This change is related to the varying forecast accuracy
+across different tasks. For the target end date of November 26, 2022, in
+Massachusetts, most forecasts are relatively accurate. Thus, even if the
+`MOBS-GLEAM\_FLUH' is assigned the worst value of importance score for
+its missing forecast, including this value in the averaging is not
+detrimental to the overall importance metric; rather, it is more
+beneficial than excluding it. In contrast, for the target end date of
+December 10, 2022, in Texas, the forecasts have much larger errors
+across the board, and assigning the worst value of importance score to
+the missing forecast of `PSI-DICE' in this task has a detrimental effect
+on averaging importance scores. This is because the scale of the
+importance scores is influenced by the magnitude of the prediction
+errors: for tasks with small errors, the scores remain moderate, while
+tasks with large errors can yield importance scores of much greater
+magnitude.
+
+It is also possible to impute the missing scores with intermediate
+values by assigning the average importance scores of other models in the
+same task. This strategy may offer a more balanced trade-off by
+mitigating the influence of the missing data without overly penalizing
+or overlooking them.
 
 \begin{verbatim}
 > model_importance(
         forecast_data = forecast_data, oracle_output_data = target_data,
         ensemble_fun = "simple_ensemble", weighted = FALSE,
-        importance_algorithm = "lomo", na_action = "worst"
+        importance_algorithm = "lomo", na_action = "average"
         )
 \end{verbatim}
 
@@ -874,9 +913,13 @@ result, as shown below.
 
 \normalsize
 
-The conservative strategy ensures that missing forecasts are penalized.
+In this simple example with only three models, the ranking of the
+importance scores remains unchanged. However, in more complex scenarios
+with a larger number of models, the choice of \texttt{na\_action} can
+impact the importance scores and their interpretation. More extensive
+application can be found in \citet{kim2024}.
 
-\subsection{Evaluation using trained ensemble in LOMO algorithm for
+\subsection{Evaluation using trained ensemble in LASOMO algorithm for
 quantile-based forecasts}\label{sec:trained-lomo-qntl}
 
 TO DO
