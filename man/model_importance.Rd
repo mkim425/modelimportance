@@ -124,7 +124,6 @@ To enable parallel execution, please set a parallel backend, e.g., via
 }
 \examples{
 \dontrun{
-future::plan(future::multisession)
 library(dplyr)
 library(hubExamples)
 forecast_data <- hubExamples::forecast_outputs |>

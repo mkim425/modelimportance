@@ -88,7 +88,6 @@
 #' `future::plan()`.
 #'
 #' @examples \dontrun{
-#' future::plan(future::multisession)
 #' library(dplyr)
 #' library(hubExamples)
 #' forecast_data <- hubExamples::forecast_outputs |>
@@ -152,7 +151,7 @@ model_importance <- function(forecast_data,
 
   # Give a message for the user to check the forecast dates
   message(sprintf(
-    "The input data has forecast from %s to %s: a total of %d forecast dates.",
+    "Forecasts from %s to %s (a total of %d forecast date(s)).",
     min(forecast_date_list), max(forecast_date_list), length(forecast_date_list)
   ))
 
@@ -221,7 +220,8 @@ model_importance <- function(forecast_data,
         ~ coalesce(., min(., na.rm = TRUE))
       )) |>
       group_by(model_id) |>
-      summarise(mean_importance = mean(importance), .groups = "drop")
+      summarise(mean_importance = mean(importance), .groups = "drop") |>
+      arrange(desc("mean_importance"))
   } else if (na_action == "average") {
     importance_result <- score_result |>
       group_by(location, horizon, target_end_date) |>
@@ -230,12 +230,14 @@ model_importance <- function(forecast_data,
         ~ coalesce(., mean(., na.rm = TRUE))
       )) |>
       group_by(model_id) |>
-      summarise(mean_importance = mean(importance), .groups = "drop")
+      summarise(mean_importance = mean(importance), .groups = "drop") |>
+      arrange(desc("mean_importance"))
   } else {
     importance_result <- score_result |>
       filter(!is.na(importance)) |>
       group_by(model_id) |>
-      summarise(mean_importance = mean(importance), .groups = "drop")
+      summarise(mean_importance = mean(importance), .groups = "drop") |>
+      arrange(desc("mean_importance"))
   }
 
   return(importance_result)
