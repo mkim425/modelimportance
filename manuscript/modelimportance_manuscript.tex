@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, boxrule=0pt, frame hidden, interior hidden, enhanced, borderline west={3pt}{0pt}{shadecolor}, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[interior hidden, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, sharp corners, enhanced, breakable, frame hidden]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -798,7 +798,7 @@ forecasts were produced and the number of models with ids as follows.
 \small
 
 \begin{verbatim}
-The input data has forecast from 2022-11-19 to 2022-11-19: a total of 1 forecast date(s).
+Forecasts from 2022-11-19 to 2022-11-19 (a total of 1 forecast date(s)).
 The available model IDs are:
      Flusight-baseline
      MOBS-GLEAM_FLUH

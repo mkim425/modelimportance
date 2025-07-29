@@ -374,7 +374,7 @@ This call generates both the result and informative messages, summarizing the in
 
 \small
 ```r
-The input data has forecast from 2022-11-19 to 2022-11-19: a total of 1 forecast date(s).
+Forecasts from 2022-11-19 to 2022-11-19 (a total of 1 forecast date(s)).
 The available model IDs are:
  	 Flusight-baseline
 	 MOBS-GLEAM_FLUH
