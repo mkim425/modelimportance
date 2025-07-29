@@ -88,7 +88,7 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
     subsets <- lapply(1:n, function(x) combn(n, x, simplify = FALSE)) |>
       unlist(recursive = FALSE)
     # data frame of all possible ensemble forecasts
-    dat_all_ens <- purrr::map_dfr(
+    dat_all_ens <- furrr::future_map_dfr(
       subsets,
       function(subset) {
         get_modelsubset <- models[subset]
