@@ -395,7 +395,7 @@ model_importance(
         ensemble_fun = "simple_ensemble", weighted = FALSE,
         importance_algorithm = "lomo",
         na_action = "drop"
-) 
+) |> arrange(desc(mean_importance))
 ```
 \normalsize
 The results show that the model 'Flusight-baseline' has the highest importance score, followed by 'PSI-DICE' and 'MOBS-GLEAM_FLUH'.
@@ -420,7 +420,7 @@ model_importance(
         forecast_data = forecast_data, oracle_output_data = target_data,
         ensemble_fun = "simple_ensemble", weighted = FALSE,
         importance_algorithm = "lomo", na_action = "worst"
-) 
+) |> arrange(desc(mean_importance))
 ```
 
 \normalsize
@@ -448,7 +448,7 @@ model_importance(
         forecast_data = forecast_data, oracle_output_data = target_data,
         ensemble_fun = "simple_ensemble", weighted = FALSE,
         importance_algorithm = "lomo", na_action = "average"
-) 
+) |> arrange(desc(mean_importance))
 ```
 
 
