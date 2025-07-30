@@ -221,7 +221,7 @@ model_importance <- function(forecast_data,
       )) |>
       group_by(model_id) |>
       summarise(mean_importance = mean(importance), .groups = "drop") |>
-      arrange(desc("mean_importance"))
+      arrange(desc(.data$mean_importance))
   } else if (na_action == "average") {
     importance_result <- score_result |>
       group_by(location, horizon, target_end_date) |>
@@ -231,13 +231,13 @@ model_importance <- function(forecast_data,
       )) |>
       group_by(model_id) |>
       summarise(mean_importance = mean(importance), .groups = "drop") |>
-      arrange(desc("mean_importance"))
+      arrange(desc(.data$mean_importance))
   } else {
     importance_result <- score_result |>
       filter(!is.na(importance)) |>
       group_by(model_id) |>
       summarise(mean_importance = mean(importance), .groups = "drop") |>
-      arrange(desc("mean_importance"))
+      arrange(desc(.data$mean_importance))
   }
 
   return(importance_result)
