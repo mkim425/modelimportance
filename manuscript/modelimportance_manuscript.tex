@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, sharp corners, breakable, interior hidden, enhanced, frame hidden, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, sharp corners, breakable, frame hidden, interior hidden, boxrule=0pt, enhanced]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -173,8 +173,8 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
-  pdftitle={: An  package for evaluating model importance within an ensemble},
-  pdfauthor={Minsu Kim; Evan Rays; Nicholas G. Reich},
+  pdftitle={: An  package for evaluating model importance within a multi-model ensemble},
+  pdfauthor={Minsu Kim; Li Shandross; Evan L. Ray; Nicholas G. Reich},
   pdfkeywords={ensemble, forecast, prediction, model importance, Shapley
 value, R},
   colorlinks=true,
@@ -189,16 +189,19 @@ value, R},
 
 %% Author information
 \author{Minsu Kim~\orcidlink{0009-0008-4637-3589}\\University of
-Massachusetts Amherst \And Evan
-Rays~\orcidlink{0000-0003-4035-0243}\\CVS \AND Nicholas G.
+Massachusetts Amherst \And Li
+Shandross~\orcidlink{0009-0008-1348-1954}\\University of Massachusetts
+Amherst \AND Evan L. Ray~\orcidlink{0000-0003-4035-0243}\\University of
+Massachusetts Amherst \\ CVS Health \And Nicholas G.
 Reich~\orcidlink{0000-0003-3503-9899}\\University of Massachusetts
 Amherst}
-\Plainauthor{Minsu Kim, Evan Rays, Nicholas G. Reich} %% comma-separated
+\Plainauthor{Minsu Kim, Li Shandross, Evan L. Ray, Nicholas G.
+Reich} %% comma-separated
 
 \title{\pkg{modelimportance}: An \proglang{R} package for evaluating
-model importance within an ensemble}
-\Plaintitle{: An package for evaluating model importance within an
-ensemble} %% without formatting
+model importance within a multi-model ensemble}
+\Plaintitle{: An package for evaluating model importance within a
+multi-model ensemble} %% without formatting
 
 %% an abstract and keywords
 \Abstract{Ensemble forecasts are commonly used to support
@@ -209,13 +212,19 @@ and measuring the value each constituent model adds to the overall
 accuracy of the ensemble is of great interest to building effective
 ensembles. The \proglang{R} package \pkg{modelimportance} provides tools
 to quantify how each component model contributes to the acccuracy of
-ensemble performance for different forecast types. It supports multiple
-functionalities; it allows users to specify which ensemble approach to
-implement and which model importance metric to use. Additionally, the
-software offers customizable options for handling missing values. These
-features enable the package to serve as a versatile tool for researchers
-and practitioners aiming to construct an effective ensemble model across
-a wide range of forecasting tasks.}
+ensemble performance for both point and probabilistic forecasts. It
+supports multiple functionalities; it allows users to specify which
+ensemble approach to implement and which model importance metric to use.
+Additionally, the software offers customizable options for handling
+missing values. These features enable the package to serve as a
+versatile tool for researchers and practitioners. It helps not only in
+constructing an effective ensemble model across a wide range of
+forecasting tasks, but also in understanding the role of each model
+within the ensemble and gaining insights into individual models
+themselves. This package follows the `hubverse' framework, which is a
+collection of open-source software and tools developed to promote
+collaborative modeling hub efforts and simplify their setup and
+operation.}
 
 %% at least one keyword must be supplied
 \Keywords{ensemble, forecast, prediction, model importance, Shapley
@@ -240,7 +249,9 @@ value, R}
 Minsu Kim\\
 E-mail: \email{minsu@umass.edu}\\
 \\~
-Evan Rays\\
+Li Shandross\\
+\\~
+Evan L. Ray\\
 \\~
 Nicholas G. Reich\\
 \\~
@@ -255,25 +266,26 @@ Nicholas G. Reich\\
 
 Ensemble forecasting is a method to produce a single, consolidated
 prediction by combining forecasts generated from different models. This
-technique it utilizes each model's strengths to counterbalance their
+technique utilizes each model's strengths to counterbalance their
 individual weaknesses, leading to more robust and accurate predictions
 \citep{gneiting2005weather, hastie01statisticallearning, lutz_applying_2019, viboud_rapidd_2018}.
 Specifically, ensembles aggregate diverse insights from various models
 and effectively handle individual models models biases and variances by
 averaging them out, which can reduce prediction errors and improve
-overall model performance. These enhanced prediction accuracy and
-robustness enable ensemble forecasting to be widely used across various
-domains such as weather forecasting
-\citep{Guerra_2020, gneiting2005weather}, financial modeling
-\citep{SUN2020101160, math11041054}, and infectious disease outbreak
-forecasting \citep{ray_prediction_2018, reich_accuracy_2019} to improve
+overall model performance. Enhanced prediction accuracy and robustness
+enable ensemble forecasting to be widely used across various domains
+such as weather forecasting \citep{Guerra_2020, gneiting2005weather},
+financial modeling \citep{SUN2020101160, math11041054}, and infectious
+disease outbreak forecasting
+\citep{ray_prediction_2018, reich_accuracy_2019} to improve
 decision-making and achieve more reliable predictions. For example,
 throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub collected
 individual models developed by over 90 different research groups and
 built a probabilistic ensemble forecasting model for COVID-19 cases,
 hospitalizations, and deaths in the US based on those models'
 predictions, which served as the official short-term forecasts for the
-US Centers for Disease Control and Prevention (CDC) \citep{kim2024}.
+US Centers for Disease Control and Prevention (CDC)
+\citep{cramer2022united}.
 
 The quality of forecasts is assessed by evaluating their error, bias,
 sharpness, and/or calibration using different scoring metrics. The
@@ -307,18 +319,18 @@ functionality provided by \pkg{scoringRules}, which makes it more useful
 for certain tasks, such as summarizing, comparing, and visualizing
 forecast performance. Additionally, the \pkg{scoringutils} supports
 forecasts represented by predictive samples or quantiles of predictive
-distributions, allowing for the assessment of any forecast type, even
-when a closed-form expression for a parametric distribution is not
-available. These packages have been valuable to evaluate individual
-models as independent entities, using performance metrics selected for
-each specific situation or problem type. However, they do not measure
-the individual models' contributions to the enhanced predictive accuracy
-when used as part of an ensemble. Kim et al. \citep{kim2024} demonstrate
-that a model's individual performance does not necessarily correspond to
-its contribution as a component within an ensemble. Our developed
-package introduces this capability. The \pkg{modelimportance} package
-provides tools to evaluate the role of each model as an ensemble member
-within an ensemble model, rather than focusing on the individual
+distributions, allowing for the assessment of many probabilistic
+forecast types, even when a closed-form expression for a parametric
+distribution is not available. These packages have been valuable to
+evaluate individual models as independent entities, using performance
+metrics selected for each specific situation or problem type. However,
+they do not measure the individual models' contributions to the enhanced
+predictive accuracy when used as part of an ensemble. \citet{kim2024}
+demonstrate that a model's individual performance does not necessarily
+correspond to its contribution as a component within an ensemble. Our
+developed package introduces this capability. The \pkg{modelimportance}
+package provides tools to evaluate the role of each model as an ensemble
+member within an ensemble model, rather than focusing on the individual
 predictive performance per se.
 
 In ensemble forecasting, certain models contribute more significantly to
@@ -420,19 +432,18 @@ incident influenza hospitalizations extracted from
 
 \end{table}%
 
-\subsection{Structure of forecasts}\label{subsec:structure_of_forecasts}
+\subsection{Model output representation}\label{subsec:model_output}
 
-The forecasting model supports multiple output types. Generally,
-quantitative forecasts can be categorized into either point forecasts or
-probabilistic forecasts. For a specific task, point forecasts,
-represented by a single predicted value, provide a clear and concise
-prediction, making them easy to interpret and communicate. Probabilistic
-forecasts, on the other hand, describe the likelihood of different
-outcomes, conveying the uncertainty inherent in the prediction. These
-forecasts are represented by a probability distribution over possible
-future values in various ways, such as probability mass functions (pmf),
-cumulative distribution functions (cdf), or probability quantiles (or
-intervals).
+Generally, quantitative forecasts can be categorized into either point
+forecasts or probabilistic forecasts. For a specific task, point
+forecasts, represented by a single predicted value, provide a clear and
+concise prediction, making them easy to interpret and communicate.
+Probabilistic forecasts, on the other hand, describe the likelihood of
+different outcomes, conveying the uncertainty inherent in the
+prediction. These forecasts are represented by a probability
+distribution over possible future values in various ways, such as
+probability mass functions (pmf), cumulative distribution functions
+(cdf), or probability quantiles (or intervals).
 
 The \texttt{output\_type} and \texttt{output\_type\_id} columns in the
 model output format, as defined by the hubverse convention, specify the
@@ -474,8 +485,9 @@ their associated scoring rules for evaluating prediction performance.}
 \section{Algorithms}\label{sec:algorithms}
 
 This section provides a brief description of the leave one model out
-(LOMO) and leave all subsets of models out (LASOMO) algorithms. (Details
-can be found in \citet{kim2024})
+(LOMO) and leave all subsets of models out (LASOMO) algorithms, which
+are used to compute the model importance score. (Details can be found in
+\citet{kim2024})
 
 LOMO involves creating an ensemble by excluding one component model from
 the entire set of models. Let \({\cal A}\) be a set of \(n\) models and
@@ -484,13 +496,13 @@ the entire set of models. Let \({\cal A}\) be a set of \(n\) models and
 including all the others. Denoting by \(F^{{\cal A}^{-i}}\) an ensemble
 forecast constructed without \(F^i\) and by \(F^{\cal A}\) the ensemble
 forecast built from the entire set of models, the importance score using
-LOMO is calculated by the difference of measures of these two ensemble
-performances, \(F^{{\cal A}^{-i}}\) and \(F^{\cal A}\). For example,
-when evaluating model 1 within an ensemble of three models (\(n=3\)),
-LOMO creates an ensemble forecast \(F^{\{2,3\}}\) using only \(F^2\) and
-\(F^3\). The performance of this reduced ensemble is then compared to
-the full ensemble forecast \(F^{\{1,2,3\}}\), which incorporates all
-three models.
+LOMO is calculated as the difference in accuracy, as measured by a
+specific score, between \(F^{{\cal A}^{-i}}\) and \(F^{\cal A}\)
+(Algorithm \ref{alg:lomo}). For example, when evaluating model 1 within
+an ensemble of three models (\(n=3\)), LOMO creates an ensemble forecast
+\(F^{\{2,3\}}\) using only \(F^2\) and \(F^3\). The performance of this
+reduced ensemble is then compared to the full ensemble forecast
+\(F^{\{1,2,3\}}\), which incorporates all three models.
 
 On the other hand, LASOMO involves ensemble constructions from all
 possible subsets of models. For each subset \(S\) that does not contain
@@ -498,23 +510,24 @@ the model \(i\), \(S \cup \{i\}\) plays a role of \({\cal A}\) in the
 LOMO; the score associated with the subset \(S\) is the difference of
 measures between \(F^S\) and \(F^{S \cup \{i\}}\). Then, all scores are
 aggregated across all possible subsets that the model \(i\) does not
-belong to. For example, using the earlier setup of three forecast
-models, LASOMO considers three subsets, \(\{2\}\), \(\{3\}\), and
-\(\{2, 3\}\), to calculate the importance score of model 1 (excluding
-all subsets that include model 1). The ensemble forecasts
-\(F^{\{2\}}, F^{\{3\}}\), and \(F^{\{2,3\}}\) are then compared to
-\(F^{\{1,2\}}, F^{\{1,3\}}\), and \(F^{\{1,2,3\}}\), respectively. The
-performance differences attributable to model 1's inclusion are
-aggregated, which results in the importance score of model 1. We note
-that the subsets may have different weights during the aggregating
-process. The \pkg{modelimportance} package offers two weighting options
-for subsets: one assigns equal (uniform) weights to all subsets, and the
-other assigns weights based on their size, similar to the concept of
-Shapley values. Users can choose one to evaluate the contribution of
-each model in a manner suited to their preferred framework.
+belong to (Algorithm \ref{alg:lasomo}). For example, using the earlier
+setup of three forecast models, LASOMO considers three subsets,
+\(\{2\}\), \(\{3\}\), and \(\{2, 3\}\), to calculate the importance
+score of model 1 (excluding all subsets that include model 1). The
+ensemble forecasts \(F^{\{2\}}, F^{\{3\}}\), and \(F^{\{2,3\}}\) are
+then compared to \(F^{\{1,2\}}, F^{\{1,3\}}\), and \(F^{\{1,2,3\}}\),
+respectively. The performance differences attributable to model 1's
+inclusion are aggregated, which results in the importance score for
+model 1. We note that the subsets may have different weights during the
+aggregating process. The \pkg{modelimportance} package offers two
+weighting options for subsets: one assigns equal (uniform) weights to
+all subsets, and the other assigns weights based on their size, similar
+to the concept of Shapley values. Users can choose one to evaluate the
+contribution of each model in a manner suited to their preferred
+framework.
 
 \begin{algorithm}[bh!]
-\caption{Importance score using leave one model out (LOMO) algorithm} 
+\caption{Importance score calculation for one prediction task using leave one model out (LOMO) algorithm} 
 \label{alg:lomo}
  \begin{spacing}{1.2}
   \begin{algorithmic}[1]
@@ -539,7 +552,7 @@ Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to
 implement LOMO and LASOMO for a single prediction task, respectively.
 
 \begin{algorithm}[bh!]
-\caption{Importance score using leave all subsets of models out (LASOMO) algorithm} 
+\caption{Importance score calculation for one prediction task using leave all subsets of models out (LASOMO) algorithm} 
 \label{alg:lasomo}
  \begin{spacing}{1.2}
   \begin{algorithmic}[1]
@@ -570,7 +583,7 @@ implement LOMO and LASOMO for a single prediction task, respectively.
  \end{spacing}
 \end{algorithm}
 
-\section{Main funtion: Evaluating ensemble
+\section{Main function: Evaluating ensemble
 members}\label{sec:main-function}
 
 In this section, we describe the functionalities of the main function
@@ -599,7 +612,7 @@ Argument & Description & Possible Values & Default\\
 \texttt{training\_window\_length} & Time interval of historical data used during the training process & Non-negative integer & 0\\
 \cellcolor{gray!10}{\texttt{importance\_algorithm}} & \cellcolor{gray!10}{Algorithm to calculate importance} & \cellcolor{gray!10}{\texttt{lomo, lasomo}} & \cellcolor{gray!10}{\texttt{lomo}}\\
 \addlinespace
-\texttt{subset\_wt} & Method for assigning weight to subsets when using lasomo algorithm & \texttt{equal, perm\_based} & \texttt{equal}\\
+\texttt{subset\_wt} & Method for assigning weight to subsets when using LASOMO algorithm & \texttt{equal, perm\_based} & \texttt{equal}\\
 \cellcolor{gray!10}{\texttt{na\_action}} & \cellcolor{gray!10}{Method to handle missing data} & \cellcolor{gray!10}{\texttt{worst, average, drop}} & \cellcolor{gray!10}{\texttt{worst}}\\
 \texttt{...} & Optional arguments for \texttt{simple\_ensemble} & Varies & \texttt{agg\_fun = mean}\\
 \bottomrule
@@ -785,9 +798,12 @@ from the evaluation.
 
 \begin{verbatim}
 > model_importance(
-        forecast_data = forecast_data, oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble", weighted = FALSE,
-        importance_algorithm = "lomo", na_action = "drop"
+        forecast_data = forecast_data, 
+        oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble", 
+        weighted = FALSE,
+        importance_algorithm = "lomo", 
+        na_action = "drop"
         )
 \end{verbatim}
 
@@ -916,7 +932,7 @@ or overlooking them.
 In this simple example with only three models, the ranking of the
 importance scores remains unchanged. However, in more complex scenarios
 with a larger number of models, the choice of \texttt{na\_action} can
-impact the importance scores and their interpretation. More extensive
+impact the importance scores and their interpretation. A more extensive
 application can be found in \citet{kim2024}.
 
 \subsection{Evaluation using trained ensemble in LASOMO algorithm for
