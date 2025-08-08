@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, sharp corners, breakable, frame hidden, interior hidden, boxrule=0pt, enhanced]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, borderline west={3pt}{0pt}{shadecolor}, sharp corners, frame hidden, boxrule=0pt, enhanced, interior hidden]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -268,31 +268,31 @@ Ensemble forecasting is a method to produce a single, consolidated
 prediction by combining forecasts generated from different models. This
 technique utilizes each model's strengths to counterbalance their
 individual weaknesses, leading to more robust and accurate predictions
-\citep{gneiting2005weather, hastie01statisticallearning, lutz_applying_2019, viboud_rapidd_2018}.
-Specifically, ensembles aggregate diverse insights from various models
-and effectively handle individual models models biases and variances by
-averaging them out, which can reduce prediction errors and improve
-overall model performance. Enhanced prediction accuracy and robustness
-enable ensemble forecasting to be widely used across various domains
-such as weather forecasting \citep{Guerra_2020, gneiting2005weather},
-financial modeling \citep{SUN2020101160, math11041054}, and infectious
-disease outbreak forecasting
-\citep{ray_prediction_2018, reich_accuracy_2019} to improve
-decision-making and achieve more reliable predictions. For example,
-throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub collected
-individual models developed by over 90 different research groups and
-built a probabilistic ensemble forecasting model for COVID-19 cases,
-hospitalizations, and deaths in the US based on those models'
+\citep{gneiting2005weather, hastie01statisticallearning}. Specifically,
+ensembles aggregate diverse insights from various models and effectively
+handle individual models' biases and variances by averaging them out,
+which can reduce prediction errors and improve overall model
+performance. Enhanced prediction accuracy and robustness enable ensemble
+forecasting to be widely used across various domains such as weather
+forecasting \citep{Guerra_2020, gneiting2005weather}, financial modeling
+\citep{SUN2020101160, math11041054}, and infectious disease outbreak
+forecasting
+\citep{ray_prediction_2018, reich_accuracy_2019, lutz_applying_2019, viboud_rapidd_2018}
+to improve decision-making and achieve more reliable predictions. For
+example, throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub
+collected individual models developed by over 90 different research
+groups and built a probabilistic ensemble forecasting model for COVID-19
+cases, hospitalizations, and deaths in the US based on those models'
 predictions, which served as the official short-term forecasts for the
 US Centers for Disease Control and Prevention (CDC)
 \citep{cramer2022united}.
 
 The quality of forecasts is assessed by evaluating their error, bias,
 sharpness, and/or calibration using different scoring metrics. The
-selection of the scoring metrics depends on the type of forecast, such
-as point forecasts and probabilistic forecasts, and their corresponding
-formats, such as median/mean, quantiles, and predictive cumulative
-distribution functions. In the case of point forecasts, accuracy is
+selection of the scoring metrics depends on the type of forecast: point
+forecasts (e.g., mean, median) and probabilistic forecasts (e.g.,
+quantiles, samples, predictive cumulative distribution functions,
+probability mass function). In the case of point forecasts, accuracy is
 commonly measured by the mean absolute error (MAE) and the mean squared
 error (MSE), which are direct assessment tools that calculate the
 average magnitude of forecast errors. Probabilistic forecasts are
@@ -302,29 +302,28 @@ evaluations through numerical scores \citep{gneiting_strictly_2007}.
 Some examples include the weighted interval score (WIS) for the
 quantile-based forecasts and the continuous ranked probability score
 (CRPS) for the forecasts taking the form of predictive cumulative
-distribution functions \citep{bracher_evaluating_2021}.
+distribution functions \citep{bracher_evaluating_2021}. We note that
+CRPS is a general scoring rule that can be computed either analytically
+in closed form or numerically from samples, and WIS is a quantile-based
+approximation of CRPS.
 
 Several \proglang{R} packages have been developed for this purpose. To
-name a few, the \pkg{forecast} package \citep{Rpackage-forecast} is
-widely used for univariate time series forecasting and includes
-functions for accuracy measurement. The \pkg{Metrics}
-\citep{Rpackage-Metrics} and \pkg{MLmetrics} \citep{Rpackage-MLmetrics}
-provide a wide range of performance metrics specifically designed for
-evaluating machine learning models. The \pkg{scoringRules}
-\citep{Rpackage-scoringRules} package offers a comprehensive set of
-proper scoring rules for evaluating probabilistic forecasts and supports
-both univariate and multivariate settings. The \pkg{scoringutils}
+name a few, the \pkg{fable} package \citep{Rpackage-fable} is widely
+used for univariate time series forecasting and includes functions for
+accuracy measurement. The \pkg{Metrics} \citep{Rpackage-Metrics} and
+\pkg{MLmetrics} \citep{Rpackage-MLmetrics} provide a wide range of
+performance metrics specifically designed for evaluating machine
+learning models. The \pkg{scoringRules} \citep{Rpackage-scoringRules}
+package offers a comprehensive set of proper scoring rules for
+evaluating probabilistic forecasts and supports both univariate and
+multivariate settings. The \pkg{scoringutils}
 \citep{bosse2022evaluating} package offers additional features to the
 functionality provided by \pkg{scoringRules}, which makes it more useful
 for certain tasks, such as summarizing, comparing, and visualizing
-forecast performance. Additionally, the \pkg{scoringutils} supports
-forecasts represented by predictive samples or quantiles of predictive
-distributions, allowing for the assessment of many probabilistic
-forecast types, even when a closed-form expression for a parametric
-distribution is not available. These packages have been valuable to
-evaluate individual models as independent entities, using performance
-metrics selected for each specific situation or problem type. However,
-they do not measure the individual models' contributions to the enhanced
+forecast performance. These packages have been valuable to evaluate
+individual models as independent entities, using performance metrics
+selected for each specific situation or problem type. However, they do
+not measure the individual models' contributions to the enhanced
 predictive accuracy when used as part of an ensemble. \citet{kim2024}
 demonstrate that a model's individual performance does not necessarily
 correspond to its contribution as a component within an ensemble. Our
