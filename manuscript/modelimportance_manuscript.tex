@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, borderline west={3pt}{0pt}{shadecolor}, sharp corners, frame hidden, boxrule=0pt, enhanced, interior hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, breakable, frame hidden, borderline west={3pt}{0pt}{shadecolor}, interior hidden, enhanced, sharp corners]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -337,46 +337,69 @@ the overall predictions than others. Assessing the impact of each
 component model on ensemble predictions is methodologically similar to
 determining variable importance in traditional regression and machine
 learning models, where variable importance measures evaluate how much
-individual variables enhance the model's predictive performance.
-\proglang{R} packages that implement these functions include
+individual variables decrease in accuracy of the model's predictive
+performance or reduce the average loss. \proglang{R} packages such as
 \pkg{randomForest} \citep{Rpackage-randomForest}, \pkg{caret}
 \citep{Rpackage-caret}, \pkg{xgboost} \citep{Rpackage-xgboost}, and
-\pkg{gbm} \citep{Rpackage-gbm}, each providing variable importance
-measures for different types of models: random forest models, general
-machine learning models, extreme gradient boosting models, and
-generalized boosted regression models, respectively. Similarly, the
-tools in the \pkg{modelimportance} package quantify the contribution of
-each component model within an ensemble to the ensemble model's
-predictive performance. They assign numerical scores to each model based
-on a selected metric that measures forecast accuracy, depending on the
+\pkg{gbm} \citep{Rpackage-gbm} implement these functions for different
+types of models: random forest models, general machine learning models,
+extreme gradient boosting models, and generalized boosted regression
+models, respectively. These packages focus on feature-level importance
+within a single model and do not measure the contribution of individual
+models within an ensemble. The \pkg{modelimportance} package addresses
+this limitation. The tools in the \pkg{modelimportance} quantify how
+each component model helps enhance the ensemble model's predictive
+performance. They assign numerical scores to each model based on a
+selected metric that measures forecast accuracy, depending on the
 forecast type.
 
-These capabilities provide unique support for hub organizers, such as
-the CDC in the US and the European Centre for Disease Prevention and
-Control in the EU. These organizations can create more effective
-ensemble forecasts by gathering and utilizing forecasts from various
-models based on the precise evaluation of each model's contribution via
-the \pkg{modelimportance} package. This, in turn, facilitates better
-communication with the public and decision-makers and enhances the
-overall decision-making process. Specifically, \pkg{modelimportance} is
-incorporated into the `hubverse', which is a collection of open-source
-software and data tools developed to promote collaborative modeling hub
-efforts and reduce the effort required to set up and operate them
-\citep{hubverse_docs}. This package adheres to the model output formats
-specified by the hubverse convention, which enables seamless integration
-and interoperability with other forecasting tools and systems.
+These capabilities provide unique support for hub organizers who refer
+to the entity responsible for launching and managing a collective
+modeling hub. They coordinate multiple teams to produce forecasts and
+integrate their predictions into an ensemble forecast, which is known
+for having better performance compared to individual models
+\citep{Shandross2024}. Examples include the CDC in the US and the
+European Centre for Disease Prevention and Control in the EU. The
+\pkg{modelimportance} package can even strengthen the benefits of a
+multi-model ensemble by helping these organizations create more
+effective ensemble forecasts based on the precise evaluation of each
+model's contribution. Specifically, \pkg{modelimportance} follows
+`hubverse' standards, where `hubverse' offers a set of publicly
+available software and data tools developed to promote collaborative
+modeling hub efforts and reduce the effort required to set up and
+operate them \citep{hubverse_docs}. Adherence to the model output
+formats specified by the hubverse convention enables seamless
+integration and flexibility with other forecasting tools and systems.
 
-The paper proceeds as follows. In Section 2, we address the model output
-formats proposed within the hubverse framework and the structure of
-forecasts, followed by a motivating example. Section 3 presents two
+The paper proceeds as follows. In Section \ref{sec:data}, we address the
+model output formats proposed within the hubverse framework and the
+structure of forecasts. Section \ref{sec:algorithms} presents two
 algorithms implemented in \pkg{modelimportance} for calculating the
 model importance metric: leave-one-model-out and
 leave-all-subsets-of-models-out. We demonstrate the various
-functionalities \pkg{modelimportance} supports in Section 4 and give
-some examples in Section 5. We close this paper with some concluding
-remarks and a discussion of possible extensions.
+functionalities \pkg{modelimportance} supports in Section
+\ref{sec:main-function} and give some examples in Section
+\ref{sec:examples}. We close this paper with some concluding remarks and
+a discussion of possible extensions.
 
 \section{Data}\label{sec:data}
+
+\subsection{Relationship and Dependencies on
+Hubverse}\label{subsec:dependence_hubverse}
+
+The \pkg{modelimportance} package is designed to work with the hubverse
+framework and, accordingly, depends on several packages in the hubverse
+ecosystem, such as \pkg{hubUtils}, \pkg{hubEnsembles}, \pkg{hubEvals},
+and \pkg{hubExamples}. The \pkg{modelimportance} uses a
+\texttt{model\_out\_tbl} S3 class as the model output format defined in
+the \pkg{hubUtils}, which consists of utility functions to standardize
+prediction files and data formats (details in Section
+\ref{subsec:model_output_format}). Ensembling predictions from multiple
+models relies on the \pkg{hubEnsembles}. Calculation of forecast
+accuracy using various metrics is based on the \pkg{hubEvals}, which
+internally leverage the \pkg{scoringutils}. We use all the example
+datasets for testing and demonstration purposes from the
+\pkg{hubExamples} (see Section \ref{sec:examples}).
 
 \subsection{Model output format}\label{subsec:model_output_format}
 
