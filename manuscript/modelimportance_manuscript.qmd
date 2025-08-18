@@ -61,15 +61,15 @@ options(tibble.width = Inf)
 
 ## Introduction {#sec:intro}
 
-Ensemble forecasting is a method to produce a single, consolidated prediction by combining forecasts generated from different models. This technique utilizes each model’s strengths to counterbalance their individual weaknesses, leading to more robust and accurate predictions [@gneiting2005weather; @hastie01statisticallearning].
-Specifically, ensembles aggregate diverse insights from various models and effectively handle individual models' biases and variances by averaging them out, which can reduce prediction errors and improve overall model performance. Enhanced prediction accuracy and robustness enable ensemble forecasting to be widely used across various domains such as weather forecasting [@Guerra_2020; @gneiting2005weather], financial modeling [@SUN2020101160; @math11041054], and infectious disease outbreak forecasting [@ray_prediction_2018; @reich_accuracy_2019; @lutz_applying_2019; @viboud_rapidd_2018] to improve decision-making and achieve more reliable predictions. For example, throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub collected individual models developed by over 90 different research groups and built a probabilistic ensemble forecasting model for COVID-19 cases, hospitalizations, and deaths in the US based on those models’ predictions, which served as the official short-term forecasts for the US Centers for Disease Control and Prevention (CDC) [@cramer2022united].
+Ensemble forecasting is a method to produce a single, consolidated prediction by combining forecasts generated from different models. While each model's strengths are pronounced, its weaknesses are counterbalanced, which leads to an ensemble forecast that is more robust and accurate [@gneiting2005weather; @hastie01statisticallearning].
+Specifically, ensembles effectively mitigate the bias and variance arising from the predictions of individual models by averaging them out, and aggregating in this way can reduce prediction errors and improve overall performance. 
+Enhanced prediction accuracy and robustness enable the achievement of more reliable predictions, thereby improving decision-making. For this reason, ensemble forecasting is widely used across various domains such as weather forecasting [@Guerra_2020; @gneiting2005weather], financial modeling [@SUN2020101160; @math11041054], and infectious disease outbreak forecasting [@ray_prediction_2018; @reich_accuracy_2019; @lutz_applying_2019; @viboud_rapidd_2018]. For example, throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub collected individual models developed by over 90 different research groups and built a probabilistic ensemble forecasting model for COVID-19 cases, hospitalizations, and deaths in the US based on those models’ predictions, which served as the official short-term forecasts for the US Centers for Disease Control and Prevention (CDC) [@cramer2022united].
 
 The quality of forecasts is assessed by evaluating their error, bias, sharpness, and/or calibration using different scoring metrics.
 The selection of the scoring metrics depends on the type of forecast: 
 point forecasts (e.g., mean, median) and probabilistic forecasts (e.g., quantiles, samples, predictive cumulative distribution functions, probability mass function).
-In the case of point forecasts, accuracy is commonly measured by the mean absolute error (MAE) and the mean squared error (MSE), which are direct assessment tools that calculate the average magnitude of forecast errors. 
-Probabilistic forecasts are typically assessed using proper scoring rules, which consider the uncertainty and variability in predictions, providing concise evaluations through numerical scores [@gneiting_strictly_2007].  Some examples include the weighted interval score (WIS) for the quantile-based forecasts and the continuous ranked probability score (CRPS) for the forecasts taking the form of predictive cumulative distribution functions [@bracher_evaluating_2021]. We note that CRPS is a general scoring rule that can be computed either analytically in closed form or numerically from samples, and WIS is a quantile-based approximation of CRPS.
-
+Commonly used assessment tools for point forecasts are the mean absolute error (MAE) and the mean squared error (MSE), which calculate the average magnitude of forecast errors. 
+Proper scoring rules for probabilistic forecasts consider the uncertainty and variability in predictions and provide concise evaluations through numerical scores [@gneiting_strictly_2007].  Some examples include the weighted interval score (WIS) for the quantile-based forecasts and the continuous ranked probability score (CRPS) for the forecasts taking the form of predictive cumulative distribution functions [@bracher_evaluating_2021]. We note that CRPS is a general scoring rule that can be computed either analytically in closed form or numerically from samples, and WIS is a quantile-based approximation of CRPS.
 
 Several [R]{.proglang} packages have been developed for this purpose. To name a few, the [fable]{.pkg} package [@Rpackage-fable] is widely used for univariate time series forecasting and includes functions for accuracy measurement. The [Metrics]{.pkg} [@Rpackage-Metrics] and [MLmetrics]{.pkg} [@Rpackage-MLmetrics] provide a wide range of performance metrics specifically designed for evaluating machine learning models. The [scoringRules]{.pkg} [@Rpackage-scoringRules] package offers a comprehensive set of proper scoring rules for evaluating probabilistic forecasts and supports both univariate and multivariate settings. 
 The [scoringutils]{.pkg} [@bosse2022evaluating] package offers additional features to the functionality provided by
@@ -84,7 +84,7 @@ These packages focus on feature-level importance within a single model and do no
 The tools in the [modelimportance]{.pkg} quantify how each component model helps enhance the ensemble model's predictive performance. They assign numerical scores to each model based on a selected metric that measures forecast accuracy, depending on the forecast type.
 
 
-These capabilities provide unique support for hub organizers who refer to the entity responsible for launching and managing a collective modeling hub. They coordinate multiple teams to produce forecasts and integrate their predictions into an ensemble forecast, which is known for having better performance compared to individual models [@Shandross2024]. Examples include the CDC in the US and the European Centre for Disease Prevention and Control in the EU. 
+These capabilities provide unique support for hub organizers who refer to the entity responsible for launching and managing a collective modeling hub. They coordinate multiple teams to produce forecasts and integrate their predictions into an ensemble forecast [@Shandross2024], which, as mentioned earlier, is known for having better performance compared to individual models. Examples include the CDC in the US and the European Centre for Disease Prevention and Control in the EU. 
 The [modelimportance]{.pkg} package can even strengthen the benefits of a multi-model ensemble by helping these organizations create more effective ensemble forecasts based on the precise evaluation of each model's contribution. Specifically, [modelimportance]{.pkg} follows 'hubverse' standards, where 'hubverse' offers a set of publicly available software and data tools developed to promote collaborative modeling hub efforts and reduce the effort required to set up and operate them [@hubverse_docs]. Adherence to the model output formats specified by the hubverse convention enables seamless integration and flexibility with other forecasting tools and systems.
 
 
@@ -99,12 +99,11 @@ The [modelimportance]{.pkg} package is designed to work with the hubverse framew
 The [modelimportance]{.pkg} uses a `model_out_tbl` S3 class as the model output format defined in the [hubUtils]{.pkg}, which consists of utility functions to standardize prediction files and data formats (details in Section \ref{subsec:model_output_format}).
 Ensembling predictions from multiple models relies on the [hubEnsembles]{.pkg}. 
 Calculation of forecast accuracy using various metrics is based on the [hubEvals]{.pkg}, which internally leverage the [scoringutils]{.pkg}.
-We use all the example datasets for testing and demonstration purposes from the [hubExamples]{.pkg} (see Section \ref{sec:examples}). 
-
+We use or modify the example datasets from the [hubExamples]{.pkg}  for testing and demonstration purposes (see Section \ref{sec:examples}). 
 
 
 ### Model output format {#subsec:model_output_format}
-Model outputs are structured in a tabular format designed specifically for predictions.
+Model outputs are structured in a tabular format designed specifically for predictions, which is a formal S3 object called `model_out_tbl`.
 In the hubverse standard, each row represents an individual prediction for a single task, and its details are described in multiple columns through which one can identify the model IDs, task characteristics, prediction representation type, and predicted values [@Shandross2024]. In @tbl-example-model_output, for example, the `model_id` column contains the uniquely identified name of the model that produced the prediction in each row. Task characteristics are represented by `reference_date`, `target`, `horizon`, `location`, and `target_end_date` columns, collectively referred to as the task ID columns. The prediction representation type is specified in the `output_type` and `output_type_id` columns. This example illustrates short-term forecasts of incident influenza hospitalizations in the US for Massachusetts (FIPS code 25), generated by the model 'Flusight-baseline' on November 19, 2022. The forecasts are provided in seven quantiles (0.05, 0.1, 0.25,  0.5, 0.75, 0.9, 0.95) for each target end date.  
 
 
@@ -158,7 +157,11 @@ data.frame(
   column_spec(3, width = "10cm")
 ```
 
+### Oracle output data {#subsec:oracle_output_data}
+The `oracle_output_data` is a data frame that contains the ground truth values for the variables used to define modeling targets. 
+This data must follow the oracle output format defined in the hubverse standard, which includes independent task ID columns (e.g., `location`, `target_date`, and `age_group`), the `output_type` column specifying the output type of the predictions and an `oracle_value` column for the observed values. If the `output_type` is either `"quantile"` or `"pmf"`, the `output_type_id` column is required to provide further identifying information. For `"quantile"`, it should contain numeric values between 0 and 1 indicating quantile levels (e.g., "0.1", "0.25", "0.5", "0.75", "0.9"). For `"pmf"`, it should contain categorical values such as "low", "moderate", "high", and "very high". 
 
+The `model_out_tbl` and `oracle_output_data` must have the same task ID columns and `output_type`, including `output_type_id` if necessary, which are used to match the predictions with the ground truth data. 
 
 ## Algorithms {#sec:algorithms}
 
@@ -296,9 +299,6 @@ tbl_argument |>
 
 `forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. Only one `output_type` is allowed in the data frame, and it must be one of the `mean`, `median`, `quantile`, or `pmf`.
 
-`oracle_output_data` is a data frame containing the ground truth data for the variables that are used to define modeling targets. This data must follow the oracle output format, which includes independent task ID columns (e.g., `location`, `target_date`, and `age_group`), the `output_type` column specifying the output type of the predictions and an `oracle_value` column for the observed values. If the `output_type` is either `"quantile"` or `"pmf"`, the `output_type_id` column is required to provide further identifying information. For `"quantile"`, it should contain numeric values between 0 and 1 indicating quantile levels (e.g., "0.1", "0.25", "0.5", "0.75", "0.9"). For `"pmf"`, it should contain categorical values such as "low", "moderate", "high", and "very high". 
-
-The `forecast_data` and `oracle_output_data` must have the same task ID columns and `output_type`, including `output_type_id` if necessary, which are used to match the predictions with the ground truth data. As aforementioned, these data frames should follow the model output format and the oracle output format, respectively, as defined by the hubverse convention. 
 
 The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance. 
 The currently supported methods are `"simple_ensemble"` and `"linear_pool"`. 

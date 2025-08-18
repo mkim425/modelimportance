@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, breakable, frame hidden, borderline west={3pt}{0pt}{shadecolor}, interior hidden, enhanced, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, interior hidden, sharp corners, frame hidden, breakable, boxrule=0pt, enhanced]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -265,22 +265,23 @@ Nicholas G. Reich\\
 \section{Introduction}\label{sec:intro}
 
 Ensemble forecasting is a method to produce a single, consolidated
-prediction by combining forecasts generated from different models. This
-technique utilizes each model's strengths to counterbalance their
-individual weaknesses, leading to more robust and accurate predictions
-\citep{gneiting2005weather, hastie01statisticallearning}. Specifically,
-ensembles aggregate diverse insights from various models and effectively
-handle individual models' biases and variances by averaging them out,
-which can reduce prediction errors and improve overall model
-performance. Enhanced prediction accuracy and robustness enable ensemble
-forecasting to be widely used across various domains such as weather
-forecasting \citep{Guerra_2020, gneiting2005weather}, financial modeling
+prediction by combining forecasts generated from different models. While
+each model's strengths are pronounced, its weaknesses are
+counterbalanced, which leads to an ensemble forecast that is more robust
+and accurate \citep{gneiting2005weather, hastie01statisticallearning}.
+Specifically, ensembles effectively mitigate the bias and variance
+arising from the predictions of individual models by averaging them out,
+and aggregating in this way can reduce prediction errors and improve
+overall performance. Enhanced prediction accuracy and robustness enable
+the achievement of more reliable predictions, thereby improving
+decision-making. For this reason, ensemble forecasting is widely used
+across various domains such as weather forecasting
+\citep{Guerra_2020, gneiting2005weather}, financial modeling
 \citep{SUN2020101160, math11041054}, and infectious disease outbreak
 forecasting
-\citep{ray_prediction_2018, reich_accuracy_2019, lutz_applying_2019, viboud_rapidd_2018}
-to improve decision-making and achieve more reliable predictions. For
-example, throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub
-collected individual models developed by over 90 different research
+\citep{ray_prediction_2018, reich_accuracy_2019, lutz_applying_2019, viboud_rapidd_2018}.
+For example, throughout the COVID-19 pandemic, the US COVID-19 Forecast
+Hub collected individual models developed by over 90 different research
 groups and built a probabilistic ensemble forecasting model for COVID-19
 cases, hospitalizations, and deaths in the US based on those models'
 predictions, which served as the official short-term forecasts for the
@@ -292,20 +293,19 @@ sharpness, and/or calibration using different scoring metrics. The
 selection of the scoring metrics depends on the type of forecast: point
 forecasts (e.g., mean, median) and probabilistic forecasts (e.g.,
 quantiles, samples, predictive cumulative distribution functions,
-probability mass function). In the case of point forecasts, accuracy is
-commonly measured by the mean absolute error (MAE) and the mean squared
-error (MSE), which are direct assessment tools that calculate the
-average magnitude of forecast errors. Probabilistic forecasts are
-typically assessed using proper scoring rules, which consider the
-uncertainty and variability in predictions, providing concise
-evaluations through numerical scores \citep{gneiting_strictly_2007}.
-Some examples include the weighted interval score (WIS) for the
-quantile-based forecasts and the continuous ranked probability score
-(CRPS) for the forecasts taking the form of predictive cumulative
-distribution functions \citep{bracher_evaluating_2021}. We note that
-CRPS is a general scoring rule that can be computed either analytically
-in closed form or numerically from samples, and WIS is a quantile-based
-approximation of CRPS.
+probability mass function). Commonly used assessment tools for point
+forecasts are the mean absolute error (MAE) and the mean squared error
+(MSE), which calculate the average magnitude of forecast errors. Proper
+scoring rules for probabilistic forecasts consider the uncertainty and
+variability in predictions and provide concise evaluations through
+numerical scores \citep{gneiting_strictly_2007}. Some examples include
+the weighted interval score (WIS) for the quantile-based forecasts and
+the continuous ranked probability score (CRPS) for the forecasts taking
+the form of predictive cumulative distribution functions
+\citep{bracher_evaluating_2021}. We note that CRPS is a general scoring
+rule that can be computed either analytically in closed form or
+numerically from samples, and WIS is a quantile-based approximation of
+CRPS.
 
 Several \proglang{R} packages have been developed for this purpose. To
 name a few, the \pkg{fable} package \citep{Rpackage-fable} is widely
@@ -356,14 +356,14 @@ forecast type.
 These capabilities provide unique support for hub organizers who refer
 to the entity responsible for launching and managing a collective
 modeling hub. They coordinate multiple teams to produce forecasts and
-integrate their predictions into an ensemble forecast, which is known
-for having better performance compared to individual models
-\citep{Shandross2024}. Examples include the CDC in the US and the
-European Centre for Disease Prevention and Control in the EU. The
-\pkg{modelimportance} package can even strengthen the benefits of a
-multi-model ensemble by helping these organizations create more
-effective ensemble forecasts based on the precise evaluation of each
-model's contribution. Specifically, \pkg{modelimportance} follows
+integrate their predictions into an ensemble forecast
+\citep{Shandross2024}, which, as mentioned earlier, is known for having
+better performance compared to individual models. Examples include the
+CDC in the US and the European Centre for Disease Prevention and Control
+in the EU. The \pkg{modelimportance} package can even strengthen the
+benefits of a multi-model ensemble by helping these organizations create
+more effective ensemble forecasts based on the precise evaluation of
+each model's contribution. Specifically, \pkg{modelimportance} follows
 `hubverse' standards, where `hubverse' offers a set of publicly
 available software and data tools developed to promote collaborative
 modeling hub efforts and reduce the effort required to set up and
@@ -397,21 +397,22 @@ prediction files and data formats (details in Section
 \ref{subsec:model_output_format}). Ensembling predictions from multiple
 models relies on the \pkg{hubEnsembles}. Calculation of forecast
 accuracy using various metrics is based on the \pkg{hubEvals}, which
-internally leverage the \pkg{scoringutils}. We use all the example
-datasets for testing and demonstration purposes from the
-\pkg{hubExamples} (see Section \ref{sec:examples}).
+internally leverage the \pkg{scoringutils}. We use or modify the example
+datasets from the \pkg{hubExamples} for testing and demonstration
+purposes (see Section \ref{sec:examples}).
 
 \subsection{Model output format}\label{subsec:model_output_format}
 
 Model outputs are structured in a tabular format designed specifically
-for predictions. In the hubverse standard, each row represents an
-individual prediction for a single task, and its details are described
-in multiple columns through which one can identify the model IDs, task
-characteristics, prediction representation type, and predicted values
-\citep{Shandross2024}. In Table~\ref{tbl-example-model_output}, for
-example, the \texttt{model\_id} column contains the uniquely identified
-name of the model that produced the prediction in each row. Task
-characteristics are represented by \texttt{reference\_date},
+for predictions, which is a formal S3 object called
+\texttt{model\_out\_tbl}. In the hubverse standard, each row represents
+an individual prediction for a single task, and its details are
+described in multiple columns through which one can identify the model
+IDs, task characteristics, prediction representation type, and predicted
+values \citep{Shandross2024}. In Table~\ref{tbl-example-model_output},
+for example, the \texttt{model\_id} column contains the uniquely
+identified name of the model that produced the prediction in each row.
+Task characteristics are represented by \texttt{reference\_date},
 \texttt{target}, \texttt{horizon}, \texttt{location}, and
 \texttt{target\_end\_date} columns, collectively referred to as the task
 ID columns. The prediction representation type is specified in the
@@ -503,6 +504,28 @@ pmf & Log Score & Evaluate using the logarithm of the probability assigned to th
 their associated scoring rules for evaluating prediction performance.}
 
 \end{table}%
+
+\subsection{Oracle output data}\label{subsec:oracle_output_data}
+
+The \texttt{oracle\_output\_data} is a data frame that contains the
+ground truth values for the variables used to define modeling targets.
+This data must follow the oracle output format defined in the hubverse
+standard, which includes independent task ID columns (e.g.,
+\texttt{location}, \texttt{target\_date}, and \texttt{age\_group}), the
+\texttt{output\_type} column specifying the output type of the
+predictions and an \texttt{oracle\_value} column for the observed
+values. If the \texttt{output\_type} is either \texttt{"quantile"} or
+\texttt{"pmf"}, the \texttt{output\_type\_id} column is required to
+provide further identifying information. For \texttt{"quantile"}, it
+should contain numeric values between 0 and 1 indicating quantile levels
+(e.g., ``0.1'', ``0.25'', ``0.5'', ``0.75'', ``0.9''). For
+\texttt{"pmf"}, it should contain categorical values such as ``low'',
+``moderate'', ``high'', and ``very high''.
+
+The \texttt{model\_out\_tbl} and \texttt{oracle\_output\_data} must have
+the same task ID columns and \texttt{output\_type}, including
+\texttt{output\_type\_id} if necessary, which are used to match the
+predictions with the ground truth data.
 
 \section{Algorithms}\label{sec:algorithms}
 
@@ -655,28 +678,6 @@ is the standard S3 class model output format defined by the hubverse
 convention. Only one \texttt{output\_type} is allowed in the data frame,
 and it must be one of the \texttt{mean}, \texttt{median},
 \texttt{quantile}, or \texttt{pmf}.
-
-\texttt{oracle\_output\_data} is a data frame containing the ground
-truth data for the variables that are used to define modeling targets.
-This data must follow the oracle output format, which includes
-independent task ID columns (e.g., \texttt{location},
-\texttt{target\_date}, and \texttt{age\_group}), the
-\texttt{output\_type} column specifying the output type of the
-predictions and an \texttt{oracle\_value} column for the observed
-values. If the \texttt{output\_type} is either \texttt{"quantile"} or
-\texttt{"pmf"}, the \texttt{output\_type\_id} column is required to
-provide further identifying information. For \texttt{"quantile"}, it
-should contain numeric values between 0 and 1 indicating quantile levels
-(e.g., ``0.1'', ``0.25'', ``0.5'', ``0.75'', ``0.9''). For
-\texttt{"pmf"}, it should contain categorical values such as ``low'',
-``moderate'', ``high'', and ``very high''.
-
-The \texttt{forecast\_data} and \texttt{oracle\_output\_data} must have
-the same task ID columns and \texttt{output\_type}, including
-\texttt{output\_type\_id} if necessary, which are used to match the
-predictions with the ground truth data. As aforementioned, these data
-frames should follow the model output format and the oracle output
-format, respectively, as defined by the hubverse convention.
 
 The \texttt{ensemble\_fun} argument specifies the ensemble method to be
 used for evaluating model importance. The currently supported methods
