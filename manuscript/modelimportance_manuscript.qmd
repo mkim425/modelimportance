@@ -128,10 +128,105 @@ forecast_data <- hubExamples::forecast_outputs |>
   )
 
 forecast_data |>
+        filter(horizon != 0) |> 
   head(10) |>
   knitr::kable(format = "latex", booktabs = TRUE) |>
   kable_styling(latex_options = c("scale_down"))
 ```
+
+@fig-example-model_output visualize the information on the prediction task provided by @tbl-example-model_output for three models. 
+For each model, the quantile-based forecasts are shown for the target end dates of November 26, 2022 (horizon 1), December 03, 2022 (horizon 2), and December 10, 2022 (horizon 3), which were made on November 19, 2022 based on the historical data available as of that date. The prediction intervals defined by the lowest and highest quantiles (0.05 and 0.95) represent the uncertainty of the predictions. To give brief details in the interpretation, the Flusight-baseline model under-predicted the outcomes for the first two target dates (horizon 1 and 2), but it over-predicted the outcome for the last target date (horizon 3). Its prediction intervals are narrow compared to the other two models, which indicates that it is more confident about its predictions. 
+
+```{r fig-example-model_output, fig.pos="t"}
+#| echo: false
+#| label: fig-example-model_output
+#| fig-cap: "Example plot of three distributional forecasts corresponding to the model output for incident influenza hospitalizations shown in @tbl-example-model_output. Solid black dots indicate historically available data as of the forecast generation date, and open black circles indicate the eventually observed values. The blut dots represent predictive medians and the blue shaded area represents the corresponding 90% prediction interval defined by the 0.05 and 0.95 quantiles."
+
+target_data <- hubExamples::forecast_target_ts |>
+  dplyr::filter(
+    date %in% unique(forecast_data$target_end_date),
+    location %in% unique(forecast_data$location)
+  ) |>
+  rename(target_end_date = date)
+
+forecast_data |>
+  filter(
+    reference_date == "2022-12-17",
+    horizon != 0,
+    output_type_id %in% c(0.05, 0.5, 0.95)
+  ) |>
+  pivot_wider(names_from = output_type_id, values_from = value) |>
+  rename(lower = "0.05", upper = "0.95", value = "0.5") |>
+  ggplot(aes(x = target_end_date)) +
+  facet_grid(~model_id) +
+  geom_point(aes(y = value, color = "medians"), size = 2) +
+  geom_line(aes(y = value, color = "medians"), linewidth = 1) +
+  geom_ribbon(
+    aes(
+      ymin = lower, ymax = upper,
+      fill = "#3388FF"
+    ),
+    alpha = 0.5
+  ) +
+  geom_point(
+    data = target_data |> filter(target_end_date <= "2022-12-17"),
+    aes(y = observation, group = 1, color = "obs")
+  ) +
+  geom_line(
+    data = target_data |> filter(target_end_date <= "2022-12-17"),
+    aes(y = observation, group = 1, color = "obs")
+  ) +
+  geom_point(
+    data = target_data |> filter(target_end_date > "2022-12-17"),
+    aes(y = observation, group = 1, color = "truth"),
+    shape = 1, alpha = 1
+  ) +
+  geom_line(
+    data = target_data |> filter(target_end_date > "2022-12-17"),
+    aes(y = observation, group = 1, color = "truth"),
+    alpha = 0.75
+  ) +
+  # coord_cartesian(ylim = c(0, 500)) +
+  scale_x_date(name = NULL, date_breaks = "1 week", date_labels = "%Y-%m-%d") +
+  labs(
+    y = "Weekly Hospitalization",
+    # title = "Forecasts of incident deaths in Massachusetts on November 28, 2021",
+    x = "Date"
+  ) +
+  scale_color_manual(
+    name = "",
+    values = c(
+      "medians" = "DodgerBlue",
+      "obs" = "Black",
+      "truth" = "Black"
+    ),
+    labels = c(
+      "Forecast (Predictive median)",
+      "Observed data before forecasting",
+      "Eventually observed value"
+    )
+  ) +
+  scale_fill_manual("",
+    values = "#3388FF",
+    labels = "90% Prediction interval"
+  ) +
+  theme(
+          axis.title.x = element_text(size = 8), 
+    axis.title.y = element_text(size = 8),
+    axis.text.x = element_text(size = 6, angle = 90),
+    axis.text.y = element_text(size = 8),
+    strip.text = element_text(size = 8),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 8),
+    legend.position = "bottom",
+    legend.direction = "vertical",
+    legend.box = "horizontal"
+  ) 
+```
+
+
+
+
 
 ### Forecast data representation {#subsec:model_output}
 
@@ -251,8 +346,8 @@ In this section, we describe the usage of the function `model_importance()`, whe
 
 ```r
 R> model_importance(forecast_data, oracle_output_data, ensemble_fun, weighted,
-                   training_window_length, importance_algorithm, subset_wt, 
-                   na_action, ...)
+                    training_window_length, importance_algorithm, subset_wt, 
+                    na_action, ...)
 ```
 
 
@@ -354,7 +449,7 @@ forecast_data <- hubExamples::forecast_outputs |>
     output_type %in% c("mean"),
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
   ) |>
-  mutate(value = round(value)) |> 
+  mutate(value = round(value)) |>
   filter(
     !(model_id == "MOBS-GLEAM_FLUH" & location == "25" & target_end_date == as.Date("2022-11-26")),
     !(model_id == "PSI-DICE" & location == "48" & target_end_date == as.Date("2022-12-10"))
@@ -396,13 +491,13 @@ The following code evaluates the importance of each model in the simple mean ens
 
 ```r
 R> model_importance(
-        forecast_data = forecast_data, 
-        oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble", 
-        weighted = FALSE,
-        importance_algorithm = "lomo", 
-        na_action = "drop"
-        )
+                    forecast_data = forecast_data, 
+                    oracle_output_data = target_data,
+                    ensemble_fun = "simple_ensemble", 
+                    weighted = FALSE,
+                    importance_algorithm = "lomo", 
+                    na_action = "drop"
+                   )
 ```
 
 This call generates both the result and informative messages, summarizing the input data, including the number of dates on which forecasts were produced and the number of models with ids as follows.
@@ -426,11 +521,11 @@ The column name `mean_importance` indicates the average of task-specific importa
 ```{r}
 #| echo: false
 model_importance(
-        forecast_data = forecast_data, oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble", weighted = FALSE,
-        importance_algorithm = "lomo",
-        na_action = "drop"
-) 
+  forecast_data = forecast_data, oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble", weighted = FALSE,
+  importance_algorithm = "lomo",
+  na_action = "drop"
+)
 ```
 \normalsize
 The results show that the model 'Flusight-baseline' has the highest importance score, followed by 'PSI-DICE' and 'MOBS-GLEAM_FLUH'.
@@ -442,20 +537,23 @@ Another approach to handling missing values is to use the `"worst"` option for `
 
 ```r
 R> model_importance(
-        forecast_data = forecast_data, oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble", weighted = FALSE,
-        importance_algorithm = "lomo", na_action = "worst"
-        )
+                    forecast_data = forecast_data, 
+                    oracle_output_data = target_data,
+                    ensemble_fun = "simple_ensemble", 
+                    weighted = FALSE,
+                    importance_algorithm = "lomo", 
+                    na_action = "worst"
+                   )
 ```
 
 \small 
 ```{r}
 #| echo: false
 model_importance(
-        forecast_data = forecast_data, oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble", weighted = FALSE,
-        importance_algorithm = "lomo", na_action = "worst"
-) 
+  forecast_data = forecast_data, oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble", weighted = FALSE,
+  importance_algorithm = "lomo", na_action = "worst"
+)
 ```
 
 \normalsize
@@ -470,20 +568,23 @@ It is also possible to impute the missing scores with intermediate values by ass
 
 ```r
 R> model_importance(
-        forecast_data = forecast_data, oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble", weighted = FALSE,
-        importance_algorithm = "lomo", na_action = "average"
-        )
+                    forecast_data = forecast_data, 
+                    oracle_output_data = target_data,
+                    ensemble_fun = "simple_ensemble", 
+                    weighted = FALSE,
+                    importance_algorithm = "lomo", 
+                    na_action = "average"
+                   )
 ```
 
 \small 
 ```{r}
 #| echo: false
 model_importance(
-        forecast_data = forecast_data, oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble", weighted = FALSE,
-        importance_algorithm = "lomo", na_action = "average"
-) 
+  forecast_data = forecast_data, oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble", weighted = FALSE,
+  importance_algorithm = "lomo", na_action = "average"
+)
 ```
 
 
@@ -517,6 +618,3 @@ These extensions would aim to broaden the scope of applications in real-world fo
 We acknowledge Zhian N. Kamvar for debugging and resolving coding issues while developing the package. 
 
 ## References {.unnumbered}
-
-
-
