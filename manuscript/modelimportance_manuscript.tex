@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, interior hidden, boxrule=0pt, frame hidden, enhanced, sharp corners, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[interior hidden, enhanced, borderline west={3pt}{0pt}{shadecolor}, breakable, sharp corners, frame hidden, boxrule=0pt]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -583,8 +583,15 @@ predictions with the ground truth data.
 
 This section provides a brief description of the leave one model out
 (LOMO) and leave all subsets of models out (LASOMO) algorithms, which
-are used to compute the model importance score. (Details can be found in
-\citet{kim2024})
+are used to compute the model importance score. The basic idea of
+measuring the importance of each component model is to evaluate the
+change in ensemble performance when that model is included or excluded
+in the ensemble construction. More specifically, we compare the
+performance of an ensemble with and without a specific model for a
+specific task, and consider the difference in performance as the
+importance of that model for that task. We apply this idea to many tasks
+and aggregate the importance scores for that model across all tasks
+using averages. (Details can be found in \citet{kim2024})
 
 LOMO involves creating an ensemble by excluding one component model from
 the entire set of models. Let \({\cal A}\) be a set of \(n\) models and
@@ -599,7 +606,9 @@ specific score, between \(F^{{\cal A}^{-i}}\) and \(F^{\cal A}\)
 an ensemble of three models (\(n=3\)), LOMO creates an ensemble forecast
 \(F^{\{2,3\}}\) using only \(F^2\) and \(F^3\). The performance of this
 reduced ensemble is then compared to the full ensemble forecast
-\(F^{\{1,2,3\}}\), which incorporates all three models.
+\(F^{\{1,2,3\}}\), which incorporates all three models. It is worth
+noting that a model can make an ensemble better or worse, and thus the
+importance score for model 1 can be positive or negative accordingly.
 
 On the other hand, LASOMO involves ensemble constructions from all
 possible subsets of models. For each subset \(S\) that does not contain
