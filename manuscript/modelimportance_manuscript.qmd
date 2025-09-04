@@ -93,15 +93,14 @@ The paper proceeds as follows. In Section \ref{sec:data}, we address the model o
 
 ## Data {#sec:data}
 
-### Relationship and Dependencies on Hubverse {#subsec:dependence_hubverse}
+### Relationship and dependencies on hubverse {#subsec:dependence_hubverse}
 
-The [modelimportance]{.pkg} package is designed to work with the hubverse framework and, accordingly, depends on several packages in the hubverse ecosystem, such as [hubUtils]{.pkg}, [hubEnsembles]{.pkg}, [hubEvals]{.pkg}, and [hubExamples]{.pkg}. 
+The [modelimportance]{.pkg} package is designed to work with the hubverse framework and, accordingly, depends on several packages in the hubverse ecosystem, such as [hubUtils]{.pkg} (@Rpackage-hubUtils), [hubEnsembles]{.pkg} (@Rpackage-hubEnsembles), [hubEvals]{.pkg} (@Rpackage-hubEvals), and [hubExamples]{.pkg} (@Rpackage-hubExamples). 
 The [modelimportance]{.pkg} uses a `model_out_tbl` S3 class as the model output format defined in the [hubUtils]{.pkg}, which consists of utility functions to standardize prediction files and data formats (details in Section \ref{subsec:model_output_format}).
 Ensembling predictions from multiple models relies on the [hubEnsembles]{.pkg}, which offers a broadly applicable framework to construct multi-model ensembles using various ensemble methods.
 Calculation of forecast accuracy using various metrics is based on the [hubEvals]{.pkg}, which internally leverage the [scoringutils]{.pkg}.
 We use or modify the example datasets from the [hubExamples]{.pkg}  for testing and demonstration purposes (see Section \ref{sec:examples}). 
 
-\textcolor{red}{Should I cite relevant papers or links for each package?}
 
 ### Model output format {#subsec:model_output_format}
 Model outputs are structured in a tabular format designed specifically for predictions, which is a formal S3 object called `model_out_tbl`.
@@ -279,13 +278,9 @@ This section provides a brief description of the leave one model out (LOMO) and 
 LOMO involves creating an ensemble by excluding one component model from the entire set of models. 
 Let ${\cal A}$ be a set of $n$ models and $F^i$ be a forecast produced by model $i$, where $i = 1,2, \dots, n.$
 Each ensemble excludes exactly one model while including all the others. Denoting by $F^{{\cal A}^{-i}}$ an ensemble forecast constructed without $F^i$ and by $F^{\cal A}$ the ensemble forecast built from the entire set of models, the importance score using LOMO is calculated as the difference in accuracy, as measured by a specific score, between $F^{{\cal A}^{-i}}$ and $F^{\cal A}$  (Algorithm \ref{alg:lomo}). 
-For example, when evaluating model 1 within an ensemble of three models ($n=3$), LOMO creates an ensemble forecast $F^{\{2,3\}}$ using only $F^2$ and $F^3$. The performance of this reduced ensemble is then compared to the full ensemble forecast $F^{\{1,2,3\}}$, which incorporates all three models. It is worth noting that a model can make an ensemble better or worse, and thus the importance score for model 1 can be positive or negative accordingly.
+For example, when evaluating model 1 within an ensemble of three models ($n=3$), LOMO creates an ensemble forecast $F^{\{2,3\}}$ using only $F^2$ and $F^3$. The performance of this reduced ensemble is then compared to the full ensemble forecast $F^{\{1,2,3\}}$, which incorporates all three models. We note that a model can make an ensemble better or worse, and thus the importance score for model 1 can be positive or negative accordingly.
 
-On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays a role of ${\cal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (Algorithm \ref{alg:lasomo}).
-For example, using the earlier setup of three forecast models, LASOMO considers three subsets, $\{2\}$, $\{3\}$, and $\{2, 3\}$, to calculate the importance score of model 1 (excluding all subsets that include model 1). The ensemble forecasts $F^{\{2\}}, F^{\{3\}}$, and $F^{\{2,3\}}$ are then compared to $F^{\{1,2\}}, F^{\{1,3\}}$, and $F^{\{1,2,3\}}$, respectively. The performance differences attributable to model 1's inclusion are aggregated, which results in the importance score for model 1. We note that the subsets may have different weights during the aggregating process. 
-The [modelimportance]{.pkg} package offers two weighting options for subsets: one assigns equal (uniform) weights to all subsets, and the other assigns weights based on their size, similar to the concept of Shapley values. Users can choose one to evaluate the contribution of each model in a manner suited to their preferred framework.
-
-\begin{algorithm}[bh!]
+\begin{algorithm}[b!]
 \caption{Importance score calculation for one prediction task using leave one model out (LOMO) algorithm} 
 \label{alg:lomo}
  \begin{spacing}{1.2}
@@ -307,10 +302,14 @@ The [modelimportance]{.pkg} package offers two weighting options for subsets: on
  \end{spacing}
 \end{algorithm}
 
+On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays a role of ${\cal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (Algorithm \ref{alg:lasomo}).
+For example, using the earlier setup of three forecast models, LASOMO considers three subsets, which we denote by $S_1=\{2\}$, $S_2=\{3\}$, and $S_3=\{2, 3\}$, to calculate the importance score of model 1 (excluding all subsets that include model 1). The ensemble forecasts $F^{\{2\}}, F^{\{3\}}$, and $F^{\{2,3\}}$ are then compared to $F^{\{1,2\}}, F^{\{1,3\}}$, and $F^{\{1,2,3\}}$, respectively. The performance differences attributable to model 1's inclusion are aggregated, which results in the importance score for model 1. We note that the subsets (e.g., $S_1, S_2,$ and $S_3$) may have different weights during the aggregating process. 
+The [modelimportance]{.pkg} package offers two weighting options for subsets: one assigns equal (uniform) weights to all subsets, and the other assigns weights based on their size, similar to the concept of Shapley values in cooperative game theory, which measure a player’s average contribution to all possible coalitions (@Shapley1953). Users can choose one to evaluate the contribution of each model in a manner suited to their preferred framework.
 
 Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to implement LOMO and LASOMO for a single prediction task, respectively.
 
-\begin{algorithm}[bh!]
+
+\begin{algorithm}[t!]
 \caption{Importance score calculation for one prediction task using leave all subsets of models out (LASOMO) algorithm} 
 \label{alg:lasomo}
  \begin{spacing}{1.2}
@@ -353,6 +352,15 @@ R> model_importance(forecast_data, oracle_output_data, ensemble_fun, weighted,
                     na_action, ...)
 ```
 
+`forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
+
+
+The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance, which relies on implementations in the \pkg{hubEnsembles} package.
+The currently supported methods are `"simple_ensemble"` and `"linear_pool"`. 
+The `"simple_ensemble"` method returns the average of the predicted values from all component models per prediction task defined by task IDs, `output_type`, and `output_type_id` columns. 
+The default aggregation function for this method is `"mean"`, but it can be customized by 
+specifying additional arguments through `...`, such as `agg_fun="median"`.
+When `"linear_pool"` is specified, ensemble model outputs are created as a linear pool of component model outputs. This method supports only an `output_type` of `"mean"`, `"quantile"`, or `"pmf"`.
 
 ```{r}
 #| echo: false
@@ -406,15 +414,7 @@ tbl_argument |>
   kable_styling(latex_options = c("striped", "t"), font_size = 10.5)
 ```
 
-`forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. 
 
-
-The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance. 
-The currently supported methods are `"simple_ensemble"` and `"linear_pool"`. 
-The `"simple_ensemble"` method returns the average of the predicted values from all component models per prediction task defined by task IDs, `output_type`, and `output_type_id` columns. 
-The default aggregation function for this method is `"mean"`, but it can be customized by 
-specifying additional arguments through `...`, such as `agg_fun="median"`.
-When `"linear_pool"` is specified, ensemble model outputs are created as a linear pool of component model outputs. This method supports only an `output_type` of `"mean"`, `"quantile"`, or `"pmf"`.
 
 The `weighted` argument is a logical value that indicates whether model weighting should be done when building an ensemble using the specified `ensemble_fun`. 
 If it is set to `TRUE`, model weights are estimated based on the previous performance of each model, and these weights are used to build the ensemble. 
@@ -428,10 +428,10 @@ Three options are available: `"worst"`, `"average"`, and `"drop"`.
 In each specific prediction task, if a model has any missing predictions, the `"worst"` option replaces those missing values with the smallest value from the other models, while the `"average"` option replaces them with the average of the other models' predictions in that task. The `"drop"` option removes missing values, which results in the exclusion of the model from the evaluation for that task.
 
 
-## Implementation and Availability
+## Implementation and availability
 
 This package is implemented in [R]{.proglang} and distributed via CRAN and GitHhub. 
-We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure the correctness of all functions, including those used internally. Additionally, we performed continuous integration testing using GitHub Actions to maintain code quality and functionality across platforms. 
+We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure the correctness of all functions, including those used internally. Additionally, we performed continuous integration testing using GitHub Actions to maintain code quality and functionality across platforms, including Windows, macOS, and Linux. 
 
 
 ## Examples {#sec:examples}
@@ -491,12 +491,62 @@ target_data <- hubExamples::forecast_target_ts |>
 print(target_data, width = Inf)
 ```
 
-Overall, the forecasts tend to have larger prediction errors for the target end date of December 10, 2022, compared to November 26, 2022, which is expected due to increased uncertainty at  longer horizons. Additionally, the forecasts for Massachusetts are relatively more accurate compared to those for Texas, which tend to have higher errors.
 
 \normalsize
 
+@fig-example-mean-lomo illustrates these point forecasts and the eventually observed values for each location. 
+
+```{r fig-example-mean-lomo, fig.pos="t"}
+#| echo: false
+#| label: fig-example-mean-lomo
+#| fig-cap: "Plot of three point forecasts (mean) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values."
+
+forecast_data |>
+  ggplot(aes(x = target_end_date)) +
+  geom_point(aes(y = value, color = model_id), size = 2) +
+  facet_wrap(~location, scales = "free_y", 
+             labeller = labeller(location = function(x) paste0("Location: ", x))) +
+  geom_point(
+    data = target_data,
+    aes(y = oracle_value, group = 1, color = "Observed"),
+    shape = 1, alpha = 1, size = 2
+  ) +
+  scale_x_date(breaks = target_data$target_end_date, 
+               date_labels = "%Y-%m-%d",
+               expand = expansion(add = c(5, 5)) )+
+  scale_color_manual(name = "model_id/Observed",
+                     values = c("Flusight-baseline" = "#619CFF", 
+                                "MOBS-GLEAM_FLUH" = "#00BA38", 
+                                "PSI-DICE" = "#F8766D", 
+                                "Observed" = "black"),
+                     limits = c("Flusight-baseline", 
+                                "MOBS-GLEAM_FLUH", 
+                                "PSI-DICE", 
+                                "Observed")) +
+  labs(
+    y = "Weekly Hospitalization",
+    # title = "Forecasts of incident deaths in Massachusetts (25) on November 28, 2021",
+    x = "Date"
+  ) +
+  theme(
+    axis.title.x = element_text(size = 9), 
+    axis.title.y = element_text(size = 9),
+    axis.text.x = element_text(size = 9),
+    axis.text.y = element_text(size = 9),
+    strip.text = element_text(size = 9),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 9),
+    legend.position = "bottom",
+    legend.box = "horizontal"
+  ) 
+```
+
+
+Overall, the forecasts tend to have larger prediction errors for the target end date of December 10, 2022, compared to November 26, 2022, which is expected due to increased uncertainty at  longer horizons. Additionally, the forecasts for Massachusetts are relatively more accurate compared to those for Texas, which tend to have higher errors.
+
+
 We can evaluate the importance of each model in the ensemble using the `model_importance()` function. 
-The following code evaluates the importance of each model in the simple mean ensemble using the LOMO algorithm, without training the ensemble (`weighted = FALSE`). The `na_action` argument is set to `"drop"`, which represents that any missing values in the forecasts will be excluded from the evaluation. 
+The following code evaluates the importance of each model in the simple mean ensemble using the LOMO algorithm, without training the ensemble (`weighted = FALSE`); training is infeasible as the data available for training is limited. The `na_action` argument is set to `"drop"`, which represents that any missing values in the forecasts will be excluded from the evaluation. 
 
 ```r
 R> model_importance(
