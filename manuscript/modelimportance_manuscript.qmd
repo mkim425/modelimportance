@@ -88,7 +88,13 @@ These capabilities provide unique support for hub organizers who refer to the en
 The [modelimportance]{.pkg} package can even strengthen the benefits of a multi-model ensemble by helping these organizations create more effective ensemble forecasts based on the precise evaluation of each model's contribution. Specifically, [modelimportance]{.pkg} follows 'hubverse' standards, where 'hubverse' offers a set of publicly available software and data tools developed to promote collaborative modeling hub efforts and reduce the effort required to set up and operate them [@hubverse_docs]. Adherence to the model output formats specified by the hubverse convention enables seamless integration and flexibility with other forecasting tools and systems.
 
 
-The paper proceeds as follows. In Section \ref{sec:data}, we address the model output formats proposed within the hubverse framework and the structure of forecasts. Section \ref{sec:algorithms} presents two algorithms implemented in [modelimportance]{.pkg} for calculating the model importance metric: leave-one-model-out and leave-all-subsets-of-models-out. We demonstrate the various functionalities [modelimportance]{.pkg} supports in Section \ref{sec:main-function} and give some examples in Section \ref{sec:examples}. We close this paper with some concluding remarks and a discussion of possible extensions.   
+The paper proceeds as follows. Section \ref{sec:data} describes how the \pkg{modelimportance} package relates to the hubverse framework, including its dependencies, the model output formats defined within hubverse, and the structure of data presentation for both forecasts and actual observations. 
+Section \ref{sec:algorithms} presents two
+algorithms implemented in \pkg{modelimportance} for calculating the
+model importance metric: leave-one-model-out and
+leave-all-subsets-of-models-out. We demonstrate the various
+functionalities \pkg{modelimportance} supports in Section \ref{sec:main-function} and highlight our quality assurance measures and its open access in Section \ref{sec:implementation-and-availability}. Some examples are provided in Section \ref{sec:examples}. We close this paper with some concluding remarks and a discussion of possible extensions.
+ 
 
 
 ## Data {#sec:data}
@@ -131,7 +137,7 @@ forecast_data |>
   filter(
     reference_date == "2022-12-17",
     horizon != 0
-  ) |> 
+  ) |>
   head(10) |>
   knitr::kable(format = "latex", booktabs = TRUE) |>
   kable_styling(latex_options = c("scale_down"))
@@ -214,7 +220,7 @@ forecast_data |>
     labels = "90% Prediction interval"
   ) +
   theme(
-          axis.title.x = element_text(size = 8), 
+    axis.title.x = element_text(size = 8),
     axis.title.y = element_text(size = 8),
     axis.text.x = element_text(size = 6, angle = 90),
     axis.text.y = element_text(size = 8),
@@ -224,7 +230,7 @@ forecast_data |>
     legend.position = "bottom",
     legend.direction = "vertical",
     legend.box = "horizontal"
-  ) 
+  )
 ```
 
 
@@ -419,7 +425,7 @@ tbl_argument |>
 The `weighted` argument is a logical value that indicates whether model weighting should be done when building an ensemble using the specified `ensemble_fun`. 
 If it is set to `TRUE`, model weights are estimated based on the previous performance of each model, and these weights are used to build the ensemble. 
 
-The `importance_algorithm` argument specifies the algorithm for model importance calculation, which can be either `"lomo"` (leave-one-model-out) and `"lasomo"` (leave all subsets of models out). The `subset_wt` argument is employed only for the `"lasomo"` algorithm. This argument has two options: `"equal"` assigns equal weight to all subsets and `"perm_based"` assigns weight averaged over all possible permutations as in
+The `importance_algorithm` argument specifies the algorithm for model importance calculation, which can be either `"lomo"` (leave one model out) and `"lasomo"` (leave all subsets of models out). The `subset_wt` argument is employed only for the `"lasomo"` algorithm. This argument has two options: `"equal"` assigns equal weight to all subsets and `"perm_based"` assigns weight averaged over all possible permutations as in
 the formula of Shapley values (Algorithm \ref{alg:lasomo}). The default values of `importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`, respectively.
 
 
@@ -428,7 +434,7 @@ Three options are available: `"worst"`, `"average"`, and `"drop"`.
 In each specific prediction task, if a model has any missing predictions, the `"worst"` option replaces those missing values with the smallest value from the other models, while the `"average"` option replaces them with the average of the other models' predictions in that task. The `"drop"` option removes missing values, which results in the exclusion of the model from the evaluation for that task.
 
 
-## Implementation and availability
+## Implementation and availability {#sec:implementation-and-availability}
 
 This package is implemented in [R]{.proglang} and distributed via CRAN and GitHhub. 
 We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure the correctness of all functions, including those used internally. Additionally, we performed continuous integration testing using GitHub Actions to maintain code quality and functionality across platforms, including Windows, macOS, and Linux. 
@@ -494,7 +500,6 @@ print(target_data, width = Inf)
 
 \normalsize
 
-@fig-example-mean-lomo illustrates these point forecasts and the eventually observed values for each location. 
 
 ```{r fig-example-mean-lomo, fig.pos="t"}
 #| echo: false
@@ -504,49 +509,60 @@ print(target_data, width = Inf)
 forecast_data |>
   ggplot(aes(x = target_end_date)) +
   geom_point(aes(y = value, color = model_id), size = 2) +
-  facet_wrap(~location, scales = "free_y", 
-             labeller = labeller(location = function(x) paste0("Location: ", x))) +
+  facet_wrap(~location,
+    scales = "free_y",
+    labeller = labeller(location = function(x) paste0("Location: ", x))
+  ) +
   geom_point(
     data = target_data,
-    aes(y = oracle_value, group = 1, color = "Observed"),
-    shape = 1, alpha = 1, size = 2
+    aes(y = oracle_value, group = 1, shape = "Observed"),
+    alpha = 1, size = 2
   ) +
-  scale_x_date(breaks = target_data$target_end_date, 
-               date_labels = "%Y-%m-%d",
-               expand = expansion(add = c(5, 5)) )+
-  scale_color_manual(name = "model_id/Observed",
-                     values = c("Flusight-baseline" = "#619CFF", 
-                                "MOBS-GLEAM_FLUH" = "#00BA38", 
-                                "PSI-DICE" = "#F8766D", 
-                                "Observed" = "black"),
-                     limits = c("Flusight-baseline", 
-                                "MOBS-GLEAM_FLUH", 
-                                "PSI-DICE", 
-                                "Observed")) +
+  scale_x_date(
+    breaks = target_data$target_end_date,
+    date_labels = "%Y-%m-%d",
+    expand = expansion(add = c(5, 5))
+  ) +
+  scale_color_manual(
+    name = "model_id/Observed",
+    values = c(
+      "Flusight-baseline" = "#619CFF",
+      "MOBS-GLEAM_FLUH" = "#00BA38",
+      "PSI-DICE" = "#F8766D"
+    ),
+    limits = c(
+      "Flusight-baseline",
+      "MOBS-GLEAM_FLUH",
+      "PSI-DICE"
+    )
+  ) +
+  scale_shape_manual(values = c("Observed" = 1)) +
   labs(
     y = "Weekly Hospitalization",
     # title = "Forecasts of incident deaths in Massachusetts (25) on November 28, 2021",
     x = "Date"
   ) +
   theme(
-    axis.title.x = element_text(size = 9), 
+    axis.title.x = element_text(size = 9),
     axis.title.y = element_text(size = 9),
     axis.text.x = element_text(size = 9),
     axis.text.y = element_text(size = 9),
     strip.text = element_text(size = 9),
     legend.title = element_blank(),
-    legend.text = element_text(size = 9),
+    legend.text = element_text(size = 8),
     legend.position = "bottom",
-    legend.box = "horizontal"
-  ) 
+    legend.box = "horizontal",
+    legend.spacing.x = unit(0.25, "mm"),
+    legend.key.width = unit(0.4, "cm")
+  )
 ```
 
 
-Overall, the forecasts tend to have larger prediction errors for the target end date of December 10, 2022, compared to November 26, 2022, which is expected due to increased uncertainty at  longer horizons. Additionally, the forecasts for Massachusetts are relatively more accurate compared to those for Texas, which tend to have higher errors.
+Overall, the forecasts tend to have larger prediction errors for the target end date of December 10, 2022, compared to November 26, 2022, which is expected due to increased uncertainty at  longer horizons. Additionally, the forecasts for Massachusetts are relatively more accurate compared to those for Texas, which tend to have higher errors (@fig-example-mean-lomo).
 
 
-We can evaluate the importance of each model in the ensemble using the `model_importance()` function. 
-The following code evaluates the importance of each model in the simple mean ensemble using the LOMO algorithm, without training the ensemble (`weighted = FALSE`); training is infeasible as the data available for training is limited. The `na_action` argument is set to `"drop"`, which represents that any missing values in the forecasts will be excluded from the evaluation. 
+We can quantify the contribution of each model within the ensemble using the `model_importance()` function. 
+The following code evaluates the importance of each model in the simple mean ensemble using the LOMO algorithm, without training the ensemble (`weighted = FALSE`); training is infeasible in this example as the data available for training is limited. The `na_action` argument is set to `"drop"`, which represents that any missing values in the forecasts will be excluded from the evaluation. 
 
 ```r
 R> model_importance(

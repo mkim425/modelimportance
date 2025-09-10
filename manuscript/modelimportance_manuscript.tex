@@ -165,7 +165,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, sharp corners, interior hidden, breakable, enhanced, frame hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, boxrule=0pt, sharp corners, borderline west={3pt}{0pt}{shadecolor}, interior hidden, breakable, enhanced]}{\end{tcolorbox}}\fi
 \makeatother
 
 \usepackage{bookmark}
@@ -371,16 +371,20 @@ operate them \citep{hubverse_docs}. Adherence to the model output
 formats specified by the hubverse convention enables seamless
 integration and flexibility with other forecasting tools and systems.
 
-The paper proceeds as follows. In Section \ref{sec:data}, we address the
-model output formats proposed within the hubverse framework and the
-structure of forecasts. Section \ref{sec:algorithms} presents two
+The paper proceeds as follows. Section \ref{sec:data} describes how the
+\pkg{modelimportance} package relates to the hubverse framework,
+including its dependencies, the model output formats defined within
+hubverse, and the structure of data presentation for both forecasts and
+actual observations. Section \ref{sec:algorithms} presents two
 algorithms implemented in \pkg{modelimportance} for calculating the
 model importance metric: leave-one-model-out and
 leave-all-subsets-of-models-out. We demonstrate the various
 functionalities \pkg{modelimportance} supports in Section
-\ref{sec:main-function} and give some examples in Section
-\ref{sec:examples}. We close this paper with some concluding remarks and
-a discussion of possible extensions.
+\ref{sec:main-function} and highlight our quality assurance measures and
+its open access in Section \ref{sec:implementation-and-availability}.
+Some examples are provided in Section \ref{sec:examples}. We close this
+paper with some concluding remarks and a discussion of possible
+extensions.
 
 \section{Data}\label{sec:data}
 
@@ -766,9 +770,9 @@ weights are estimated based on the previous performance of each model,
 and these weights are used to build the ensemble.
 
 The \texttt{importance\_algorithm} argument specifies the algorithm for
-model importance calculation, which can be either \texttt{"lomo"}
-(leave-one-model-out) and \texttt{"lasomo"} (leave all subsets of models
-out). The \texttt{subset\_wt} argument is employed only for the
+model importance calculation, which can be either \texttt{"lomo"} (leave
+one model out) and \texttt{"lasomo"} (leave all subsets of models out).
+The \texttt{subset\_wt} argument is employed only for the
 \texttt{"lasomo"} algorithm. This argument has two options:
 \texttt{"equal"} assigns equal weight to all subsets and
 \texttt{"perm\_based"} assigns weight averaged over all possible
@@ -788,7 +792,7 @@ in that task. The \texttt{"drop"} option removes missing values, which
 results in the exclusion of the model from the evaluation for that task.
 
 \section{Implementation and
-availability}\label{implementation-and-availability}
+availability}\label{sec:implementation-and-availability}
 
 This package is implemented in \proglang{R} and distributed via CRAN and
 GitHhub. We conducted unit tests using the \pkg{testthat} package
@@ -881,9 +885,6 @@ R> target_data
 
 \normalsize
 
-Figure~\ref{fig-example-mean-lomo} illustrates these point forecasts and
-the eventually observed values for each location.
-
 \begin{figure}[t]
 
 \centering{
@@ -906,16 +907,17 @@ Overall, the forecasts tend to have larger prediction errors for the
 target end date of December 10, 2022, compared to November 26, 2022,
 which is expected due to increased uncertainty at longer horizons.
 Additionally, the forecasts for Massachusetts are relatively more
-accurate compared to those for Texas, which tend to have higher errors.
+accurate compared to those for Texas, which tend to have higher errors
+(Figure~\ref{fig-example-mean-lomo}).
 
-We can evaluate the importance of each model in the ensemble using the
-\texttt{model\_importance()} function. The following code evaluates the
-importance of each model in the simple mean ensemble using the LOMO
+We can quantify the contribution of each model within the ensemble using
+the \texttt{model\_importance()} function. The following code evaluates
+the importance of each model in the simple mean ensemble using the LOMO
 algorithm, without training the ensemble (\texttt{weighted\ =\ FALSE});
-training is infeasible as the data available for training is limited.
-The \texttt{na\_action} argument is set to \texttt{"drop"}, which
-represents that any missing values in the forecasts will be excluded
-from the evaluation.
+training is infeasible in this example as the data available for
+training is limited. The \texttt{na\_action} argument is set to
+\texttt{"drop"}, which represents that any missing values in the
+forecasts will be excluded from the evaluation.
 
 \begin{verbatim}
 R> model_importance(
