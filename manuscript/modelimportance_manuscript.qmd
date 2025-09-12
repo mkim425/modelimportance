@@ -35,7 +35,7 @@ execute:
   message: false
 bibliography: references.bib
 abstract: |
-  Ensemble forecasts are commonly used to support decision-making and policy planning across various fields because they often offer improved accuracy and stability compared to individual models. As each model has its own unique characteristics, understanding and measuring the value each constituent model adds to the overall accuracy of the ensemble is of great interest to building effective ensembles. The [R]{.proglang} package [modelimportance]{.pkg}  provides tools to quantify how each component model contributes to the acccuracy of ensemble performance for both point and probabilistic forecasts. It supports multiple functionalities; it allows users to specify which ensemble approach to implement and which model importance metric to use. Additionally, the software offers customizable options for handling missing values. These features enable the package to serve as a versatile tool for researchers and practitioners. It helps not only in constructing an effective ensemble model across a wide range of forecasting tasks, but also in understanding the role of each model within the ensemble and gaining insights into individual models themselves. This package follows the 'hubverse' framework, which is a collection of open-source software and tools developed to promote collaborative modeling hub efforts and simplify their setup and operation.
+  Ensemble forecasts are commonly used to support decision-making and policy planning across various fields because they often offer improved accuracy and stability compared to individual models. As each model has its own unique characteristics, understanding and measuring the value each constituent model adds to the overall accuracy of the ensemble can support the construction of effective ensembles. The [R]{.proglang} package [modelimportance]{.pkg}  provides tools to quantify how each component model contributes to the acccuracy of ensemble performance for both point and probabilistic forecasts. It supports multiple functionalities; it allows users to specify which ensemble approach to implement and which model importance metric to use. Additionally, the software offers customizable options for handling missing values. These features enable the package to serve as a versatile tool for researchers and practitioners. It helps not only in constructing an effective ensemble model across a wide range of forecasting tasks, but also in understanding the role of each model within the ensemble and gaining insights into individual models themselves. This package follows the 'hubverse' framework, which is a collection of open-source software and tools developed to promote collaborative modeling hub efforts and simplify their setup and operation.
 keywords: [ensemble, forecast, prediction, model importance, Shapley value, R]
 keywords-formatted: [ensemble, forecast, prediction, model importance, Shapley value, R]
 ---
@@ -84,7 +84,7 @@ These packages focus on feature-level importance within a single model and do no
 The tools in the [modelimportance]{.pkg} quantify how each component model helps enhance the ensemble model's predictive performance. They assign numerical scores to each model based on a selected metric that measures forecast accuracy, depending on the forecast type.
 
 
-These capabilities provide unique support for hub organizers who refer to the entity responsible for launching and managing a collective modeling hub. They coordinate multiple teams to produce forecasts and integrate their predictions into an ensemble forecast [@Shandross2024], which, as mentioned earlier, is known for having better performance compared to individual models. Examples include the CDC in the US and the European Centre for Disease Prevention and Control in the EU. 
+These capabilities provide unique support for hub organizers who refer to the entity responsible for launching and managing a collective modeling hub. They coordinate multiple teams to produce forecasts and integrate their predictions into an ensemble forecast [@Shandross2024], which, as mentioned earlier, is known for having better performance compared to individual models. Examples include the US CDC and the European Centre for Disease Prevention and Control. 
 The [modelimportance]{.pkg} package can even strengthen the benefits of a multi-model ensemble by helping these organizations create more effective ensemble forecasts based on the precise evaluation of each model's contribution. Specifically, [modelimportance]{.pkg} follows 'hubverse' standards, where 'hubverse' offers a set of publicly available software and data tools developed to promote collaborative modeling hub efforts and reduce the effort required to set up and operate them [@hubverse_docs]. Adherence to the model output formats specified by the hubverse convention enables seamless integration and flexibility with other forecasting tools and systems.
 
 
@@ -102,19 +102,19 @@ functionalities \pkg{modelimportance} supports in Section \ref{sec:main-function
 ### Relationship and dependencies on hubverse {#subsec:dependence_hubverse}
 
 The [modelimportance]{.pkg} package is designed to work with the hubverse framework and, accordingly, depends on several packages in the hubverse ecosystem, such as [hubUtils]{.pkg} (@Rpackage-hubUtils), [hubEnsembles]{.pkg} (@Rpackage-hubEnsembles), [hubEvals]{.pkg} (@Rpackage-hubEvals), and [hubExamples]{.pkg} (@Rpackage-hubExamples). 
-The [modelimportance]{.pkg} uses a `model_out_tbl` S3 class as the model output format defined in the [hubUtils]{.pkg}, which consists of utility functions to standardize prediction files and data formats (details in Section \ref{subsec:model_output_format}).
-Ensembling predictions from multiple models relies on the [hubEnsembles]{.pkg}, which offers a broadly applicable framework to construct multi-model ensembles using various ensemble methods.
-Calculation of forecast accuracy using various metrics is based on the [hubEvals]{.pkg}, which internally leverage the [scoringutils]{.pkg}.
-We use or modify the example datasets from the [hubExamples]{.pkg}  for testing and demonstration purposes (see Section \ref{sec:examples}). 
+[modelimportance]{.pkg} uses a `model_out_tbl` S3 class as the model output format defined in [hubUtils]{.pkg}, which consists of utility functions to standardize prediction files and data formats (details in Section \ref{subsec:model_output_format}).
+Ensembling predictions from multiple models relies on [hubEnsembles]{.pkg}, which offers a broadly applicable framework to construct multi-model ensembles using various ensemble methods.
+Calculation of forecast accuracy using various metrics is based on [hubEvals]{.pkg}, which internally leverages [scoringutils]{.pkg}.
+We use the example datasets from [hubExamples]{.pkg}  for testing and demonstration purposes (see Section \ref{sec:examples}). 
 
 
 ### Model output format {#subsec:model_output_format}
 Model outputs are structured in a tabular format designed specifically for predictions, which is a formal S3 object called `model_out_tbl`.
-In the hubverse standard, each row represents an individual prediction for a single task, and its details are described in multiple columns through which one can identify the model IDs, task characteristics, prediction representation type, and predicted values [@Shandross2024]. 
+In the hubverse standard, each row represents an individual prediction or a component of a prediction for a single task, and its details are described in multiple columns through which one can identify the model IDs, task characteristics, prediction representation type, and predicted values [@Shandross2024]. 
 To elaborate on the task characteristics, each prediction task means a specific forecasting problem and it is defined by a set of task ID variables, which includes a date on which forecasts are generated, the target to predict (e.g., flu-related incident deaths, cases, or hospitalizations), and the prediction horizon, which is the length of time into the future from the point when a model generate its forecast, for a specific location on a certain target date.
 @tbl-example-model_output illustrates short-term forecasts of weekly incident influenza hospitalizations in the US for Massachusetts, generated by the model 'Flusight-baseline' on December 17, 2022, in the `model_out_tbl` format.
 The `model_id` column lists a uniquely identified model name. All of the `reference_date`, `target`, `horizon`, `location`, and `target_end_date` columns are all referred to as the task ID variables, which together defines the task characteristics.
-Note that the forecast generation date and the target date for prediction are mapped to the `reference_date` and `target_end_date` columns, respectively, and the location is represented based on the FIPS code (e.g., '25' for Massachusetts).
+Note that the forecast generation date and the target date for which the prediction is made are mapped to the `reference_date` and `target_end_date` columns, respectively, and the location is represented based on the FIPS code (e.g., '25' for Massachusetts).
 The time length to the `target_end_date`, which is the number of weeks ahead from the `reference_date`, is indicated in the `horizon` column. 
 The prediction representation is specified as 'quantile' in the `output_type` column, and details are represented in the `output_type_id` column with seven quantiles of 0.05, 0.1, 0.25,  0.5, 0.75, 0.9, and 0.95 for each target end date.
 The predicted value corresponding to each quantile is recorded in the `value` column.
@@ -124,7 +124,7 @@ The predicted value corresponding to each quantile is recorded in the `value` co
 #| echo: false
 #| label: tbl-example-model_output
 #| tbl-cap: "Example of the model output for incident influenza
-#| hospitalizations extracted from `forecast_outputs` data in the
+#| hospitalizations (top 10 rows) extracted from `forecast_outputs` data in the
 #| [hubExamples]{.pkg} package."
 
 forecast_data <- hubExamples::forecast_outputs |>
@@ -144,7 +144,7 @@ forecast_data |>
 ```
 
 @fig-example-model_output visualize the information on the prediction task provided by @tbl-example-model_output for three models. 
-For each model, the quantile-based forecasts are shown for the target end dates of December 24, 2022 (horizon 1), December 31, 2022 (horizon 2), and January 07, 2023 (horizon 3), which were made on December 17, 2022 based on the historical data available as of that date. The prediction intervals defined by the lowest and highest quantiles (0.05 and 0.95) represent the uncertainty of the predictions. To give brief details in the interpretation, the Flusight-baseline model under-predicted the outcomes for the first two target dates (horizon 1 and 2), but it over-predicted the outcome for the last target date (horizon 3). Its prediction intervals are narrow compared to the other two models, which indicates that it is more confident about its predictions. 
+For each model, the quantile-based forecasts are shown for the target end dates of December 24, 2022 (horizon 1), December 31, 2022 (horizon 2), and January 07, 2023 (horizon 3), which were made on December 17, 2022 based on the historical data available as of that date. The prediction intervals defined by the lowest and highest quantiles (0.05 and 0.95) represent the uncertainty of the predictions. To give brief details in the interpretation, the Flusight-baseline model under-predicted the outcomes for the first two target dates (horizon 1 and 2), but it over-predicted the outcome for the last target date (horizon 3). Its prediction intervals are narrow compared to the other two models, which indicates that it is more confident about its predictions. However, two of three prediction intervals (horizons 1 and 2) failed to cover the eventually observed values, implying that the model was apparently overconfident. 
 
 ```{r fig-example-model_output, fig.pos="t"}
 #| echo: false
@@ -270,7 +270,7 @@ data.frame(
 ```
 
 ### Oracle output data {#subsec:oracle_output_data}
-The `oracle_output_data` is a data frame that contains the ground truth values for the variables used to define modeling targets. 
+The `oracle_output_data` is a data frame that contains the ground truth values for the variables used to define modeling targets. It is referred to as ``oracle" because it is formatted as if an oracle made a perfect point prediction equal to the truth.
 This data must follow the oracle output format defined in the hubverse standard, which includes independent task ID columns (e.g., `location`, `target_date`), the `output_type` column specifying the output type of the predictions and an `oracle_value` column for the observed values. 
 As in the forecast data, if the `output_type` is either `"quantile"` or `"pmf"`, the `output_type_id` column is often required to provide further identifying information. 
 
@@ -279,7 +279,7 @@ The `model_out_tbl` and `oracle_output_data` must have the same task ID columns 
 
 ## Algorithms {#sec:algorithms}
 
-This section provides a brief description of the leave one model out (LOMO) and leave all subsets of models out (LASOMO) algorithms, which are used to compute the model importance score. The basic idea of measuring the importance of each component model is to evaluate the change in ensemble performance when that model is included or excluded in the ensemble construction. More specifically, we compare the performance of an ensemble with and without a specific model for a specific task, and consider the difference in performance as the importance of that model for that task. We apply this idea to many tasks and aggregate the importance scores for that model across all tasks using averages. (Details can be found in @kim2024) 
+This section provides a brief description of the leave one model out (LOMO) and leave all subsets of models out (LASOMO) algorithms, which are used to compute the model importance score. The basic idea of measuring the importance of each component model is to evaluate the change in ensemble performance when that model is included or excluded in the ensemble construction. More specifically, we compare the performance of an ensemble with and without a specific model for a specific task, and consider the difference in performance as the importance of that model for that task. We apply this idea to many tasks and aggregate the importance scores for that model across all tasks using averages. (Details can be found in @kim2024.) 
 
 LOMO involves creating an ensemble by excluding one component model from the entire set of models. 
 Let ${\cal A}$ be a set of $n$ models and $F^i$ be a forecast produced by model $i$, where $i = 1,2, \dots, n.$
@@ -361,7 +361,7 @@ R> model_importance(forecast_data, oracle_output_data, ensemble_fun, weighted,
 `forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
 
 
-The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance, which relies on implementations in the \pkg{hubEnsembles} package.
+The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance, which relies on implementations in the \pkg{hubEnsembles} package (@Rpackage-hubEnsembles).
 The currently supported methods are `"simple_ensemble"` and `"linear_pool"`. 
 The `"simple_ensemble"` method returns the average of the predicted values from all component models per prediction task defined by task IDs, `output_type`, and `output_type_id` columns. 
 The default aggregation function for this method is `"mean"`, but it can be customized by 
@@ -388,27 +388,27 @@ tbl_argument <- data.frame(
     "Algorithm to calculate importance",
     "Method for assigning weight to subsets when using LASOMO algorithm",
     "Method to handle missing data",
-    "Optional arguments for \\texttt{simple\\_ensemble}"
+    "Optional arguments for \\texttt{\"simple\\_ensemble\"}"
   ),
   "Possible Values" = c(
     "Must be the model output format",
     "Must be the oracle output format",
-    "\\texttt{simple\\_ensemble}, \\texttt{linear\\_pool}",
+    "\\texttt{\"simple\\_ensemble\"}, \\texttt{\"linear\\_pool\"}",
     "Non-negative integer",
-    "\\texttt{lomo, lasomo}",
-    "\\texttt{equal, perm\\_based}",
-    "\\texttt{worst, average, drop}",
+    "\\texttt{\"lomo\", \"lasomo\"}",
+    "\\texttt{\"equal\", \"perm\\_based\"}",
+    "\\texttt{\"worst\", \"average\", \"drop\"}",
     "Varies"
   ),
   Default = c(
     "N/A",
     "N/A",
-    "\\texttt{simple\\_ensemble}",
+    "\\texttt{\"simple\\_ensemble\"}",
     "0",
-    "\\texttt{lomo}",
-    "\\texttt{equal}",
-    "\\texttt{worst}",
-    "\\texttt{agg\\_fun = mean}"
+    "\\texttt{\"lomo\"}",
+    "\\texttt{\"equal\"}",
+    "\\texttt{\"worst\"}",
+    "\\texttt{agg\\_fun=\"mean\"}"
   ),
   check.names = FALSE
 )
@@ -437,7 +437,7 @@ In each specific prediction task, if a model has any missing predictions, the `"
 ## Implementation and availability {#sec:implementation-and-availability}
 
 This package is implemented in [R]{.proglang} and distributed via CRAN and GitHhub. 
-We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure the correctness of all functions, including those used internally. Additionally, we performed continuous integration testing using GitHub Actions to maintain code quality and functionality across platforms, including Windows, macOS, and Linux. 
+We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure the correctness of all functions, including those used internally. Additionally, we performed continuous integration testing using GitHub Actions to maintain code quality and functionality across platforms, including Windows, macOS, and Linux. All code changes were systematically reviewed by fellow team members, thereby enhancing reliability.
 
 
 ## Examples {#sec:examples}
@@ -450,7 +450,7 @@ The examples in this section illustrate the use of the `model_importance()` func
 
 The forecast data used here contains forecasts of weekly incident influenza hospitalizations in the US for Massachusetts (FIPS code 25) and Texas (FIPS code 48), generated on November 19, 2022. 
 These forecasts are for two target end dates, November 26, 2022 (horizon 1), and  December 10, 2022 (horizon 3), and were produced by three models: 'Flusight-baseline', 'MOBS-GLEAM_FLUH', and 'PSI-DICE'. The output type is `mean` and the `output_type_id` column has `NA`s as no further specification is required for this output type. 
-We have modified the example data slightly: the forecast values were rounded to the nearest integer and some forecasts have been removed to demonstrate the handling of missing values. Therefore, 'MOBS-GLEAM_FLUH''s forecast for Massachusetts on November 26, 2022, and 'PSI-DICE's forecast for Texas on December 10, 2022, are missing.
+We have modified the example data slightly: the forecast values were rounded to the nearest integer and some forecasts have been removed to demonstrate the handling of missing values. Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 
 
 ```r
@@ -504,7 +504,7 @@ print(target_data, width = Inf)
 ```{r fig-example-mean-lomo, fig.pos="t"}
 #| echo: false
 #| label: fig-example-mean-lomo
-#| fig-cap: "Plot of three point forecasts (mean) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values."
+#| fig-cap: "Plot of three point forecasts (mean) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing."
 
 forecast_data |>
   ggplot(aes(x = target_end_date)) +
