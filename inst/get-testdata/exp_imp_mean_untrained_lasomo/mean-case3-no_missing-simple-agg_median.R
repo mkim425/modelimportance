@@ -4,6 +4,9 @@
 # ----------------------------------------------------------------------------
 # load the package to make its internal functions available
 devtools::load_all()
+source(system.file("get-testdata/helper-exp_imp-untrained.R",
+  package = "modelimportance"
+))
 # target data
 target_data_mean <- readRDS(
   testthat::test_path("testdata/target_mean.rds")
@@ -25,32 +28,7 @@ subsets <- lapply(1:n, function(x) combn(n, x, simplify = FALSE)) |>
 dat_all_ens <- purrr::map_dfr(
   subsets,
   function(subset) {
-    get_modelsubset <- models[subset]
-    # index of the subsets list that is identical to the current subset, S
-    i <- Position(function(x) identical(x, subset), subsets)
-    # calculate the weight given to this subset when subset_wt="perm_based"
-    weight_perm <- 1 / ((n - 1) * choose(n - 1, length(get_modelsubset)))
-    # when the subset includes all indices, its weight is infinite
-    # replace it with NA (this value won't be used)
-    weight_perm <- ifelse(is.infinite(weight_perm), NA, weight_perm)
-    # calculate the weight when subset_wt="equal"
-    weight_eq <- 1
-    # reduced data including the models in the subset S
-    data_subset <- dat_mean |>
-      filter(.data$model_id %in% get_modelsubset)
-    # build an ensemble forecast using the models in the subset S
-    ensemble_forecast <- simple_ensemble(data_subset,
-      model_id = paste0("ensemble_", i),
-      agg_fun = "median"
-    )
-    # add index and weight to the ensemble forecast
-    ens_dat <- ensemble_forecast |>
-      mutate(
-        subset_idx = i,
-        subset_wt_perm = weight_perm,
-        subset_wt_eq = weight_eq
-      )
-    ens_dat
+    simple_ens_untrained_lasomo(models, subset, d = dat_mean, aggfun = "median")
   }
 )
 
@@ -74,20 +52,7 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   scores_by_subset <- map(cols, function(col) {
     purrr::map_dbl(
       set_incl_j_more,
-      function(k) {
-        # get elements of the subset that includes j
-        set_k <- subsets[[k]]
-        # index in 'subsets' list that include elements of set_k except for j
-        k1 <- which(sapply(subsets, setequal, set_k[set_k != j]))
-        # se_point for the ensemble forecast including jth model
-        score_incl_j <- score_ens_all$se_point[k]
-        # se_point for the ensemble forecast not including jth model
-        score_not_incl_j <- score_ens_all$se_point[k1]
-        # get the subset weight for the current subset
-        subset_weight <- score_ens_all[[col]][k1]
-        # jth model's marginal contribution multiplied by the subset weight
-        subset_weight * (-score_incl_j + score_not_incl_j)
-      }
+      function(k) wtd_marginal_cntrbt_mean(k, j, score_ens_all, subsets, col)
     )
   })
 
@@ -95,20 +60,8 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   # accumulate the scores calculated by subsets
   score <- lapply(scores_by_subset, sum)
   # store the importance score for the jth model
-  map_dfr(cols, function(col) {
-    data.frame(
-      model_id = models[j],
-      subset_wt = col,
-      importance = score[[col]]
-    )
-  }) |>
-    # importance score for the jth model depending on the subset_wt option
-    mutate(
-      subset_wt = sub("^subset_wt_", "", subset_wt),
-      importance = ifelse(subset_wt == "perm", importance,
-        importance / (2^(n - 1) - 1)
-      )
-    )
+  out <- df_score(cols, j, models, score)
+  out
 })
 
 exp_imp_mean_case3perm <- model_imp_scores |>
