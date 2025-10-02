@@ -63,20 +63,8 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   # accumulate the scores calculated by subsets
   score <- lapply(scores_by_subset, sum)
   # store the importance score for the jth model
-  map_dfr(cols, function(col) {
-    data.frame(
-      model_id = models[j],
-      subset_wt = col,
-      importance = score[[col]]
-    )
-  }) |>
-    # importance score for the jth model depending on the subset_wt option
-    mutate(
-      subset_wt = sub("^subset_wt_", "", subset_wt),
-      importance = ifelse(subset_wt == "perm", importance,
-        importance / (2^(n - 1) - 1)
-      )
-    )
+  out <- df_score(cols, j, models, score)
+  out
 })
 
 exp_imp_pmf_case1perm <- model_imp_scores |>
