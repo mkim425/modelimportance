@@ -670,6 +670,58 @@ model_importance(
 In this simple example with only three models, the ranking of the importance scores remains unchanged. However, in more complex scenarios with a larger number of models, the choice of `na_action` can impact the importance scores and their interpretation. A more extensive application can be found in @kim2024.
 
 
+### Evaluation using untrained ensemble in LASOMO algorithm for mean forecasts  {#sec:untrained-lasomo-mean}
+
+```r
+R> model_importance(
+                    forecast_data = forecast_data, 
+                    oracle_output_data = target_data,
+                    ensemble_fun = "simple_ensemble", 
+                    weighted = FALSE,
+                    importance_algorithm = "lasomo", 
+                    na_action = "drop",
+                    subset_wt = "equal"
+                   )
+```
+
+
+\small
+```{r}
+#| echo: false
+#| message: false
+
+model_importance(
+  forecast_data = forecast_data,
+  oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble",
+  importance_algorithm = "lasomo",
+  na_action = "drop",
+  subset_wt = "equal"
+)
+```
+
+\normalsize
+
+
+
+
+\small
+```{r}
+#| echo: false
+#| message: false
+
+model_importance(
+  forecast_data = forecast_data,
+  oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble",
+  importance_algorithm = "lasomo",
+  na_action = "drop",
+  subset_wt = "perm_based"
+)
+```
+\normalsize
+
+
 
 ### Evaluation using trained ensemble in LASOMO algorithm for quantile-based forecasts  {#sec:trained-lomo-qntl}
 
