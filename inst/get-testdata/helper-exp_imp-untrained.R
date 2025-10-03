@@ -135,7 +135,7 @@ wtd_marginal_cntrbt_pmf <- function(k, j, score_ens_all, subsets, col) {
 # ----------------------------------------------------------------------------
 # 3) store the importance score for the jth model
 df_score <- function(cols, j, models, score) {
-  map_dfr(cols, function(col) {
+  purrr::map_dfr(cols, function(col) {
     data.frame(
       model_id = models[j],
       subset_wt = col,
