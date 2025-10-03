@@ -6,7 +6,7 @@
 # =============================================================================
 
 # 1-1) Build linear pool ensemble in LASOMO for untrained ensemble models
-lp_ens_untrained_lasomo <- function(models, subset, d) {
+lp_ens_untrained_lasomo <- function(models, subset, subsets, d) {
   get_modelsubset <- models[subset]
   # index of the subsets list that is identical to the current subset, S
   i <- Position(function(x) identical(x, subset), subsets)
@@ -36,7 +36,7 @@ lp_ens_untrained_lasomo <- function(models, subset, d) {
 
 
 # 1-2) Build simple ensemble in LASOMO for untrained ensemble models
-simple_ens_untrained_lasomo <- function(models, subset, d, aggfun) {
+simple_ens_untrained_lasomo <- function(models, subset, subsets, d, aggfun) {
   get_modelsubset <- models[subset]
   # index of the subsets list that is identical to the current subset, S
   i <- Position(function(x) identical(x, subset), subsets)

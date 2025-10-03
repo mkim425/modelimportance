@@ -27,7 +27,9 @@ subsets <- lapply(1:n, function(x) combn(n, x, simplify = FALSE)) |>
 # data frame of all possible ensemble forecasts
 dat_all_ens <- purrr::map_dfr(
   subsets,
-  function(subset) lp_ens_untrained_lasomo(models, subset, d = dat_qntl)
+  function(subset) {
+    lp_ens_untrained_lasomo(models, subset, subsets, d = dat_qntl)
+  }
 )
 
 # score the ensemble forecasts
