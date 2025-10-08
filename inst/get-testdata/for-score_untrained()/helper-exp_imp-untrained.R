@@ -145,8 +145,8 @@ df_score <- function(cols, j, models, score) {
     # importance score for the jth model depending on the subset_wt option
     mutate(
       subset_wt = sub("^subset_wt_", "", .data$subset_wt),
-      importance = ifelse(.data$subset_wt == "perm", importance,
-        importance / (2^(n - 1) - 1)
+      importance = ifelse(.data$subset_wt == "perm", .data$importance,
+        .data$importance / (2^(n - 1) - 1)
       )
     )
 }
