@@ -1,27 +1,24 @@
 ## Generate expected importance scores for the untrained ensemble models
-## with pmf output in LASOMO
-## Case 4: missing data and 'simple_ensemble' using agg_fun = mean
+## with mean output in LASOMO
+## Case 3: no missing data and 'simple_ensemble' using agg_fun = median
 # ----------------------------------------------------------------------------
 # load the package to make its internal functions available
 devtools::load_all()
 source(system.file(
-  "get-testdata/for-score_untrained()/helper-exp_imp-untrained.R",
+  "get-testdata/for-score_untrained-fn/helper-exp_imp-untrained.R",
   package = "modelimportance"
 ))
 # target data
-target_data_pmf <- readRDS(
-  testthat::test_path("testdata/target_pmf.rds")
+target_data_mean <- readRDS(
+  testthat::test_path("testdata/target_mean.rds")
 )
 
-# forecast data with pmf output
-dat_pmf <- readRDS(
-  testthat::test_path("testdata/dat_pmf.rds")
+# forecast data with mean output
+dat_mean <- readRDS(
+  testthat::test_path("testdata/dat_mean.rds")
 )
-model_id_list <- unique(dat_pmf$model_id)
 
-# data with missing values
-sub_dat_pmf <- dat_pmf |> filter(model_id %in% model_id_list[c(1, 3)])
-models <- unique(sub_dat_pmf$model_id)
+models <- dat_mean$model_id
 # number of models
 n <- length(models)
 # Power set of {1,2,...,n} not including the empty set.
@@ -33,8 +30,7 @@ dat_all_ens <- purrr::map_dfr(
   subsets,
   function(subset) {
     simple_ens_untrained_lasomo(models, subset, subsets,
-      d = sub_dat_pmf,
-      aggfun = "mean"
+      d = dat_mean, aggfun = "median"
     )
   }
 )
@@ -42,15 +38,10 @@ dat_all_ens <- purrr::map_dfr(
 # score the ensemble forecasts
 score_ens_all <- score_model_out(
   dat_all_ens |> select(-c(subset_idx, subset_wt_perm, subset_wt_eq)),
-  target_data_pmf,
-  metrics = "log_score"
+  target_data_mean,
+  metrics = "se_point"
 ) |>
-  left_join(
-    dat_all_ens |>
-      select(c("model_id", "subset_wt_perm", "subset_wt_eq")) |>
-      distinct(),
-    by = "model_id"
-  )
+  left_join(dat_all_ens, by = "model_id")
 
 # calculate importance scores
 model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
@@ -64,7 +55,7 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   scores_by_subset <- map(cols, function(col) {
     purrr::map_dbl(
       set_incl_j_more,
-      function(k) wtd_marginal_cntrbt_pmf(k, j, score_ens_all, subsets, col)
+      function(k) wtd_marginal_cntrbt_mean(k, j, score_ens_all, subsets, col)
     )
   })
 
@@ -76,24 +67,22 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   out
 })
 
-exp_imp_pmf_case4perm <- model_imp_scores |>
+exp_imp_mean_case3perm <- model_imp_scores |>
   filter(subset_wt == "perm") |>
-  right_join(data.frame(model_id = model_id_list), by = "model_id") |>
   mutate(
-    ens_mthd = "simple_ensemble-mean",
+    ens_mthd = "simple_ensemble-median",
     algorithm = "lasomo",
-    test_purp = "missing data",
+    test_purp = "properly assigned",
     subset_wt = "perm_based"
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)
 
-exp_imp_pmf_case4eq <- model_imp_scores |>
+exp_imp_mean_case3eq <- model_imp_scores |>
   filter(subset_wt == "eq") |>
-  right_join(data.frame(model_id = model_id_list), by = "model_id") |>
   mutate(
-    ens_mthd = "simple_ensemble-mean",
+    ens_mthd = "simple_ensemble-median",
     algorithm = "lasomo",
-    test_purp = "missing data",
+    test_purp = "properly assigned",
     subset_wt = "equal"
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)
