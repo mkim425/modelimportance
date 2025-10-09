@@ -10,7 +10,9 @@ f_all_data <- readRDS(
   testthat::test_path("testdata/forecast_data_all_outputs.rds")
 )
 data_list <- list(
-  dat_mean = f_all_data |> dplyr::filter(output_type == "mean")
+  dat_mean = f_all_data |> dplyr::filter(output_type == "mean"),
+  dat_quantile = f_all_data |> dplyr::filter(output_type == "quantile"),
+  dat_median = f_all_data |> dplyr::filter(output_type == "median")
 )
 # target data
 target_data <- readRDS(
@@ -19,7 +21,9 @@ target_data <- readRDS(
 
 # list of expected values for testing
 exp_file_names <- c(
-  exp_overall_imp_mean_untrained = "exp_overall_imp_mean_untrained.rds"
+  exp_overall_imp_mean_untrained = "exp_overall_imp_mean_untrained.rds",
+  exp_overall_imp_quantile_untrained = "exp_overall_imp_quantile_untrained.rds",
+  exp_overall_imp_median_untrained = "exp_overall_imp_median_untrained.rds"
 )
 exp_imp_list <- map(
   exp_file_names,
@@ -28,7 +32,7 @@ exp_imp_list <- map(
 
 # combination of arguments
 params <- expand.grid(
-  output_type = c("mean"),
+  output_type = c("mean", "quantile", "median"), # , "pmf"),
   ens_fun = c("simple_ensemble", "linear_pool"),
   agg_fun = c("mean", "median"),
   algorithm = c("lomo", "lasomo"),
@@ -41,7 +45,7 @@ params <- expand.grid(
     agg_fun = ifelse(ens_fun == "linear_pool", "NA", agg_fun),
     subset_weight = ifelse(algorithm == "lomo", "equal", subset_weight)
   ) |>
-  # filter(!(output_type == "median" & ens_fun == "linear_pool")) |>
+  filter(!(output_type == "median" & ens_fun == "linear_pool")) |>
   distinct() |>
   arrange(algorithm, output_type, ens_fun, agg_fun, subset_weight)
 
