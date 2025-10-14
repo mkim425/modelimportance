@@ -8,6 +8,8 @@
 # 3) parameter settings for scoring with simple_ensemble and linear_pool
 # =============================================================================
 
+devtools::load_all()
+
 # 1)
 # Function to replace NAs in importance scores calculated by score_untrained()
 # Args:
