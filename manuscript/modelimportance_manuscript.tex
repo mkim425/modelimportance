@@ -1,4 +1,5 @@
 % Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 \PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
@@ -7,21 +8,22 @@
   article,
   shortnames,
   notitle]{jss}
-
+\usepackage{xcolor}
 \usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math}
+  \usepackage{unicode-math} % this also loads fontspec
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
 \usepackage{lmodern}
-\ifPDFTeX\else  
-    % xetex/luatex font selection
+\ifPDFTeX\else
+  % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -39,9 +41,6 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
-\usepackage{xcolor}
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 % Make \paragraph and \subparagraph free-standing
 \makeatletter
 \ifx\paragraph\undefined\else
@@ -67,8 +66,7 @@
 \makeatother
 
 
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{longtable,booktabs,array}
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -93,6 +91,19 @@
 % Set default figure placement to htbp
 \def\fps@figure{htbp}
 \makeatother
+
+
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+
 
 \usepackage{booktabs}
 \usepackage{longtable}
@@ -165,13 +176,11 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, sharp corners, boxrule=0pt, interior hidden, frame hidden, breakable, enhanced]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, borderline west={3pt}{0pt}{shadecolor}, enhanced, frame hidden, interior hidden, breakable, boxrule=0pt]}{\end{tcolorbox}}\fi
 \makeatother
-
 \usepackage{bookmark}
-
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same} % disable monospaced font for URLs
+\urlstyle{same}
 \hypersetup{
   pdftitle={: Evaluating model importance within a multi-model ensemble in },
   pdfauthor={Minsu Kim; Li Shandross; Evan L. Ray; Nicholas G. Reich},
@@ -565,8 +574,8 @@ package.
 \toprule
 Output Type & Scoring Rule & Description\\
 \midrule
-mean & MSE & Evaluate using the mean squared error (MSE)\\
-median & MAE & Evaluate using the mean absolute error (MAE)\\
+mean & SE & Evaluate using the squared error (SE)\\
+median & AE & Evaluate using the absolute error (AE)\\
 quantile & WIS & Evaluate using the weighted interval score (WIS)\\
 pmf & Log Score & Evaluate using the logarithm of the probability assigned to the true outcome (LogScore)\\
 \bottomrule
@@ -583,9 +592,16 @@ their associated scoring rules for evaluating prediction performance.}
 
 The \texttt{oracle\_output\_data} is a data frame that contains the
 ground truth values for the variables used to define modeling targets.
-It is referred to as
-`\texttt{oracle"\ because\ it\ is\ formatted\ as\ if\ an\ oracle\ made\ a\ perfect\ point\ prediction\ equal\ to\ the\ truth.\ This\ data\ must\ follow\ the\ oracle\ output\ format\ defined\ in\ the\ hubverse\ standard,\ which\ includes\ independent\ task\ ID\ columns\ (e.g.,}location\texttt{,}target\_date\texttt{),\ the}output\_type\texttt{column\ specifying\ the\ output\ type\ of\ the\ predictions\ and\ an}oracle\_value\texttt{column\ for\ the\ observed\ values.\ \ As\ in\ the\ forecast\ data,\ if\ the}output\_type\texttt{is\ either}``quantile''\texttt{or}``pmf''\texttt{,\ the}output\_type\_id`
-column is often required to provide further identifying information.
+It is referred to as ``oracle'' because it is formatted as if an oracle
+made a perfect point prediction equal to the truth. This data must
+follow the oracle output format defined in the hubverse standard, which
+includes independent task ID columns (e.g., \texttt{location},
+\texttt{target\_date}), the \texttt{output\_type} column specifying the
+output type of the predictions and an \texttt{oracle\_value} column for
+the observed values. As in the forecast data, if the
+\texttt{output\_type} is either \texttt{"quantile"} or \texttt{"pmf"},
+the \texttt{output\_type\_id} column is often required to provide
+further identifying information.
 
 The \texttt{model\_out\_tbl} and \texttt{oracle\_output\_data} must have
 the same task ID columns and \texttt{output\_type}, including
@@ -887,13 +903,17 @@ R> target_data
 \small
 
 \begin{verbatim}
-# A tibble: 4 x 3
-  target_end_date location oracle_value
-  <date>          <chr>           <dbl>
-1 2022-11-26      25                221
-2 2022-11-26      48               1929
-3 2022-12-10      25                578
-4 2022-12-10      48               1781
+# A tibble: 8 x 4
+  target_end_date target           location oracle_value
+  <date>          <chr>            <chr>           <dbl>
+1 2022-11-26      wk inc flu hosp  25             221   
+2 2022-11-26      wk inc flu hosp  48            1929   
+3 2022-12-10      wk inc flu hosp  25             578   
+4 2022-12-10      wk inc flu hosp  48            1781   
+5 2022-11-26      wk flu hosp rate 25               3.17
+6 2022-11-26      wk flu hosp rate 48               6.45
+7 2022-12-10      wk flu hosp rate 25               8.28
+8 2022-12-10      wk flu hosp rate 48               5.95
 \end{verbatim}
 
 \normalsize
@@ -1079,6 +1099,47 @@ with a larger number of models, the choice of \texttt{na\_action} can
 impact the importance scores and their interpretation. A more extensive
 application can be found in \citet{kim2024}.
 
+\subsection{Evaluation using untrained ensemble in LASOMO algorithm for
+mean forecasts}\label{sec:untrained-lasomo-mean}
+
+\begin{verbatim}
+R> model_importance(
+                    forecast_data = forecast_data, 
+                    oracle_output_data = target_data,
+                    ensemble_fun = "simple_ensemble", 
+                    weighted = FALSE,
+                    importance_algorithm = "lasomo", 
+                    na_action = "drop",
+                    subset_wt = "equal"
+                   )
+\end{verbatim}
+
+\small
+
+\begin{verbatim}
+# A tibble: 3 x 2
+  model_id          mean_importance
+  <chr>                       <dbl>
+1 Flusight-baseline          64500.
+2 PSI-DICE                   57672.
+3 MOBS-GLEAM_FLUH          -117856.
+\end{verbatim}
+
+\normalsize
+
+\small
+
+\begin{verbatim}
+# A tibble: 3 x 2
+  model_id          mean_importance
+  <chr>                       <dbl>
+1 Flusight-baseline          65662.
+2 PSI-DICE                   54329.
+3 MOBS-GLEAM_FLUH          -116761.
+\end{verbatim}
+
+\normalsize
+
 \subsection{Evaluation using trained ensemble in LASOMO algorithm for
 quantile-based forecasts}\label{sec:trained-lomo-qntl}
 
@@ -1125,7 +1186,7 @@ while developing the package.
 
 
 \renewcommand\refname{References}
-  \bibliography{references.bib}
+\bibliography{references.bib}
 
 
 

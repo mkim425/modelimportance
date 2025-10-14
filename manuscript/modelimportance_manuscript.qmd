@@ -154,10 +154,10 @@ For each model, the quantile-based forecasts are shown for the target end dates 
 
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
-    date %in% unique(forecast_data$target_end_date),
-    location %in% unique(forecast_data$location)
-  ) |>
-  rename(target_end_date = date)
+    target_end_date %in% unique(forecast_data$target_end_date),
+    location %in% unique(forecast_data$location),
+    target == "wk inc flu hosp"
+  ) 
 
 forecast_data |>
   filter(
@@ -257,10 +257,10 @@ Different output types correspond to different scoring rules for evaluating a mo
 
 data.frame(
   "Output Type" = c("mean", "median", "quantile", "pmf"),
-  "Scoring Rule" = c("MSE", "MAE", "WIS", "Log Score"),
+  "Scoring Rule" = c("SE", "AE", "WIS", "Log Score"),
   Description = c(
-    "Evaluate using the mean squared error (MSE)",
-    "Evaluate using the mean absolute error (MAE)",
+    "Evaluate using the squared error (SE)",
+    "Evaluate using the absolute error (AE)",
     "Evaluate using the weighted interval score (WIS)",
     "Evaluate using the logarithm of the probability assigned to the true outcome (LogScore)"
   ),
@@ -271,7 +271,8 @@ data.frame(
 ```
 
 ### Oracle output data {#subsec:oracle_output_data}
-The `oracle_output_data` is a data frame that contains the ground truth values for the variables used to define modeling targets. It is referred to as ``oracle" because it is formatted as if an oracle made a perfect point prediction equal to the truth.
+
+The `oracle_output_data` is a data frame that contains the ground truth values for the variables used to define modeling targets. It is referred to as "oracle" because it is formatted as if an oracle made a perfect point prediction equal to the truth.
 This data must follow the oracle output format defined in the hubverse standard, which includes independent task ID columns (e.g., `location`, `target_date`), the `output_type` column specifying the output type of the predictions and an `oracle_value` column for the observed values. 
 As in the forecast data, if the `output_type` is either `"quantile"` or `"pmf"`, the `output_type_id` column is often required to provide further identifying information. 
 
@@ -486,12 +487,11 @@ R> target_data
 #| echo: false
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
-    date %in% unique(forecast_data$target_end_date),
+    target_end_date %in% unique(forecast_data$target_end_date),
     location %in% unique(forecast_data$location)
   ) |>
   # Rename columns to match the oracle output format
   rename(
-    target_end_date = date,
     oracle_value = observation
   )
 
