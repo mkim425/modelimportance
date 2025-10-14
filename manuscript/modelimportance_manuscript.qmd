@@ -257,9 +257,9 @@ Different output types correspond to different scoring rules for evaluating a mo
 
 data.frame(
   "Output Type" = c("mean", "median", "quantile", "pmf"),
-  "Scoring Rule" = c("SE", "AE", "WIS", "Log Score"),
+  "Scoring Rule" = c("RSE", "AE", "WIS", "Log Score"),
   Description = c(
-    "Evaluate using the squared error (SE)",
+    "Evaluate using the root squared error (RSE)",
     "Evaluate using the absolute error (AE)",
     "Evaluate using the weighted interval score (WIS)",
     "Evaluate using the logarithm of the probability assigned to the true outcome (LogScore)"
@@ -488,7 +488,8 @@ R> target_data
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
     target_end_date %in% unique(forecast_data$target_end_date),
-    location %in% unique(forecast_data$location)
+    location %in% unique(forecast_data$location),
+    target == "wk inc flu hosp"
   ) |>
   # Rename columns to match the oracle output format
   rename(

@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, borderline west={3pt}{0pt}{shadecolor}, enhanced, frame hidden, interior hidden, breakable, boxrule=0pt]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, interior hidden, sharp corners, borderline west={3pt}{0pt}{shadecolor}, frame hidden, enhanced, boxrule=0pt]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -574,7 +574,7 @@ package.
 \toprule
 Output Type & Scoring Rule & Description\\
 \midrule
-mean & SE & Evaluate using the squared error (SE)\\
+mean & RSE & Evaluate using the root squared error (RSE)\\
 median & AE & Evaluate using the absolute error (AE)\\
 quantile & WIS & Evaluate using the weighted interval score (WIS)\\
 pmf & Log Score & Evaluate using the logarithm of the probability assigned to the true outcome (LogScore)\\
@@ -903,17 +903,13 @@ R> target_data
 \small
 
 \begin{verbatim}
-# A tibble: 8 x 4
-  target_end_date target           location oracle_value
-  <date>          <chr>            <chr>           <dbl>
-1 2022-11-26      wk inc flu hosp  25             221   
-2 2022-11-26      wk inc flu hosp  48            1929   
-3 2022-12-10      wk inc flu hosp  25             578   
-4 2022-12-10      wk inc flu hosp  48            1781   
-5 2022-11-26      wk flu hosp rate 25               3.17
-6 2022-11-26      wk flu hosp rate 48               6.45
-7 2022-12-10      wk flu hosp rate 25               8.28
-8 2022-12-10      wk flu hosp rate 48               5.95
+# A tibble: 4 x 4
+  target_end_date target          location oracle_value
+  <date>          <chr>           <chr>           <dbl>
+1 2022-11-26      wk inc flu hosp 25                221
+2 2022-11-26      wk inc flu hosp 48               1929
+3 2022-12-10      wk inc flu hosp 25                578
+4 2022-12-10      wk inc flu hosp 48               1781
 \end{verbatim}
 
 \normalsize
