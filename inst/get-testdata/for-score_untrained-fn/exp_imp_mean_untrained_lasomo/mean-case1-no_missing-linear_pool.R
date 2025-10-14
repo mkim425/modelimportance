@@ -29,7 +29,7 @@ subsets <- lapply(1:n, function(x) combn(n, x, simplify = FALSE)) |>
 dat_all_ens <- purrr::map_dfr(
   subsets,
   function(subset) {
-    lp_ens_untrained_lasomo(models, subset, subsets, d = dat_mean)
+    lp_ens_untrained_lasomo(models, subset, subsets, n, d = dat_mean)
   }
 )
 
