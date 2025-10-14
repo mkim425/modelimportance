@@ -8,7 +8,7 @@
 # 3) parameter settings for scoring with simple_ensemble and linear_pool
 # =============================================================================
 
-devtools::load_all()
+library(dplyr)
 
 # 1)
 # Function to replace NAs in importance scores calculated by score_untrained()
@@ -19,19 +19,19 @@ devtools::load_all()
 #   na_action indicating how NAs were handled
 replace_na <- function(score_df) {
   avg <- score_df |>
-    mutate(
-      across("importance", ~ coalesce(., mean(., na.rm = TRUE))),
+    dplyr::mutate(
+      dplyr::across("importance", ~ coalesce(., mean(., na.rm = TRUE))),
       na_action = "average"
     )
   worst <- score_df |>
-    mutate(
-      across("importance", ~ coalesce(., min(., na.rm = TRUE))),
+    dplyr::mutate(
+      dplyr::across("importance", ~ coalesce(., min(., na.rm = TRUE))),
       na_action = "worst"
     )
   drop <- score_df |>
-    filter(!is.na(.data$importance)) |>
-    mutate(na_action = "drop")
-  bind_rows(avg, worst, drop)
+    dplyr::filter(!is.na(.data$importance)) |>
+    dplyr::mutate(na_action = "drop")
+  dplyr::bind_rows(avg, worst, drop)
 }
 
 # 2) Function to aggregate importance scores across different tasks
@@ -42,9 +42,12 @@ replace_na <- function(score_df) {
 
 aggregate_scores <- function(score_result) {
   score_result |>
-    group_by(.data$model_id, .data$na_action) |>
-    summarise(mean_importance = mean(.data$importance), .groups = "drop") |>
-    arrange(.data$na_action, desc(.data$mean_importance))
+    dplyr::group_by(.data$model_id, .data$na_action) |>
+    dplyr::summarise(
+      mean_importance = mean(.data$importance),
+      .groups = "drop"
+    ) |>
+    dplyr::arrange(.data$na_action, desc(.data$mean_importance))
 }
 
 # 3) Set parameters for scoring
