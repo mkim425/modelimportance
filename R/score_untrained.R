@@ -17,6 +17,9 @@
 #' @param metric A character string specifying the metric to be used for scoring
 #' the model output. The metric is determined by the `output_type` and must be
 #' one of the following: `se_point`, `ae_point`, `wis`, or `log_score`.
+#' Note that for the `mean` output type, `se_point` is used by default,
+#' but we convert it to `rse_point` to ensure consistency in the units of
+#' importance score.
 #'
 #' @returns A data.frame with columns
 #' `task_id`, `output_type`, `model_id`, `task_level_importance`.
@@ -62,8 +65,17 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       oracle_output_data,
       metrics = metric
     ) |>
+      # if metric is se_point, convert it to rse_point
+      (\(df) if ("se_point" %in% names(df)) {
+        df |>
+          mutate(rse_point = sqrt(se_point)) |>
+          select(-se_point)
+      } else {
+        df
+      })() |>
+      # rename the calculated metric column to a common name
       rename(calculated_metric = any_of(
-        c("ae_point", "se_point", "wis", "log_score")
+        c("ae_point", "rse_point", "wis", "log_score")
       )) |>
       left_join(ensemble_data, by = "model_id") |>
       as_tibble()
@@ -124,8 +136,17 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       oracle_output_data,
       metrics = metric
     ) |>
+      # if metric is se_point, convert it to rse_point
+      (\(df) if ("se_point" %in% names(df)) {
+        df |>
+          mutate(rse_point = sqrt(se_point)) |>
+          select(-se_point)
+      } else {
+        df
+      })() |>
+      # rename the calculated metric column to a common name
       rename(calculated_metric = any_of(
-        c("ae_point", "se_point", "wis", "log_score")
+        c("ae_point", "rse_point", "wis", "log_score")
       )) |>
       left_join(
         dat_all_ens |>
