@@ -4,9 +4,20 @@
 # 2) calculate weighted marginal contributions of individual models
 # 3) store the importance score for a specific model
 # =============================================================================
+library(dplyr)
+library(hubEnsembles)
 
 # 1-1) Build linear pool ensemble in LASOMO for untrained ensemble models
-lp_ens_untrained_lasomo <- function(models, subset, subsets, d) {
+# Args:
+#   models: model_id vector of all individual models
+#   subset: indices of models included in the current subset, S
+#   subsets: list of all possible subsets of models
+#   d: data frame of forecasts from all individual models
+#   n: number of individual models
+# Returns:
+#   data frame of all possible ensemble forecasts along with corresponding
+#   subset weights
+lp_ens_untrained_lasomo <- function(models, subset, subsets, n, d) {
   get_modelsubset <- models[subset]
   # index of the subsets list that is identical to the current subset, S
   i <- Position(function(x) identical(x, subset), subsets)
@@ -19,9 +30,9 @@ lp_ens_untrained_lasomo <- function(models, subset, subsets, d) {
   weight_eq <- 1
   # reduced data including the models in the subset S
   data_subset <- d |>
-    filter(.data$model_id %in% get_modelsubset)
+    dplyr::filter(.data$model_id %in% get_modelsubset)
   # build an ensemble forecast using the models in the subset S
-  ensemble_forecast <- linear_pool(data_subset,
+  ensemble_forecast <- hubEnsembles::linear_pool(data_subset,
     model_id = paste0("ensemble_", i)
   )
   # add index and weight to the ensemble forecast
@@ -36,7 +47,16 @@ lp_ens_untrained_lasomo <- function(models, subset, subsets, d) {
 
 
 # 1-2) Build simple ensemble in LASOMO for untrained ensemble models
-simple_ens_untrained_lasomo <- function(models, subset, subsets, d, aggfun) {
+# Args:
+#   models: model_id vector of all individual models
+#   subset: indices of models included in the current subset, S
+#   subsets: list of all possible subsets of models
+#   d: data frame of forecasts from all individual models
+#   n: number of individual models
+# Returns:
+#   data frame of all possible ensemble forecasts along with corresponding
+#   subset weights
+simple_ens_untrained_lasomo <- function(models, subset, subsets, n, d, aggfun) {
   get_modelsubset <- models[subset]
   # index of the subsets list that is identical to the current subset, S
   i <- Position(function(x) identical(x, subset), subsets)
@@ -49,15 +69,15 @@ simple_ens_untrained_lasomo <- function(models, subset, subsets, d, aggfun) {
   weight_eq <- 1
   # reduced data including the models in the subset S
   data_subset <- d |>
-    filter(.data$model_id %in% get_modelsubset)
+    dplyr::filter(.data$model_id %in% get_modelsubset)
   # build an ensemble forecast using the models in the subset S
-  ensemble_forecast <- simple_ensemble(data_subset,
+  ensemble_forecast <- hubEnsembles::simple_ensemble(data_subset,
     model_id = paste0("ensemble_", i),
     agg_fun = aggfun
   )
   # add index and weight to the ensemble forecast
   ens_dat <- ensemble_forecast |>
-    mutate(
+    dplyr::mutate(
       subset_idx = i,
       subset_wt_perm = weight_perm,
       subset_wt_eq = weight_eq
@@ -143,10 +163,10 @@ df_score <- function(cols, j, models, score) {
     )
   }) |>
     # importance score for the jth model depending on the subset_wt option
-    mutate(
+    dplyr::mutate(
       subset_wt = sub("^subset_wt_", "", .data$subset_wt),
-      importance = ifelse(.data$subset_wt == "perm", importance,
-        importance / (2^(n - 1) - 1)
+      importance = ifelse(.data$subset_wt == "perm", .data$importance,
+        .data$importance / (2^(n - 1) - 1)
       )
     )
 }

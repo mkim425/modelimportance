@@ -1,10 +1,11 @@
 ## Generate expected importance scores for the untrained ensemble models
 ## with quantile output in LASOMO
-## Case 1: no missing data and 'linear pool' ensemble
+## Case 4: missing data and 'simple_ensemble' using agg_fun = mean
 # ----------------------------------------------------------------------------
 # load the package to make its internal functions available
 devtools::load_all()
-source(system.file("get-testdata/helper-exp_imp-untrained.R",
+source(system.file(
+  "get-testdata/for-score_untrained-fn/helper-exp_imp-untrained.R",
   package = "modelimportance"
 ))
 # target data
@@ -16,8 +17,11 @@ target_data_qntl <- readRDS(
 dat_qntl <- readRDS(
   testthat::test_path("testdata/dat_qntl.rds")
 )
+model_id_list <- unique(dat_qntl$model_id)
 
-models <- unique(dat_qntl$model_id)
+# data with missing values
+sub_dat_qntl <- dat_qntl |> filter(model_id %in% model_id_list[c(1, 3)])
+models <- unique(sub_dat_qntl$model_id)
 # number of models
 n <- length(models)
 # Power set of {1,2,...,n} not including the empty set.
@@ -28,7 +32,10 @@ subsets <- lapply(1:n, function(x) combn(n, x, simplify = FALSE)) |>
 dat_all_ens <- purrr::map_dfr(
   subsets,
   function(subset) {
-    lp_ens_untrained_lasomo(models, subset, subsets, d = dat_qntl)
+    simple_ens_untrained_lasomo(models, subset, subsets, n,
+      d = sub_dat_qntl,
+      aggfun = "mean"
+    )
   }
 )
 
@@ -69,22 +76,24 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   out
 })
 
-exp_imp_qntl_case1perm <- model_imp_scores |>
+exp_imp_qntl_case4perm <- model_imp_scores |>
   filter(subset_wt == "perm") |>
+  right_join(data.frame(model_id = model_id_list), by = "model_id") |>
   mutate(
-    ens_mthd = "linear_pool-NA",
+    ens_mthd = "simple_ensemble-mean",
     algorithm = "lasomo",
-    test_purp = "properly assigned",
+    test_purp = "missing data",
     subset_wt = "perm_based"
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)
 
-exp_imp_qntl_case1eq <- model_imp_scores |>
+exp_imp_qntl_case4eq <- model_imp_scores |>
   filter(subset_wt == "eq") |>
+  right_join(data.frame(model_id = model_id_list), by = "model_id") |>
   mutate(
-    ens_mthd = "linear_pool-NA",
+    ens_mthd = "simple_ensemble-mean",
     algorithm = "lasomo",
-    test_purp = "properly assigned",
+    test_purp = "missing data",
     subset_wt = "equal"
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)

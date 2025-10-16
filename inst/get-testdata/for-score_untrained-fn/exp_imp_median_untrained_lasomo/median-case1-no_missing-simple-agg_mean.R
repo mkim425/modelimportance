@@ -1,23 +1,24 @@
 ## Generate expected importance scores for the untrained ensemble models
-## with quantile output in LASOMO
-## Case 2: no missing data and 'simple_ensemble' using agg_fun = mean
+## with median output in LASOMO
+## Case 1: no missing data and 'simple_ensemble' using agg_fun = mean
 # ----------------------------------------------------------------------------
 # load the package to make its internal functions available
 devtools::load_all()
-source(system.file("get-testdata/helper-exp_imp-untrained.R",
+source(system.file(
+  "get-testdata/for-score_untrained-fn/helper-exp_imp-untrained.R",
   package = "modelimportance"
 ))
 # target data
-target_data_qntl <- readRDS(
-  testthat::test_path("testdata/target_qntl.rds")
+target_data_median <- readRDS(
+  testthat::test_path("testdata/target_median.rds")
 )
 
-# forecast data with qntl output
-dat_qntl <- readRDS(
-  testthat::test_path("testdata/dat_qntl.rds")
+# forecast data with median output
+dat_median <- readRDS(
+  testthat::test_path("testdata/dat_median.rds")
 )
 
-models <- unique(dat_qntl$model_id)
+models <- dat_median$model_id
 # number of models
 n <- length(models)
 # Power set of {1,2,...,n} not including the empty set.
@@ -28,8 +29,8 @@ subsets <- lapply(1:n, function(x) combn(n, x, simplify = FALSE)) |>
 dat_all_ens <- purrr::map_dfr(
   subsets,
   function(subset) {
-    simple_ens_untrained_lasomo(models, subset, subsets,
-      d = dat_qntl, aggfun = "mean"
+    simple_ens_untrained_lasomo(models, subset, subsets, n,
+      d = dat_median, aggfun = "mean"
     )
   }
 )
@@ -37,15 +38,10 @@ dat_all_ens <- purrr::map_dfr(
 # score the ensemble forecasts
 score_ens_all <- score_model_out(
   dat_all_ens |> select(-c(subset_idx, subset_wt_perm, subset_wt_eq)),
-  target_data_qntl,
-  metrics = "wis"
+  target_data_median,
+  metrics = "ae_point"
 ) |>
-  left_join(
-    dat_all_ens |>
-      select(c("model_id", "subset_wt_perm", "subset_wt_eq")) |>
-      distinct(),
-    by = "model_id"
-  )
+  left_join(dat_all_ens, by = "model_id")
 
 # calculate importance scores
 model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
@@ -59,7 +55,7 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   scores_by_subset <- map(cols, function(col) {
     purrr::map_dbl(
       set_incl_j_more,
-      function(k) wtd_marginal_cntrbt_qntl(k, j, score_ens_all, subsets, col)
+      function(k) wtd_marginal_cntrbt_median(k, j, score_ens_all, subsets, col)
     )
   })
 
@@ -71,7 +67,7 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   out
 })
 
-exp_imp_qntl_case2perm <- model_imp_scores |>
+exp_imp_median_case1perm <- model_imp_scores |>
   filter(subset_wt == "perm") |>
   mutate(
     ens_mthd = "simple_ensemble-mean",
@@ -81,7 +77,7 @@ exp_imp_qntl_case2perm <- model_imp_scores |>
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)
 
-exp_imp_qntl_case2eq <- model_imp_scores |>
+exp_imp_median_case1eq <- model_imp_scores |>
   filter(subset_wt == "eq") |>
   mutate(
     ens_mthd = "simple_ensemble-mean",
