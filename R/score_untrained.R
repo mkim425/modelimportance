@@ -66,12 +66,14 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       metrics = metric
     ) |>
       # if metric is se_point, convert it to rse_point
-      (\(df) if ("se_point" %in% names(df)) {
-        df |>
-          mutate(rse_point = sqrt(se_point)) |>
-          select(-se_point)
-      } else {
-        df
+      (\(df) {
+        if ("se_point" %in% names(df)) {
+          df |>
+            mutate(rse_point = sqrt(.data$se_point)) |>
+            select(-"se_point")
+        } else {
+          df
+        }
       })() |>
       # rename the calculated metric column to a common name
       rename(calculated_metric = any_of(
@@ -137,12 +139,14 @@ score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
       metrics = metric
     ) |>
       # if metric is se_point, convert it to rse_point
-      (\(df) if ("se_point" %in% names(df)) {
-        df |>
-          mutate(rse_point = sqrt(se_point)) |>
-          select(-se_point)
-      } else {
-        df
+      (\(df) {
+        if ("se_point" %in% names(df)) {
+          df |>
+            mutate(rse_point = sqrt(.data$se_point)) |>
+            select(-"se_point")
+        } else {
+          df
+        }
       })() |>
       # rename the calculated metric column to a common name
       rename(calculated_metric = any_of(
