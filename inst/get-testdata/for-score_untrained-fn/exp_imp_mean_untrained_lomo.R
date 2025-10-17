@@ -31,8 +31,10 @@ ensemble_scores <- score_model_out(df_ensembles,
   target_data_mean,
   metrics = "se_point"
 ) |>
+  mutate(rse_point = sqrt(se_point)) |>
+  select(-se_point) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = se_point - se_point[1]) |>
+  mutate(importance = rse_point - rse_point[1]) |>
   filter(model_id != "ens_all")
 
 # get dataframe including model_id and each model's importance score
@@ -69,8 +71,10 @@ ensemble_scores <- score_model_out(df_ensembles_simple,
   target_data_mean,
   metrics = "se_point"
 ) |>
+  mutate(rse_point = sqrt(se_point)) |>
+  select(-se_point) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = se_point - se_point[1]) |>
+  mutate(importance = rse_point - rse_point[1]) |>
   filter(model_id != "ens_all")
 
 # get dataframe including model_id and each model's importance score
@@ -107,8 +111,10 @@ ensemble_scores <- score_model_out(df_ensembles_simple,
   target_data_mean,
   metrics = "se_point"
 ) |>
+  mutate(rse_point = sqrt(se_point)) |>
+  select(-se_point) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = se_point - se_point[1]) |>
+  mutate(importance = rse_point - rse_point[1]) |>
   filter(model_id != "ens_all")
 
 # get dataframe including model_id and each model's importance score
@@ -143,8 +149,10 @@ ensemble_scores <- score_model_out(df_ensembles,
   target_data_mean,
   metrics = "se_point"
 ) |>
+  mutate(rse_point = sqrt(se_point)) |>
+  select(-se_point) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = se_point - se_point[1]) |>
+  mutate(importance = rse_point - rse_point[1]) |>
   filter(model_id != "ens_all")
 
 # get dataframe including model_id and each model's importance score
