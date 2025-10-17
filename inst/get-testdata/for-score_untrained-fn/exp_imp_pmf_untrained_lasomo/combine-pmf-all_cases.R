@@ -8,7 +8,10 @@ file_names <- c(
   "pmf-case3-no_missing-simple-agg_median.R",
   "pmf-case4-missing-simple-agg_mean.R"
 )
-root <- "./inst/get-testdata/exp_imp_pmf_untrained_lasomo/"
+root <- paste0(
+  "./inst/get-testdata/",
+  "for-score_untrained-fn/exp_imp_pmf_untrained_lasomo/"
+)
 for (i in 1:4) source(paste0(root, file_names[i]))
 
 exp_imp_pmf <- rbind(

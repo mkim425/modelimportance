@@ -96,12 +96,14 @@ the importance is as follows.
 \tabular{ll}{
 \strong{Output Type} \tab \strong{Scoring Rule} \cr
 median \tab ae_point \cr
-mean \tab se_point \cr
+mean \tab rse_point \cr
 quantile \tab wis \cr
 pmf \tab log_score \cr
 }
-where \code{ae_point} represents the absolute error, \code{se_point} the squared error,
-\code{wis} the weighted interval score, and \code{log_score} the logarithmic score.
+where \code{ae_point} represents the absolute error,
+\code{rse_point} the root squared error,
+\code{wis} the weighted interval score, and
+\code{log_score} the logarithmic score.
 }
 \details{
 The \code{oracle_output_data} in the oracle output format should contain

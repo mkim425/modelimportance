@@ -14,12 +14,14 @@
 #' \tabular{ll}{
 #'   \strong{Output Type} \tab \strong{Scoring Rule} \cr
 #'   median \tab ae_point \cr
-#'   mean \tab se_point \cr
+#'   mean \tab rse_point \cr
 #'   quantile \tab wis \cr
 #'   pmf \tab log_score \cr
 #' }
-#' where `ae_point` represents the absolute error, `se_point` the squared error,
-#' `wis` the weighted interval score, and `log_score` the logarithmic score.
+#' where `ae_point` represents the absolute error,
+#' `rse_point` the root squared error,
+#' `wis` the weighted interval score, and
+#' `log_score` the logarithmic score.
 #'
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format. Only one `output_type` is allowed in the

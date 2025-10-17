@@ -7,7 +7,10 @@ file_names <- c(
   "median-case2-no_missing-simple-agg_median.R",
   "median-case3-missing-simple-agg_mean.R"
 )
-root <- "./inst/get-testdata/exp_imp_median_untrained_lasomo/"
+root <- paste0(
+  "./inst/get-testdata/",
+  "for-score_untrained-fn/exp_imp_median_untrained_lasomo/"
+)
 for (i in 1:3) source(paste0(root, file_names[i]))
 
 exp_imp_median <- rbind(

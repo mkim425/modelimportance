@@ -42,6 +42,8 @@ score_ens_all <- score_model_out(
   target_data_mean,
   metrics = "se_point"
 ) |>
+  mutate(rse_point = sqrt(se_point)) |>
+  select(-se_point) |>
   left_join(dat_all_ens, by = "model_id")
 
 # calculate importance scores
