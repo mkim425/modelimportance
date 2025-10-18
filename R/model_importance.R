@@ -64,6 +64,8 @@
 #' * `"average"` replaces missing values with the average value from the other
 #' models.
 #' * `"drop"` removes missing values.
+#' @param min_log_score A numeric value specifying the minimum log score when
+#' `Inf` is returned during the log score calculation for the `pmf` output
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
 #' @return A data.frame with columns
@@ -132,6 +134,7 @@ model_importance <- function(forecast_data,
                              importance_algorithm = c("lomo", "lasomo"),
                              subset_wt = c("equal", "perm_based"),
                              na_action = c("worst", "average", "drop"),
+                             min_log_score = -10,
                              ...) {
   # set defaults
   ensemble_fun <- match.arg(ensemble_fun)
@@ -209,7 +212,7 @@ model_importance <- function(forecast_data,
         score_untrained(
           single_task_data, oracle_output_data, model_id_list,
           ensemble_fun, importance_algorithm, subset_wt,
-          metric, ...
+          metric, min_log_score, ...
         )
       }
     )
