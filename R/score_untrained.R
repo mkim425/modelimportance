@@ -32,7 +32,7 @@
 
 score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
                             ensemble_fun, importance_algorithm, subset_wt,
-                            metric, ...) {
+                            metric, min_log_score, ...) {
   # models in the single_task_data
   models <- unique(single_task_data$model_id)
   missing_model <- setdiff(model_id_list, single_task_data$model_id)
