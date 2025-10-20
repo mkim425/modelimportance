@@ -1,13 +1,12 @@
 #' Check the input forecast data structure and validate it.
 #'
-#' @param forecast_data A data.frame with the predictions that is or can be
-#' coerced to a model_out_tbl format.
-#' @param oracle_output_data A data.frame with the target values.
-#' This data must follow the oracle output format.
+#' @inheritParams model_importance
+#'
 #' @return a model_out_tbl format for forecast data
 #'
 #' @import hubUtils
 #' @import dplyr
+#' @noRd
 
 validate_input_data <- function(forecast_data, oracle_output_data) {
   valid_tbl <- forecast_data |>
