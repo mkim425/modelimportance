@@ -75,7 +75,8 @@ pmap(
           importance_algorithm = algorithm,
           subset_wt = subset_weight,
           na_action = na_method,
-          agg_fun = agg_fun
+          agg_fun = agg_fun,
+          min_log_score = -10
         ))
       } else {
         calculated <- suppressMessages(model_importance(
@@ -84,7 +85,8 @@ pmap(
           ensemble_fun = ens_fun,
           importance_algorithm = algorithm,
           subset_wt = subset_weight,
-          na_action = na_method
+          na_action = na_method,
+          min_log_score = -10
         ))
       }
       # expected values

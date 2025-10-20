@@ -46,7 +46,8 @@ for (k in seq_along(output_types)) {
           importance_algorithm = imp_alg,
           subset_wt = subset_weight,
           metric = measures[k],
-          agg_fun = agg_fun
+          agg_fun = agg_fun,
+          min_log_score = -10
         )
         # replace NA values (if any) in 3 ways: "worst", "average", "drop"
         replace_na(res)
@@ -81,7 +82,8 @@ for (k in seq_along(output_types)) {
             ensemble_fun = "linear_pool",
             importance_algorithm = imp_alg,
             subset_wt = subset_weight,
-            metric = measures[k]
+            metric = measures[k],
+            min_log_score = -10
           )
           # replace NA values (if any) in 3 ways: "worst", "average", "drop"
           replace_na(res)
