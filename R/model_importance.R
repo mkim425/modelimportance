@@ -176,6 +176,14 @@ model_importance <- function(forecast_data,
     unique(valid_tbl$output_type) == "pmf" ~ "log_score"
   )
 
+  if (metric == "log_score") {
+    message(paste(
+      "If a log_score of -Inf occurs (due to zero probability for the true ",
+      "outcome), it is replaced with -10 by default.",
+      "You can change this via 'min_log_score'."
+    ))
+  }
+
   # Give a message for the user to check the model IDs
   message(paste(
     "The available model IDs are:\n",
