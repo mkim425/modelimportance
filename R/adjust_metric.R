@@ -9,7 +9,7 @@
 #'
 #' @returns A data.frame with adjusted metric values.
 #' @noRd
-adjust_metric <- function(df, log_min_val = -10) {
+adjust_metric <- function(df, log_min_val) {
   # if metric is se_point, convert it to rse_point
   if ("se_point" %in% names(df)) {
     df <- df |>
@@ -18,21 +18,6 @@ adjust_metric <- function(df, log_min_val = -10) {
   }
   # if metric is log_score and the value is Inf, convert it to log_min_val
   if ("log_score" %in% names(df) && any(is.infinite(df$log_score))) {
-    if (log_min_val == -10) {
-      message(paste(
-        "A negative infinite log_score value ('-Inf') occurred",
-        "due to the zero probability assigned to the true outcome. \n",
-        "It is convered to -10 by default.",
-        "To use a different value for the minimum score,",
-        "set the 'min_log_score' argument."
-      ))
-    } else {
-      message(paste0(
-        "A negative infinite log_score value ('-Inf') is replaced with ",
-        log_min_val, "."
-      ))
-    }
-
     df$log_score[df$log_score == -Inf] <- log_min_val
   }
   df
