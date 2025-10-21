@@ -30,14 +30,12 @@ expected_df_pmf_specified <- data.frame(
 )
 
 test_that("adjust_metric converts -Inf to defalut minimum score", {
-  adjusted_df_defalut <- suppressMessages(adjust_metric(input_df_pmf))
+  adjusted_df_defalut <- adjust_metric(input_df_pmf)
   expect_equal(adjusted_df_defalut, expected_df_pmf_default)
 })
 
 test_that("adjust_metric converts -Inf to specified minimum score", {
-  adjusted_df_specified <- suppressMessages(
-    adjust_metric(input_df_pmf, log_min_val = -2)
-  )
+  adjusted_df_specified <- adjust_metric(input_df_pmf, log_min_val = -2)
   expect_equal(adjusted_df_specified, expected_df_pmf_specified)
 })
 
