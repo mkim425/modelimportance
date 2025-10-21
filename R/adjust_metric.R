@@ -9,7 +9,7 @@
 #'
 #' @returns A data.frame with adjusted metric values.
 #' @noRd
-adjust_metric <- function(df, log_min_val) {
+adjust_metric <- function(df, log_min_val = -10) {
   # if metric is se_point, convert it to rse_point
   if ("se_point" %in% names(df)) {
     df <- df |>
