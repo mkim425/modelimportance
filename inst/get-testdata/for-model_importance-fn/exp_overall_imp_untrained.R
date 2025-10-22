@@ -12,8 +12,8 @@ target_data <- readRDS(
   testthat::test_path("testdata/target_data_all_outputs.rds")
 )
 
-output_types <- c("mean", "quantile", "median") # , "pmf")
-measures <- c("se_point", "wis", "ae_point") # , "log_score")
+output_types <- c("mean", "quantile", "median", "pmf")
+measures <- c("se_point", "wis", "ae_point", "log_score")
 
 # loop over the output types and corresponding measures
 for (k in seq_along(output_types)) {
