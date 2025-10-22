@@ -18,7 +18,7 @@ adjust_metric <- function(df, log_min_val = -10) {
   }
   # if metric is log_score and the value is Inf, convert it to log_min_val
   if ("log_score" %in% names(df) && any(is.infinite(df$log_score))) {
-    df$log_score[df$log_score == -Inf] <- log_min_val
+    df$log_score[df$log_score == Inf] <- -log_min_val
   }
   df
 }
