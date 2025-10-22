@@ -4,6 +4,7 @@ library(dplyr)
 library(hubEnsembles)
 library(hubEvals)
 library(purrr)
+future::plan("sequential") # Set up sequential plan for testing
 
 # forecast data list
 f_all_data <- readRDS(
