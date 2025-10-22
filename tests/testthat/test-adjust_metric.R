@@ -16,17 +16,17 @@ test_that("adjust_metric converts se_point to rse_point", {
 # test with pmf output type
 input_df_pmf <- data.frame(
   model_id = c("model_1", "model_2", "model_3"),
-  log_score = c(-Inf, 9, 16)
+  log_score = c(Inf, 9, 16)
 )
 
 expected_df_pmf_default <- data.frame(
   model_id = c("model_1", "model_2", "model_3"),
-  log_score = c(-10, 9, 16)
+  log_score = c(10, 9, 16)
 )
 
 expected_df_pmf_specified <- data.frame(
   model_id = c("model_1", "model_2", "model_3"),
-  log_score = c(-2, 9, 16)
+  log_score = c(2, 9, 16)
 )
 
 test_that("adjust_metric converts -Inf to defalut minimum score", {
