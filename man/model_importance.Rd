@@ -14,6 +14,7 @@ model_importance(
   importance_algorithm = c("lomo", "lasomo"),
   subset_wt = c("equal", "perm_based"),
   na_action = c("worst", "average", "drop"),
+  min_log_score = -10,
   ...
 )
 }
@@ -74,6 +75,9 @@ models.
 models.
 \item \code{"drop"} removes missing values.
 }}
+
+\item{min_log_score}{A numeric value specifying the minimum log score when
+\code{Inf} is returned during the log score calculation for the \code{pmf} output}
 
 \item{...}{Optional arguments passed to \code{ensemble_fun} when it is specified
 as \code{"simple_ensemble"}. See 'Details'.}

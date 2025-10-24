@@ -4,6 +4,7 @@ library(dplyr)
 library(hubEnsembles)
 library(hubEvals)
 library(purrr)
+future::plan("sequential") # Set up sequential plan for testing
 
 # forecast data list
 f_all_data <- readRDS(
@@ -12,7 +13,8 @@ f_all_data <- readRDS(
 data_list <- list(
   dat_mean = f_all_data |> dplyr::filter(output_type == "mean"),
   dat_quantile = f_all_data |> dplyr::filter(output_type == "quantile"),
-  dat_median = f_all_data |> dplyr::filter(output_type == "median")
+  dat_median = f_all_data |> dplyr::filter(output_type == "median"),
+  dat_pmf = f_all_data |> dplyr::filter(output_type == "pmf")
 )
 # target data
 target_data <- readRDS(
@@ -23,7 +25,8 @@ target_data <- readRDS(
 exp_file_names <- c(
   exp_overall_imp_mean_untrained = "exp_overall_imp_mean_untrained.rds",
   exp_overall_imp_quantile_untrained = "exp_overall_imp_quantile_untrained.rds",
-  exp_overall_imp_median_untrained = "exp_overall_imp_median_untrained.rds"
+  exp_overall_imp_median_untrained = "exp_overall_imp_median_untrained.rds",
+  exp_overall_imp_pmf_untrained = "exp_overall_imp_pmf_untrained.rds"
 )
 exp_imp_list <- map(
   exp_file_names,
@@ -32,7 +35,7 @@ exp_imp_list <- map(
 
 # combination of arguments
 params <- expand.grid(
-  output_type = c("mean", "quantile", "median"), # , "pmf"),
+  output_type = c("mean", "quantile", "median", "pmf"),
   ens_fun = c("simple_ensemble", "linear_pool"),
   agg_fun = c("mean", "median"),
   algorithm = c("lomo", "lasomo"),
@@ -75,7 +78,8 @@ pmap(
           importance_algorithm = algorithm,
           subset_wt = subset_weight,
           na_action = na_method,
-          agg_fun = agg_fun
+          agg_fun = agg_fun,
+          min_log_score = -10
         ))
       } else {
         calculated <- suppressMessages(model_importance(
@@ -84,7 +88,8 @@ pmap(
           ensemble_fun = ens_fun,
           importance_algorithm = algorithm,
           subset_wt = subset_weight,
-          na_action = na_method
+          na_action = na_method,
+          min_log_score = -10
         ))
       }
       # expected values

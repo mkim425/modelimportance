@@ -12,8 +12,8 @@ target_data <- readRDS(
   testthat::test_path("testdata/target_data_all_outputs.rds")
 )
 
-output_types <- c("mean", "quantile", "median") # , "pmf")
-measures <- c("se_point", "wis", "ae_point") # , "log_score")
+output_types <- c("mean", "quantile", "median", "pmf")
+measures <- c("se_point", "wis", "ae_point", "log_score")
 
 # loop over the output types and corresponding measures
 for (k in seq_along(output_types)) {
@@ -46,7 +46,8 @@ for (k in seq_along(output_types)) {
           importance_algorithm = imp_alg,
           subset_wt = subset_weight,
           metric = measures[k],
-          agg_fun = agg_fun
+          agg_fun = agg_fun,
+          min_log_score = -10
         )
         # replace NA values (if any) in 3 ways: "worst", "average", "drop"
         replace_na(res)
@@ -81,7 +82,8 @@ for (k in seq_along(output_types)) {
             ensemble_fun = "linear_pool",
             importance_algorithm = imp_alg,
             subset_wt = subset_weight,
-            metric = measures[k]
+            metric = measures[k],
+            min_log_score = -10
           )
           # replace NA values (if any) in 3 ways: "worst", "average", "drop"
           replace_na(res)
