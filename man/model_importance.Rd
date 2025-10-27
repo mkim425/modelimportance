@@ -14,6 +14,7 @@ model_importance(
   importance_algorithm = c("lomo", "lasomo"),
   subset_wt = c("equal", "perm_based"),
   na_action = c("worst", "average", "drop"),
+  min_log_score = -10,
   ...
 )
 }
@@ -75,6 +76,9 @@ models.
 \item \code{"drop"} removes missing values.
 }}
 
+\item{min_log_score}{A numeric value specifying the minimum log score when
+\code{Inf} is returned during the log score calculation for the \code{pmf} output}
+
 \item{...}{Optional arguments passed to \code{ensemble_fun} when it is specified
 as \code{"simple_ensemble"}. See 'Details'.}
 }
@@ -96,12 +100,14 @@ the importance is as follows.
 \tabular{ll}{
 \strong{Output Type} \tab \strong{Scoring Rule} \cr
 median \tab ae_point \cr
-mean \tab se_point \cr
+mean \tab rse_point \cr
 quantile \tab wis \cr
 pmf \tab log_score \cr
 }
-where \code{ae_point} represents the absolute error, \code{se_point} the squared error,
-\code{wis} the weighted interval score, and \code{log_score} the logarithmic score.
+where \code{ae_point} represents the absolute error,
+\code{rse_point} the root squared error,
+\code{wis} the weighted interval score, and
+\code{log_score} the logarithmic score.
 }
 \details{
 The \code{oracle_output_data} in the oracle output format should contain

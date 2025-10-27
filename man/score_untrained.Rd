@@ -13,6 +13,7 @@ score_untrained(
   importance_algorithm,
   subset_wt,
   metric,
+  min_log_score,
   ...
 )
 }
@@ -59,7 +60,13 @@ Ignored if \code{lomo} method is used. Default is \code{"equal"}, if not specifi
 
 \item{metric}{A character string specifying the metric to be used for scoring
 the model output. The metric is determined by the \code{output_type} and must be
-one of the following: \code{se_point}, \code{ae_point}, \code{wis}, or \code{log_score}.}
+one of the following: \code{se_point}, \code{ae_point}, \code{wis}, or \code{log_score}.
+Note that for the \code{mean} output type, \code{se_point} is used by default,
+but we convert it to \code{rse_point} to ensure consistency in the units of
+importance score.}
+
+\item{min_log_score}{A numeric value specifying the minimum log score when
+\code{Inf} is returned during the log score calculation for the \code{pmf} output}
 
 \item{...}{Optional arguments passed to \code{ensemble_fun} when it is specified
 as \code{"simple_ensemble"}. See 'Details'.}

@@ -14,12 +14,14 @@
 #' \tabular{ll}{
 #'   \strong{Output Type} \tab \strong{Scoring Rule} \cr
 #'   median \tab ae_point \cr
-#'   mean \tab se_point \cr
+#'   mean \tab rse_point \cr
 #'   quantile \tab wis \cr
 #'   pmf \tab log_score \cr
 #' }
-#' where `ae_point` represents the absolute error, `se_point` the squared error,
-#' `wis` the weighted interval score, and `log_score` the logarithmic score.
+#' where `ae_point` represents the absolute error,
+#' `rse_point` the root squared error,
+#' `wis` the weighted interval score, and
+#' `log_score` the logarithmic score.
 #'
 #' @param forecast_data A data.frame with the predictions that is or can be
 #' coerced to a model_out_tbl format. Only one `output_type` is allowed in the
@@ -62,6 +64,8 @@
 #' * `"average"` replaces missing values with the average value from the other
 #' models.
 #' * `"drop"` removes missing values.
+#' @param min_log_score A numeric value specifying the minimum log score when
+#' `Inf` is returned during the log score calculation for the `pmf` output
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
 #' @return A data.frame with columns
@@ -130,7 +134,14 @@ model_importance <- function(forecast_data,
                              importance_algorithm = c("lomo", "lasomo"),
                              subset_wt = c("equal", "perm_based"),
                              na_action = c("worst", "average", "drop"),
+                             min_log_score = -10,
                              ...) {
+  # set defaults
+  ensemble_fun <- match.arg(ensemble_fun)
+  importance_algorithm <- match.arg(importance_algorithm)
+  subset_wt <- match.arg(subset_wt)
+  na_action <- match.arg(na_action)
+
   # validate inputs
   validate_inputs(
     forecast_data, oracle_output_data, ensemble_fun, weighted,
@@ -164,6 +175,14 @@ model_importance <- function(forecast_data,
     unique(valid_tbl$output_type) == "quantile" ~ "wis",
     unique(valid_tbl$output_type) == "pmf" ~ "log_score"
   )
+
+  if (metric == "log_score") {
+    message(paste(
+      "If a log_score of -Inf occurs (due to zero probability for the true ",
+      "outcome), it is replaced with -10 by default.",
+      "You can change this via 'min_log_score'."
+    ))
+  }
 
   # Give a message for the user to check the model IDs
   message(paste(
@@ -201,7 +220,7 @@ model_importance <- function(forecast_data,
         score_untrained(
           single_task_data, oracle_output_data, model_id_list,
           ensemble_fun, importance_algorithm, subset_wt,
-          metric, ...
+          metric, min_log_score, ...
         )
       }
     )
