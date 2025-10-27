@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, interior hidden, sharp corners, borderline west={3pt}{0pt}{shadecolor}, frame hidden, enhanced, boxrule=0pt]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, breakable, borderline west={3pt}{0pt}{shadecolor}, sharp corners, interior hidden, frame hidden, enhanced]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -720,6 +720,8 @@ implement LOMO and LASOMO for a single prediction task, respectively.
  \end{spacing}
 \end{algorithm}
 
+\newpage
+
 \section{Main function: Evaluating ensemble
 members}\label{sec:main-function}
 
@@ -730,7 +732,7 @@ customize the evaluation framework (Table~\ref{tbl-arguments}).
 \begin{verbatim}
 R> model_importance(forecast_data, oracle_output_data, ensemble_fun, weighted,
                     training_window_length, importance_algorithm, subset_wt, 
-                    na_action, ...)
+                    na_action, min_log_score, ...)
 \end{verbatim}
 
 \texttt{forecast\_data} is a data frame containing predictions and
@@ -770,11 +772,13 @@ Argument & Description & Possible Values & Default\\
 \cellcolor{gray!10}{\texttt{forecast\_data}} & \cellcolor{gray!10}{Forecasts} & \cellcolor{gray!10}{Must be the model output format} & \cellcolor{gray!10}{N/A}\\
 \texttt{oracle\_output\_data} & Ground truth data & Must be the oracle output format & N/A\\
 \cellcolor{gray!10}{\texttt{ensemble\_fun}} & \cellcolor{gray!10}{Ensemble method} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}, \texttt{"linear\_pool"}} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}}\\
-\texttt{training\_window\_length} & Time interval of historical data used during the training process & Non-negative integer & 0\\
-\cellcolor{gray!10}{\texttt{importance\_algorithm}} & \cellcolor{gray!10}{Algorithm to calculate importance} & \cellcolor{gray!10}{\texttt{"lomo", "lasomo"}} & \cellcolor{gray!10}{\texttt{"lomo"}}\\
+\texttt{weighted} & Whether to use model weighting when building an ensemble & Logical: \texttt{TRUE}, \texttt{FALSE} & \texttt{FALSE}\\
+\cellcolor{gray!10}{\texttt{training\_window\_length}} & \cellcolor{gray!10}{Time interval of historical data used during the training process} & \cellcolor{gray!10}{Non-negative integer} & \cellcolor{gray!10}{0}\\
 \addlinespace
-\texttt{subset\_wt} & Method for assigning weight to subsets when using LASOMO algorithm & \texttt{"equal", "perm\_based"} & \texttt{"equal"}\\
-\cellcolor{gray!10}{\texttt{na\_action}} & \cellcolor{gray!10}{Method to handle missing data} & \cellcolor{gray!10}{\texttt{"worst", "average", "drop"}} & \cellcolor{gray!10}{\texttt{"worst"}}\\
+\texttt{importance\_algorithm} & Algorithm to calculate importance & \texttt{"lomo", "lasomo"} & \texttt{"lomo"}\\
+\cellcolor{gray!10}{\texttt{subset\_wt}} & \cellcolor{gray!10}{Method for assigning weight to subsets when using LASOMO algorithm} & \cellcolor{gray!10}{\texttt{"equal", "perm\_based"}} & \cellcolor{gray!10}{\texttt{"equal"}}\\
+\texttt{na\_action} & Method to handle missing data & \texttt{"worst", "average", "drop"} & \texttt{"worst"}\\
+\cellcolor{gray!10}{\texttt{min\_log\_score}} & \cellcolor{gray!10}{Minimum value to replace for log score} & \cellcolor{gray!10}{Non-positive numeric} & \cellcolor{gray!10}{-10}\\
 \texttt{...} & Optional arguments for \texttt{"simple\_ensemble"} & Varies & \texttt{agg\_fun="mean"}\\
 \bottomrule
 \end{tabular}
@@ -790,9 +794,16 @@ values, and default settings.}
 
 The \texttt{weighted} argument is a logical value that indicates whether
 model weighting should be done when building an ensemble using the
-specified \texttt{ensemble\_fun}. If it is set to \texttt{TRUE}, model
-weights are estimated based on the previous performance of each model,
-and these weights are used to build the ensemble.
+specified \texttt{ensemble\_fun}. The value of \texttt{FALSE} means that
+all component models are equally weighted in the ensemble construction.
+If it is set to \texttt{TRUE}, model weights are estimated based on the
+previous performance of each model using historical data within a
+training window defined by the \texttt{training\_window\_length}
+argument. The non-negative value of \texttt{training\_window\_length}
+specifies the number of most recent time units (e.g., days or weeks) to
+consider when evaluating past model performance. Its default value is
+\texttt{0}, indicating no training for model weighting, thus it is
+equivalent to setting \texttt{weighted\ =\ FALSE}.
 
 The \texttt{importance\_algorithm} argument specifies the algorithm for
 model importance calculation, which can be either \texttt{"lomo"} (leave
@@ -815,6 +826,16 @@ smallest value from the other models, while the \texttt{"average"}
 option replaces them with the average of the other models' predictions
 in that task. The \texttt{"drop"} option removes missing values, which
 results in the exclusion of the model from the evaluation for that task.
+
+The \texttt{min\_log\_score} argument is relevant only for the
+\texttt{output\_type} of \texttt{"pmf"}, which uses Log Score as a
+scoring rule. It sets a minimum threshold for log scores to avoid issues
+with extremely low probabilities assigned to the true outcome, which can
+lead to undefined or negative infinite log scores. Any probability lower
+than this threshold will be adjusted to this minimum value before
+calculating the importance metric based on the log score. The default
+value is set to -10, which is an arbitrary choice. Users may choose a
+different value based on their practical needs.
 
 \section{Implementation and
 availability}\label{sec:implementation-and-availability}
@@ -849,11 +870,10 @@ and Texas (FIPS code 48), generated on November 19, 2022. These
 forecasts are for two target end dates, November 26, 2022 (horizon 1),
 and December 10, 2022 (horizon 3), and were produced by three models:
 `Flusight-baseline', `MOBS-GLEAM\_FLUH', and `PSI-DICE'. The output type
-is \texttt{mean} and the \texttt{output\_type\_id} column has
+is \texttt{median} and the \texttt{output\_type\_id} column has
 \texttt{NA}s as no further specification is required for this output
-type. We have modified the example data slightly: the forecast values
-were rounded to the nearest integer and some forecasts have been removed
-to demonstrate the handling of missing values. Therefore,
+type. We have modified the example data slightly: some forecasts have
+been removed to demonstrate the handling of missing values. Therefore,
 MOBS-GLEAM\_FLUH's forecast for Massachusetts on November 26, 2022, and
 PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 
@@ -879,16 +899,16 @@ R> forecast_data
 10 PSI-DICE          2022-11-19     wk inc flu hosp       1 48      
    target_end_date output_type output_type_id value
    <date>          <chr>       <chr>          <dbl>
- 1 2022-11-26      mean        <NA>              51
- 2 2022-12-10      mean        <NA>              53
- 3 2022-11-26      mean        <NA>            1052
- 4 2022-12-10      mean        <NA>            1053
- 5 2022-12-10      mean        <NA>              47
- 6 2022-11-26      mean        <NA>            1073
- 7 2022-12-10      mean        <NA>             701
- 8 2022-11-26      mean        <NA>              92
- 9 2022-12-10      mean        <NA>             159
-10 2022-11-26      mean        <NA>            1222
+ 1 2022-11-26      median      <NA>              51
+ 2 2022-12-10      median      <NA>              51
+ 3 2022-11-26      median      <NA>            1052
+ 4 2022-12-10      median      <NA>            1052
+ 5 2022-12-10      median      <NA>              43
+ 6 2022-11-26      median      <NA>            1072
+ 7 2022-12-10      median      <NA>             688
+ 8 2022-11-26      median      <NA>              90
+ 9 2022-12-10      median      <NA>             159
+10 2022-11-26      median      <NA>            1226
 \end{verbatim}
 
 \normalsize
@@ -990,9 +1010,9 @@ importance scores.
 # A tibble: 3 x 2
   model_id          mean_importance
   <chr>                       <dbl>
-1 Flusight-baseline          69149.
-2 PSI-DICE                   44303.
-3 MOBS-GLEAM_FLUH          -113477.
+1 PSI-DICE                     37.2
+2 Flusight-baseline            28.4
+3 MOBS-GLEAM_FLUH             -75  
 \end{verbatim}
 
 \normalsize
@@ -1030,9 +1050,9 @@ R> model_importance(
 # A tibble: 3 x 2
   model_id          mean_importance
   <chr>                       <dbl>
-1 Flusight-baseline          69149.
-2 PSI-DICE                  -38581.
-3 MOBS-GLEAM_FLUH           -86535.
+1 Flusight-baseline            28.4
+2 PSI-DICE                    -17.6
+3 MOBS-GLEAM_FLUH             -61.1
 \end{verbatim}
 
 \normalsize
@@ -1082,9 +1102,9 @@ R> model_importance(
 # A tibble: 3 x 2
   model_id          mean_importance
   <chr>                       <dbl>
-1 Flusight-baseline          69149.
-2 PSI-DICE                   40971.
-3 MOBS-GLEAM_FLUH           -85003.
+1 Flusight-baseline            28.4
+2 PSI-DICE                     27.9
+3 MOBS-GLEAM_FLUH             -56.2
 \end{verbatim}
 
 \normalsize
@@ -1116,9 +1136,9 @@ R> model_importance(
 # A tibble: 3 x 2
   model_id          mean_importance
   <chr>                       <dbl>
-1 Flusight-baseline          64500.
-2 PSI-DICE                   57672.
-3 MOBS-GLEAM_FLUH          -117856.
+1 PSI-DICE                     47.4
+2 Flusight-baseline            24.3
+3 MOBS-GLEAM_FLUH             -79.8
 \end{verbatim}
 
 \normalsize
@@ -1129,9 +1149,9 @@ R> model_importance(
 # A tibble: 3 x 2
   model_id          mean_importance
   <chr>                       <dbl>
-1 Flusight-baseline          65662.
-2 PSI-DICE                   54329.
-3 MOBS-GLEAM_FLUH          -116761.
+1 PSI-DICE                     44.8
+2 Flusight-baseline            25.3
+3 MOBS-GLEAM_FLUH             -78.6
 \end{verbatim}
 
 \normalsize

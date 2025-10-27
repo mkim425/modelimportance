@@ -350,6 +350,7 @@ Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to implement LO
 \end{algorithm}
 
 
+\newpage
 ## Main function: Evaluating ensemble members {#sec:main-function}
 
 In this section, we describe the usage of the function `model_importance()`, where multiple options are available to customize the evaluation framework (@tbl-arguments).
@@ -357,7 +358,7 @@ In this section, we describe the usage of the function `model_importance()`, whe
 ```r
 R> model_importance(forecast_data, oracle_output_data, ensemble_fun, weighted,
                     training_window_length, importance_algorithm, subset_wt, 
-                    na_action, ...)
+                    na_action, min_log_score, ...)
 ```
 
 `forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
@@ -378,38 +379,45 @@ When `"linear_pool"` is specified, ensemble model outputs are created as a linea
 tbl_argument <- data.frame(
   "Argument" = c(
     "\\texttt{forecast\\_data}", "\\texttt{oracle\\_output\\_data}",
-    "\\texttt{ensemble\\_fun}", "\\texttt{training\\_window\\_length}",
+    "\\texttt{ensemble\\_fun}", "\\texttt{weighted}",
+    "\\texttt{training\\_window\\_length}",
     "\\texttt{importance\\_algorithm}", "\\texttt{subset\\_wt}",
-    "\\texttt{na\\_action}", "\\texttt{...}"
+    "\\texttt{na\\_action}", "\\texttt{min\\_log\\_score}", "\\texttt{...}"
   ),
   "Description" = c(
     "Forecasts",
     "Ground truth data",
     "Ensemble method",
+    "Whether to use model weighting when building an ensemble",
     "Time interval of historical data used during the training process",
     "Algorithm to calculate importance",
     "Method for assigning weight to subsets when using LASOMO algorithm",
     "Method to handle missing data",
+    "Minimum value to replace for log score",
     "Optional arguments for \\texttt{\"simple\\_ensemble\"}"
   ),
   "Possible Values" = c(
     "Must be the model output format",
     "Must be the oracle output format",
     "\\texttt{\"simple\\_ensemble\"}, \\texttt{\"linear\\_pool\"}",
+    "Logical: \\texttt{TRUE}, \\texttt{FALSE}",
     "Non-negative integer",
     "\\texttt{\"lomo\", \"lasomo\"}",
     "\\texttt{\"equal\", \"perm\\_based\"}",
     "\\texttt{\"worst\", \"average\", \"drop\"}",
+    "Non-positive numeric",
     "Varies"
   ),
   Default = c(
     "N/A",
     "N/A",
     "\\texttt{\"simple\\_ensemble\"}",
+    "\\texttt{FALSE}",
     "0",
     "\\texttt{\"lomo\"}",
     "\\texttt{\"equal\"}",
     "\\texttt{\"worst\"}",
+    "-10",
     "\\texttt{agg\\_fun=\"mean\"}"
   ),
   check.names = FALSE
@@ -424,8 +432,8 @@ tbl_argument |>
 
 
 
-The `weighted` argument is a logical value that indicates whether model weighting should be done when building an ensemble using the specified `ensemble_fun`. 
-If it is set to `TRUE`, model weights are estimated based on the previous performance of each model, and these weights are used to build the ensemble. 
+The `weighted` argument is a logical value that indicates whether model weighting should be done when building an ensemble using the specified `ensemble_fun`. The value of `FALSE` means that all component models are equally weighted in the ensemble construction.
+If it is set to `TRUE`, model weights are estimated based on the previous performance of each model using historical data within a training window defined by the `training_window_length` argument. The non-negative value of `training_window_length` specifies the number of most recent time units (e.g., days or weeks) to consider when evaluating past model performance. Its default value is `0`, indicating no training for model weighting, thus it is equivalent to setting `weighted = FALSE`.
 
 The `importance_algorithm` argument specifies the algorithm for model importance calculation, which can be either `"lomo"` (leave one model out) and `"lasomo"` (leave all subsets of models out). The `subset_wt` argument is employed only for the `"lasomo"` algorithm. This argument has two options: `"equal"` assigns equal weight to all subsets and `"perm_based"` assigns weight averaged over all possible permutations as in
 the formula of Shapley values (Algorithm \ref{alg:lasomo}). The default values of `importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`, respectively.
@@ -434,6 +442,8 @@ the formula of Shapley values (Algorithm \ref{alg:lasomo}). The default values o
 The `na_action` argument allows for specifying how to handle missing values in the `forecast_data`. 
 Three options are available: `"worst"`, `"average"`, and `"drop"`. 
 In each specific prediction task, if a model has any missing predictions, the `"worst"` option replaces those missing values with the smallest value from the other models, while the `"average"` option replaces them with the average of the other models' predictions in that task. The `"drop"` option removes missing values, which results in the exclusion of the model from the evaluation for that task.
+
+The `min_log_score` argument is relevant only for the `output_type` of `"pmf"`, which uses Log Score as a scoring rule. It sets a minimum threshold for log scores to avoid issues with extremely low probabilities assigned to the true outcome, which can lead to undefined or negative infinite log scores. Any probability lower than this threshold will be adjusted to this minimum value before calculating the importance metric based on the log score. The default value is set to -10, which is an arbitrary choice. Users may choose a different value based on their practical needs. 
 
 
 ## Implementation and availability {#sec:implementation-and-availability}
@@ -451,8 +461,8 @@ The examples in this section illustrate the use of the `model_importance()` func
 ### Evaluation using untrained ensemble in LOMO algorithm for mean forecasts  {#sec:untrained-lomo-mean}
 
 The forecast data used here contains forecasts of weekly incident influenza hospitalizations in the US for Massachusetts (FIPS code 25) and Texas (FIPS code 48), generated on November 19, 2022. 
-These forecasts are for two target end dates, November 26, 2022 (horizon 1), and  December 10, 2022 (horizon 3), and were produced by three models: 'Flusight-baseline', 'MOBS-GLEAM_FLUH', and 'PSI-DICE'. The output type is `mean` and the `output_type_id` column has `NA`s as no further specification is required for this output type. 
-We have modified the example data slightly: the forecast values were rounded to the nearest integer and some forecasts have been removed to demonstrate the handling of missing values. Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
+These forecasts are for two target end dates, November 26, 2022 (horizon 1), and  December 10, 2022 (horizon 3), and were produced by three models: 'Flusight-baseline', 'MOBS-GLEAM_FLUH', and 'PSI-DICE'. The output type is `median` and the `output_type_id` column has `NA`s as no further specification is required for this output type. 
+We have modified the example data slightly: some forecasts have been removed to demonstrate the handling of missing values. Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 
 
 ```r
@@ -463,10 +473,9 @@ R> forecast_data
 #| echo: false
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
-    output_type %in% c("mean"),
+    output_type %in% c("median"),
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
   ) |>
-  mutate(value = round(value)) |>
   filter(
     !(model_id == "MOBS-GLEAM_FLUH" & location == "25" & target_end_date == as.Date("2022-11-26")),
     !(model_id == "PSI-DICE" & location == "48" & target_end_date == as.Date("2022-12-10"))
