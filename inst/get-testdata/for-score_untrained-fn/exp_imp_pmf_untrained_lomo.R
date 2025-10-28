@@ -13,6 +13,7 @@ target_data_pmf <- readRDS(
 dat_pmf <- readRDS(
   testthat::test_path("testdata/dat_pmf.rds")
 )
+min_log_score <- -10
 model_id_list <- unique(dat_pmf$model_id)
 
 ## Case 1: no missing data and 'linear pool' ensemble
@@ -34,6 +35,10 @@ ensemble_scores <- score_model_out(
   oracle_output = target_data_pmf,
   metrics = "log_score"
 ) |>
+  mutate(log_score = ifelse(.data$log_score > -min_log_score,
+    -min_log_score,
+    .data$log_score
+  )) |>
   # calculate importance scores: subtract the error of the ensemble-all
   mutate(importance = log_score - log_score[1]) |>
   filter(model_id != "ens_all")
@@ -72,6 +77,10 @@ ensemble_scores <- score_model_out(df_ensembles_simple,
   target_data_pmf,
   metrics = "log_score"
 ) |>
+  mutate(log_score = ifelse(.data$log_score > -min_log_score,
+    -min_log_score,
+    .data$log_score
+  )) |>
   # calculate importance scores: subtract the error of the ensemble-all
   mutate(importance = log_score - log_score[1]) |>
   filter(model_id != "ens_all")
@@ -110,6 +119,10 @@ ensemble_scores <- score_model_out(df_ensembles_simple,
   target_data_pmf,
   metrics = "log_score"
 ) |>
+  mutate(log_score = ifelse(.data$log_score > -min_log_score,
+    -min_log_score,
+    .data$log_score
+  )) |>
   # calculate importance scores: subtract the error of the ensemble-all
   mutate(importance = log_score - log_score[1]) |>
   filter(model_id != "ens_all")
@@ -146,6 +159,10 @@ ensemble_scores <- score_model_out(df_ensembles,
   target_data_pmf,
   metrics = "log_score"
 ) |>
+  mutate(log_score = ifelse(.data$log_score > -min_log_score,
+    -min_log_score,
+    .data$log_score
+  )) |>
   # calculate importance scores: subtract the error of the ensemble-all
   mutate(importance = log_score - log_score[1]) |>
   filter(model_id != "ens_all")
