@@ -18,6 +18,7 @@ dat_pmf <- readRDS(
   testthat::test_path("testdata/dat_pmf.rds")
 )
 
+min_log_score <- -10
 models <- unique(dat_pmf$model_id)
 # number of models
 n <- length(models)
@@ -39,6 +40,10 @@ score_ens_all <- score_model_out(
   target_data_pmf,
   metrics = "log_score"
 ) |>
+  mutate(log_score = ifelse(.data$log_score > -min_log_score,
+    -min_log_score,
+    .data$log_score
+  )) |>
   left_join(
     dat_all_ens |>
       select(c("model_id", "subset_wt_perm", "subset_wt_eq")) |>

@@ -96,7 +96,8 @@ pmap(
           importance_algorithm = "lasomo",
           subset_wt = subset_weight,
           metric = metric,
-          agg_fun = agg_fun
+          agg_fun = agg_fun,
+          min_log_score = -10
         ) |>
           dplyr::select(model_id, importance) |>
           as.data.frame()
@@ -108,7 +109,8 @@ pmap(
           ensemble_fun = ens_fun,
           importance_algorithm = "lasomo",
           subset_wt = subset_weight,
-          metric = metric
+          metric = metric,
+          min_log_score = -10
         ) |>
           dplyr::select(model_id, importance) |>
           as.data.frame()
@@ -169,7 +171,8 @@ pmap(reduced_params, function(output_type, subset_weight, metric) {
       ensemble_fun = "simple_ensemble",
       importance_algorithm = "lasomo",
       subset_wt = subset_weight,
-      metric = metric
+      metric = metric,
+      min_log_score = -10
     ) |>
       dplyr::select(model_id, importance) |>
       arrange(model_id) |>
