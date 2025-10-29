@@ -6,12 +6,12 @@ devtools::load_all()
 
 # target data
 target_data_pmf <- readRDS(
-  testthat::test_path("testdata/target_pmf.rds")
+  testthat::test_path("testdata/for-score_untrained/target_pmf.rds")
 )
 
 # forecast data with pmf output
 dat_pmf <- readRDS(
-  testthat::test_path("testdata/dat_pmf.rds")
+  testthat::test_path("testdata/for-score_untrained/dat_pmf.rds")
 )
 min_log_score <- -10
 model_id_list <- unique(dat_pmf$model_id)
@@ -188,5 +188,8 @@ exp_imp_pmf <- rbind(
 
 # save data
 saveRDS(exp_imp_pmf,
-  file = "tests/testthat/testdata/exp_imp_pmf_untrained_lomo.rds"
+  file = paste0(
+    "tests/testthat/testdata/for-score_untrained/",
+    "exp_imp_pmf_untrained_lomo.rds"
+  )
 )

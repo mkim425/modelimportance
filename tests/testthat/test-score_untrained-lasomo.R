@@ -15,7 +15,10 @@ file_names <- c(
   dat_quantile = "dat_qntl.rds",
   dat_pmf = "dat_pmf.rds"
 )
-data_list <- map(file_names, ~ readRDS(testthat::test_path("testdata", .x)))
+data_list <- map(
+  file_names,
+  ~ readRDS(testthat::test_path("testdata/for-score_untrained", .x))
+)
 # target data list
 target_file_names <- c(
   target_mean = "target_mean.rds",
@@ -25,7 +28,7 @@ target_file_names <- c(
 )
 target_data_list <- map(
   target_file_names,
-  ~ readRDS(testthat::test_path("testdata", .x))
+  ~ readRDS(testthat::test_path("testdata/for-score_untrained", .x))
 )
 # list of expected values for testing
 exp_file_names <- c(
@@ -36,7 +39,7 @@ exp_file_names <- c(
 )
 exp_imp_list <- map(
   exp_file_names,
-  ~ readRDS(testthat::test_path("testdata", .x))
+  ~ readRDS(testthat::test_path("testdata/for-score_untrained", .x))
 )
 
 # combination of arguments

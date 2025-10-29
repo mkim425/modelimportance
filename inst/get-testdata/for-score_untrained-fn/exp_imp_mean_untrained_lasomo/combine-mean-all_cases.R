@@ -23,5 +23,8 @@ exp_imp_mean <- rbind(
 
 # save data
 saveRDS(exp_imp_mean,
-  file = "tests/testthat/testdata/exp_imp_mean_untrained_lasomo.rds"
+  file = paste0(
+    "tests/testthat/testdata/for-score_untrained/",
+    "exp_imp_mean_untrained_lasomo.rds"
+  )
 )

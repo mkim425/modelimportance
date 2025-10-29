@@ -2,16 +2,24 @@ library(dplyr)
 
 # data for testing
 target_data <- readRDS(
-  testthat::test_path("testdata/flu_example_target_data.rds")
+  testthat::test_path(
+    "testdata/for-validate_input_data/flu_example_target_data.rds"
+  )
 )
 forecast_pmfs <- readRDS(
-  testthat::test_path("testdata/flu_example_pmf_model_output.rds")
+  testthat::test_path(
+    "testdata/for-validate_input_data/flu_example_pmf_model_output.rds"
+  )
 )
 forecast_means <- readRDS(
-  testthat::test_path("testdata/flu_example_mean_model_output.rds")
+  testthat::test_path(
+    "testdata/for-validate_input_data/flu_example_mean_model_output.rds"
+  )
 )
 forecast_quantiles <- readRDS(
-  testthat::test_path("testdata/flu_example_quantile_model_output.rds")
+  testthat::test_path(
+    "testdata/for-validate_input_data/flu_example_quantile_model_output.rds"
+  )
 )
 
 test_that("validate_input_data() requires a single output type in a dataset", {

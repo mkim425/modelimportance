@@ -5,12 +5,12 @@
 devtools::load_all()
 # target data
 target_data_mean <- readRDS(
-  testthat::test_path("testdata/target_mean.rds")
+  testthat::test_path("testdata/for-score_untrained/target_mean.rds")
 )
 
 # forecast data with mean output
 dat_mean <- readRDS(
-  testthat::test_path("testdata/dat_mean.rds")
+  testthat::test_path("testdata/for-score_untrained/dat_mean.rds")
 )
 model_id_list <- unique(dat_mean$model_id)
 
@@ -176,5 +176,8 @@ exp_imp_mean <- rbind(
 
 # save data
 saveRDS(exp_imp_mean,
-  file = "tests/testthat/testdata/exp_imp_mean_untrained_lomo.rds"
+  file = paste0(
+    "tests/testthat/testdata/for-score_untrained/",
+    "exp_imp_mean_untrained_lomo.rds"
+  )
 )

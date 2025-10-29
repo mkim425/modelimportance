@@ -2,11 +2,15 @@ library(dplyr)
 
 # data for testing
 target_data <- readRDS(
-  testthat::test_path("testdata/flu_example_target_data.rds")
+  testthat::test_path(
+    "testdata/for-split_data_by_task/flu_example_target_data.rds"
+  )
 )
 
 forecast_quantiles <- readRDS(
-  testthat::test_path("testdata/flu_example_quantile_model_output.rds")
+  testthat::test_path(
+    "testdata/for-split_data_by_task/flu_example_quantile_model_output.rds"
+  )
 )
 
 valid_tbl <- validate_input_data(forecast_quantiles, target_data)
