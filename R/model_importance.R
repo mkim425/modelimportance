@@ -145,7 +145,8 @@ model_importance <- function(forecast_data,
   # validate inputs
   validate_inputs(
     forecast_data, oracle_output_data, ensemble_fun, weighted,
-    training_window_length, importance_algorithm, subset_wt, na_action
+    training_window_length, importance_algorithm, subset_wt, na_action,
+    min_log_score
   )
 
   # validate input data: get a model_out_tbl format with a single output type
@@ -157,39 +158,39 @@ model_importance <- function(forecast_data,
     stop("Error: 'linear pool' cannot be used when output type is 'median'.")
   }
 
-  # forecast_dates
-  forecast_date_list <- unique(valid_tbl$reference_date)
+  # forecast_dates of the predictions to be evaluated
+  if (!weighted) {
+    forecast_date_list <- unique(valid_tbl$reference_date)
+  } else {
+    all_dates <- sort(unique(valid_tbl$reference_date))
+    forecast_date_list <- all_dates[
+      (training_window_length + 1):length(all_dates)
+    ]
+  }
 
-  # Give a message for the user to check the forecast dates
-  message(sprintf(
-    "Forecasts from %s to %s (a total of %d forecast date(s)).",
-    min(forecast_date_list), max(forecast_date_list), length(forecast_date_list)
-  ))
+  # Message for the user to check the forecast dates
+  send_message(
+    "date_range", min(forecast_date_list), max(forecast_date_list),
+    length(forecast_date_list)
+  )
 
   # model ids
   model_id_list <- unique(valid_tbl$model_id)
-  # corresponding metric to the output type
+  # Message for the user to check the model IDs
+  send_message("model_list", model_id_list)
+
+  # Corresponding metric to the output type
   metric <- case_when(
     unique(valid_tbl$output_type) == "median" ~ "ae_point",
     unique(valid_tbl$output_type) == "mean" ~ "se_point",
     unique(valid_tbl$output_type) == "quantile" ~ "wis",
     unique(valid_tbl$output_type) == "pmf" ~ "log_score"
   )
-
+  # Message for the user about log_score handling
   if (metric == "log_score") {
-    message(paste(
-      "If a log_score of -Inf occurs (due to zero probability for the true ",
-      "outcome), it is replaced with -10 by default.",
-      "You can change this via 'min_log_score'."
-    ))
+    send_message("metric_logscore")
   }
 
-  # Give a message for the user to check the model IDs
-  message(paste(
-    "The available model IDs are:\n",
-    paste("\t", model_id_list, collapse = "\n"),
-    "\n(a total of", length(model_id_list), "models)\n"
-  ))
 
   # TO ADD: two functions to implement importance score calculation
   # One is for untrained ensemble and the other is for trained ensemble.
@@ -201,10 +202,7 @@ model_importance <- function(forecast_data,
   ## Implement importance score calculation
   # check if the necessary packages are installed
   if (is(future::plan(), "sequential")) {
-    message(
-      "Note: This function uses 'furrr' and 'future' for parallelization.\n",
-      "To enable parallel execution, please set future::plan(multisession)."
-    )
+    send_message("future_plan")
   }
 
   # Group by single task
