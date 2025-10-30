@@ -12,12 +12,12 @@ send_message <- function(status, ...) {
       )
     },
     metric_logscore = paste(
-        "If a log_score is below the specified `min_log_score` value,",
-        "it is replaced with `min_log_score`. \n",
-        "The default value is -10, but you can modify it",
-        "using the 'min_log_score' argument.",
-        sep = " "
-      ),
+      "If a log_score is below the specified `min_log_score` value,",
+      "it is replaced with `min_log_score`. \n",
+      "The default value is -10, but you can modify it",
+      "using the 'min_log_score' argument.",
+      sep = " "
+    ),
     model_list = function(model_id_list) {
       paste(
         "The available model IDs are:\n",
@@ -35,9 +35,9 @@ send_message <- function(status, ...) {
   if (status %in% names(messages)) {
     msg <- messages[[status]]
     if (is.function(msg)) {
-      return(cat(msg(...)))
+      cat(msg(...))
     } else {
-      return(cat(msg))
+      cat(msg)
     }
   } else {
     stop("Invalid status for send_message().")
