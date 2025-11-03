@@ -22,7 +22,7 @@
 #' importance score.
 #'
 #' @returns A data.frame with columns
-#' `task_id`, `output_type`, `model_id`, `task_level_importance`.
+#' `task_id`, `output_type`, `model_id`, (task level) `importance`.
 #'
 #' @import hubEnsembles
 #' @import hubEvals

@@ -73,7 +73,7 @@ as \code{"simple_ensemble"}. See 'Details'.}
 }
 \value{
 A data.frame with columns
-\code{task_id}, \code{output_type}, \code{model_id}, \code{task_level_importance}.
+\code{task_id}, \code{output_type}, \code{model_id}, (task level) \code{importance}.
 }
 \description{
 Evaluate the importance of ensemble component models by quantifying their
