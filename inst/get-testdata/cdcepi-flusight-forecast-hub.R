@@ -9,10 +9,11 @@
 #             "GT-FluFNP"
 # =============================================================================
 # install hubData package if not already installed
-# install.packages("hubData", repos = c(
-#   "https://hubverse-org.r-universe.dev",
-#   "https://cloud.r-project.org"
-# ))
+install.packages("hubData", repos = c(
+  "https://hubverse-org.r-universe.dev",
+  "https://cloud.r-project.org"
+))
+
 library(dplyr)
 library(hubData)
 
@@ -79,21 +80,21 @@ saveRDS(fdat_median_w_trainset,
 # 'tests/testthat/testdata/for-score_trained/flusight_oracle_output.csv'
 #
 # Then read and save as RDS:
-# library(readr)
-# d <- read_csv(
-#   "tests/testthat/testdata/for-score_trained/flusight_oracle_output.csv"
-# ) |>
-#   dplyr::filter(horizon == 0) |>
-#   dplyr::select(-c("as_of", "horizon")) |>
-#   distinct()
-#
-# dd <- rbind(d, d |>
-#   dplyr::filter(output_type == "quantile") |>
-#   dplyr::mutate(
-#     output_type = "median",
-#     output_type_id = NA
-#   ))
-# saveRDS(
-#   dd,
-#   "tests/testthat/testdata/for-score_trained/flusight_oracle_output.rds"
-# )
+library(readr)
+d <- read_csv(
+  "tests/testthat/testdata/for-score_trained/flusight_oracle_output.csv"
+) |>
+  dplyr::filter(horizon == 0) |>
+  dplyr::select(-c("as_of", "horizon")) |>
+  distinct()
+
+dd <- rbind(d, d |>
+  dplyr::filter(output_type == "quantile") |>
+  dplyr::mutate(
+    output_type = "median",
+    output_type_id = NA
+  ))
+saveRDS(
+  dd,
+  "tests/testthat/testdata/for-score_trained/flusight_oracle_output.rds"
+)
