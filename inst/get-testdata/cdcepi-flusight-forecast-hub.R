@@ -76,8 +76,7 @@ saveRDS(fdat_median_w_trainset,
 # target data
 # directly download 'oracle-output.csv' from
 # [https://github.com/cdcepi/FluSight-forecast-hub/target-data]
-# save it as
-# 'tests/testthat/testdata/for-score_trained/flusight_oracle_output.csv'
+# save it as 'flusight_oracle_output.csv'
 #
 # Then read and save as RDS:
 library(readr)
