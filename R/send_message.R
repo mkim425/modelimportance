@@ -7,7 +7,10 @@ send_message <- function(status, ...) {
   messages <- list(
     date_range = function(first_date, last_date, n_dates) {
       sprintf(
-        "Evaluating forecasts from %s to %s (a total of %d forecast date(s)).\n",
+        paste(
+          "Evaluating forecasts from %s to %s ",
+          "(a total of %d forecast date(s)).\n"
+        ),
         first_date, last_date, n_dates
       )
     },
