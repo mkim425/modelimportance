@@ -9,8 +9,6 @@ model_importance(
   forecast_data,
   oracle_output_data,
   ensemble_fun = c("simple_ensemble", "linear_pool"),
-  weighted = FALSE,
-  training_window_length = 0,
   importance_algorithm = c("lomo", "lasomo"),
   subset_wt = c("equal", "perm_based"),
   na_action = c("worst", "average", "drop"),
@@ -37,18 +35,6 @@ optional \code{agg_fun} function in \code{...} (see 'Details').
 a linear pool of component model outputs. This method supports only
 an \code{output_type} of \code{mean}, \code{quantile}, or \code{pmf}.
 }}
-
-\item{weighted}{Boolean indicating whether model weighting should be done
-when building an ensemble using the \code{ensemble_fun}.
-\itemize{
-\item If \code{FALSE}, all models are given equal weight.
-\item If \code{TRUE}, model weights are estimated.
-}}
-
-\item{training_window_length}{An integer value representing the time interval
-of historical data used during the training process
-to estimate model weights.
-Default is \code{0}, meaning that no prior data is available for training.}
 
 \item{importance_algorithm}{A character string specifying algorithm for model
 importance calculation; \code{c("lomo", "lasomo")}.
@@ -151,15 +137,13 @@ target_data <- hubExamples::forecast_target_ts |>
 # Example with the default arguments.
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
-  ensemble_fun = "simple_ensemble", weighted = FALSE,
-  training_window_length = 0, importance_algorithm = "lomo",
+  ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
   subset_wt = "equal", na_action = "drop"
 )
 # Example with the additional argument in `...`.
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
-  ensemble_fun = "simple_ensemble", weighted = FALSE,
-  training_window_length = 0, importance_algorithm = "lomo",
+  ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
   subset_wt = "equal", na_action = "drop",
   agg_fun = median
 )

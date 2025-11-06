@@ -49,14 +49,6 @@
 #' * When `"linear_pool"` is specified, ensemble model outputs are created as
 #' a linear pool of component model outputs. This method supports only
 #' an `output_type` of `mean`, `quantile`, or `pmf`.
-#' @param weighted Boolean indicating whether model weighting should be done
-#' when building an ensemble using the `ensemble_fun`.
-#' * If `FALSE`, all models are given equal weight.
-#' * If `TRUE`, model weights are estimated.
-#' @param training_window_length An integer value representing the time interval
-#' of historical data used during the training process
-#' to estimate model weights.
-#' Default is `0`, meaning that no prior data is available for training.
 #' @param na_action A character string specifying treatment for missing data;
 #' `c("worst," "average," "drop").`
 #' * `"worst"` replaces missing values with the smallest value from the other
@@ -113,15 +105,13 @@
 #' # Example with the default arguments.
 #' model_importance(
 #'   forecast_data = forecast_data, oracle_output_data = target_data,
-#'   ensemble_fun = "simple_ensemble", weighted = FALSE,
-#'   training_window_length = 0, importance_algorithm = "lomo",
+#'   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
 #'   subset_wt = "equal", na_action = "drop"
 #' )
 #' # Example with the additional argument in `...`.
 #' model_importance(
 #'   forecast_data = forecast_data, oracle_output_data = target_data,
-#'   ensemble_fun = "simple_ensemble", weighted = FALSE,
-#'   training_window_length = 0, importance_algorithm = "lomo",
+#'   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
 #'   subset_wt = "equal", na_action = "drop",
 #'   agg_fun = median
 #' )
@@ -129,8 +119,6 @@
 model_importance <- function(forecast_data,
                              oracle_output_data,
                              ensemble_fun = c("simple_ensemble", "linear_pool"),
-                             weighted = FALSE,
-                             training_window_length = 0,
                              importance_algorithm = c("lomo", "lasomo"),
                              subset_wt = c("equal", "perm_based"),
                              na_action = c("worst", "average", "drop"),
@@ -144,9 +132,8 @@ model_importance <- function(forecast_data,
 
   # validate inputs
   validate_inputs(
-    forecast_data, oracle_output_data, ensemble_fun, weighted,
-    training_window_length, importance_algorithm, subset_wt, na_action,
-    min_log_score
+    forecast_data, oracle_output_data, ensemble_fun, importance_algorithm,
+    subset_wt, na_action, min_log_score
   )
 
   # validate input data: get a model_out_tbl format with a single output type
@@ -159,14 +146,7 @@ model_importance <- function(forecast_data,
   }
 
   # forecast_dates of the predictions to be evaluated
-  if (!weighted) {
-    forecast_date_list <- unique(valid_tbl$reference_date)
-  } else {
-    all_dates <- sort(unique(valid_tbl$reference_date))
-    forecast_date_list <- all_dates[
-      (training_window_length + 1):length(all_dates)
-    ]
-  }
+  forecast_date_list <- unique(valid_tbl$reference_date)
 
   # Message for the user to check the forecast dates
   send_message(
@@ -191,14 +171,6 @@ model_importance <- function(forecast_data,
     send_message("metric_logscore")
   }
 
-
-  # TO ADD: two functions to implement importance score calculation
-  # One is for untrained ensemble and the other is for trained ensemble.
-  # Each function will implement either lomo or lasomo algorithms for a single
-  # forecast task.
-  # The output will be a data frame with importance scores of component models
-  # along with task information given in the input forecast_data.
-  # -------------------------------------------------------------------------
   ## Implement importance score calculation
   # check if the necessary packages are installed
   if (is(future::plan(), "sequential")) {
@@ -206,27 +178,19 @@ model_importance <- function(forecast_data,
   }
 
   # Group by single task
-  df_list_by_task <- split_data_by_task(
-    valid_tbl, weighted, training_window_length
-  )
+  df_list_by_task <- split_data_by_task(valid_tbl)
 
-  if (!weighted) {
-    # Call the function to calculate importance scores for untrained ensemble
-    score_result <- furrr::future_map_dfr(
-      df_list_by_task,
-      function(single_task_data) {
-        score_untrained(
-          single_task_data, oracle_output_data, model_id_list,
-          ensemble_fun, importance_algorithm, subset_wt,
-          metric, min_log_score, ...
-        )
-      }
-    )
-  } else {
-    # TO DO:
-    # Call the function to calculate importance scores for trained ensemble
-    score_result <- forecast_data
-  }
+  # Call the function to calculate importance scores
+  score_result <- furrr::future_map_dfr(
+    df_list_by_task,
+    function(single_task_data) {
+      score_untrained(
+        single_task_data, oracle_output_data, model_id_list,
+        ensemble_fun, importance_algorithm, subset_wt,
+        metric, min_log_score, ...
+      )
+    }
+  )
 
   # NA handling
   if (na_action == "worst") {
