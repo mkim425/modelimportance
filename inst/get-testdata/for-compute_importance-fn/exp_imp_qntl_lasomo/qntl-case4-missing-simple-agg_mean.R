@@ -5,7 +5,7 @@
 # load the package to make its internal functions available
 devtools::load_all()
 source(system.file(
-  "get-testdata/for-score_untrained-fn/helper-exp_imp-untrained.R",
+  "get-testdata/for-score_untrained-fn/helper-exp_imp.R",
   package = "modelimportance"
 ))
 # target data

@@ -1,11 +1,11 @@
 ## Generate expected importance scores for the untrained ensemble models
 ## with mean output in LASOMO
-## Case 1: no missing data and 'linear pool' ensemble
+## Case 2: no missing data and 'simple_ensemble' using agg_fun = mean
 # ----------------------------------------------------------------------------
 # load the package to make its internal functions available
 devtools::load_all()
 source(system.file(
-  "get-testdata/for-score_untrained-fn/helper-exp_imp-untrained.R",
+  "get-testdata/for-score_untrained-fn/helper-exp_imp.R",
   package = "modelimportance"
 ))
 # target data
@@ -29,7 +29,10 @@ subsets <- lapply(1:n, function(x) combn(n, x, simplify = FALSE)) |>
 dat_all_ens <- purrr::map_dfr(
   subsets,
   function(subset) {
-    lp_ens_untrained_lasomo(models, subset, subsets, n, d = dat_mean)
+    simple_ens_untrained_lasomo(models, subset, subsets, n,
+      d = dat_mean,
+      aggfun = "mean"
+    )
   }
 )
 
@@ -67,20 +70,20 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   out
 })
 
-exp_imp_mean_case1perm <- model_imp_scores |>
+exp_imp_mean_case2perm <- model_imp_scores |>
   filter(subset_wt == "perm") |>
   mutate(
-    ens_mthd = "linear_pool-NA",
+    ens_mthd = "simple_ensemble-mean",
     algorithm = "lasomo",
     test_purp = "properly assigned",
     subset_wt = "perm_based"
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)
 
-exp_imp_mean_case1eq <- model_imp_scores |>
+exp_imp_mean_case2eq <- model_imp_scores |>
   filter(subset_wt == "eq") |>
   mutate(
-    ens_mthd = "linear_pool-NA",
+    ens_mthd = "simple_ensemble-mean",
     algorithm = "lasomo",
     test_purp = "properly assigned",
     subset_wt = "equal"
