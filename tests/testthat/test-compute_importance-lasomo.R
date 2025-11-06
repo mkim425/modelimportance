@@ -1,4 +1,4 @@
-# Unit tests for `score_untrained()` with LASOMO algorithm
+# Unit tests for `compute_importance()` with LASOMO algorithm
 
 library(dplyr)
 library(hubEnsembles)
@@ -17,7 +17,7 @@ file_names <- c(
 )
 data_list <- map(
   file_names,
-  ~ readRDS(testthat::test_path("testdata/for-score_untrained", .x))
+  ~ readRDS(testthat::test_path("testdata/for-compute_importance", .x))
 )
 # target data list
 target_file_names <- c(
@@ -28,7 +28,7 @@ target_file_names <- c(
 )
 target_data_list <- map(
   target_file_names,
-  ~ readRDS(testthat::test_path("testdata/for-score_untrained", .x))
+  ~ readRDS(testthat::test_path("testdata/for-compute_importance", .x))
 )
 # list of expected values for testing
 exp_file_names <- c(
@@ -39,7 +39,7 @@ exp_file_names <- c(
 )
 exp_imp_list <- map(
   exp_file_names,
-  ~ readRDS(testthat::test_path("testdata/for-score_untrained", .x))
+  ~ readRDS(testthat::test_path("testdata/for-compute_importance", .x))
 )
 
 # combination of arguments
@@ -69,7 +69,7 @@ params <- expand.grid(
   filter(!(output_type == "median" & ens_fun == "linear_pool")) |>
   arrange(output_type, ens_fun, agg_fun, subset_weight)
 
-## Test: score_untrained function works properly when ensemble function is
+## Test: compute_importance function works properly when ensemble function is
 ## simple_ensemble and aggregation function is mean or median.
 pmap(
   params,
@@ -91,7 +91,7 @@ pmap(
       )]]
       # calculate importance scores with the given arguments
       if (ens_fun != "linear_pool") {
-        calculated <- score_untrained(
+        calculated <- compute_importance(
           single_task_data = selected_data,
           oracle_output_data = selected_target_data,
           model_id_list = unique(selected_data$model_id),
@@ -105,7 +105,7 @@ pmap(
           dplyr::select(model_id, importance) |>
           as.data.frame()
       } else {
-        calculated <- score_untrained(
+        calculated <- compute_importance(
           single_task_data = selected_data,
           oracle_output_data = selected_target_data,
           model_id_list = unique(selected_data$model_id),
@@ -167,7 +167,7 @@ pmap(reduced_params, function(output_type, subset_weight, metric) {
       sub_dat <- selected_data |> filter(model_id %in% model_id_list[c(1, 3)])
     }
     # calculate importance scores with mean output and simple mean ensemble
-    calculated <- score_untrained(
+    calculated <- compute_importance(
       single_task_data = sub_dat,
       oracle_output_data = selected_target_data,
       model_id_list = unique(selected_data$model_id),
