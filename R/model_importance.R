@@ -184,7 +184,7 @@ model_importance <- function(forecast_data,
   score_result <- furrr::future_map_dfr(
     df_list_by_task,
     function(single_task_data) {
-      score_untrained(
+      compute_importance(
         single_task_data, oracle_output_data, model_id_list,
         ensemble_fun, importance_algorithm, subset_wt,
         metric, min_log_score, ...
