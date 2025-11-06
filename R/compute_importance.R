@@ -1,9 +1,8 @@
-#' @title Calculate model importance for a single task when using an untrained
-#' ensemble
+#' @title Calculate model importance for a single task
 #' @description
 #' Evaluate the importance of ensemble component models by quantifying their
-#' contribution to the prediction accuracy of an untrained ensemble for each
-#' combination of model task.
+#' contribution to the prediction accuracy of an ensemble for each combination
+#' of model task.
 #'
 #' @inheritParams model_importance
 #' @param single_task_data A data.frame with the predictions for a single
@@ -30,9 +29,9 @@
 #' @importFrom utils combn
 #' @inherit model_importance details
 
-score_untrained <- function(single_task_data, oracle_output_data, model_id_list,
-                            ensemble_fun, importance_algorithm, subset_wt,
-                            metric, min_log_score, ...) {
+compute_importance <- function(single_task_data, oracle_output_data, model_id_list,
+                               ensemble_fun, importance_algorithm, subset_wt,
+                               metric, min_log_score, ...) {
   # models in the single_task_data
   models <- unique(single_task_data$model_id)
   missing_model <- setdiff(model_id_list, single_task_data$model_id)
