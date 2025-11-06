@@ -29,8 +29,9 @@
 #' @importFrom utils combn
 #' @inherit model_importance details
 
-compute_importance <- function(single_task_data, oracle_output_data, model_id_list,
-                               ensemble_fun, importance_algorithm, subset_wt,
+compute_importance <- function(single_task_data, oracle_output_data,
+                               model_id_list, ensemble_fun,
+                               importance_algorithm, subset_wt,
                                metric, min_log_score, ...) {
   # models in the single_task_data
   models <- unique(single_task_data$model_id)
