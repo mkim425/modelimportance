@@ -1,4 +1,4 @@
-#' Split the input data by a single task make a list of data sets
+#' Split the input data by a single task and make a list of data sets
 #'
 #' @description This function splits the input data by a single task with a
 #' combination of horizon, location, and target_end_date

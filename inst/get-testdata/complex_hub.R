@@ -4,7 +4,7 @@
 # 53 locations including US
 # 3 targets: "wk inc flu hosp", "wk flu hosp rate category", "wk flu hosp rate"
 # horizon: 0, 1, 2, 3
-# 6 output types: "quantile", "median", "mean", "sample", "pmf", "cdf"
+# 3 output types: "quantile", "mean", "pmf"
 # 3 model_id: "Flusight-baseline", "MOBS-GLEAM_FLUH", "PSI-DICE"
 
 library(hubUtils)
