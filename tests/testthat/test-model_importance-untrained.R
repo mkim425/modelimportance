@@ -8,7 +8,9 @@ future::plan("sequential") # Set up sequential plan for testing
 
 # forecast data list
 f_all_data <- readRDS(
-  testthat::test_path("testdata/forecast_data_all_outputs.rds")
+  testthat::test_path(
+    "testdata/for-model_importance-untrained/forecast_data_all_outputs.rds"
+  )
 )
 data_list <- list(
   dat_mean = f_all_data |> dplyr::filter(output_type == "mean"),
@@ -18,7 +20,9 @@ data_list <- list(
 )
 # target data
 target_data <- readRDS(
-  testthat::test_path("testdata/target_data_all_outputs.rds")
+  testthat::test_path(
+    "testdata/for-model_importance-untrained/target_data_all_outputs.rds"
+  )
 )
 
 # list of expected values for testing
@@ -30,7 +34,7 @@ exp_file_names <- c(
 )
 exp_imp_list <- map(
   exp_file_names,
-  ~ readRDS(testthat::test_path("testdata", .x))
+  ~ readRDS(testthat::test_path("testdata/for-model_importance-untrained", .x))
 )
 
 # combination of arguments
