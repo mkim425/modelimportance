@@ -4,7 +4,7 @@
 # 53 locations including US
 # 3 targets: "wk inc flu hosp", "wk flu hosp rate category", "wk flu hosp rate"
 # horizon: 0, 1, 2, 3
-# 6 output types: "quantile", "median", "mean", "sample", "pmf", "cdf"
+# 3 output types: "quantile", "mean", "pmf"
 # 3 model_id: "Flusight-baseline", "MOBS-GLEAM_FLUH", "PSI-DICE"
 
 library(hubUtils)
@@ -27,19 +27,10 @@ example_quantile_model_output <- example_complex_model_output |>
   )
 
 saveRDS(example_quantile_model_output,
-  file = "tests/testthat/testdata/flu_example_quantile_model_output.rds"
-)
-
-# example median model output
-example_median_model_output <- example_complex_model_output |>
-  dplyr::filter(
-    horizon %in% c(1, 3),
-    location %in% c("25", "US"),
-    output_type == "median"
+  file = paste0(
+    "tests/testthat/testdata/for-validate_input_data/",
+    "flu_example_quantile_model_output.rds"
   )
-
-saveRDS(example_median_model_output,
-  file = "tests/testthat/testdata/flu_example_median_model_output.rds"
 )
 
 # example mean model output
@@ -51,19 +42,10 @@ example_mean_model_output <- example_complex_model_output |>
   )
 
 saveRDS(example_mean_model_output,
-  file = "tests/testthat/testdata/flu_example_mean_model_output.rds"
-)
-
-# example sample model output
-example_sample_model_output <- example_complex_model_output |>
-  dplyr::filter(
-    horizon %in% c(1, 3),
-    location %in% c("25", "US"),
-    output_type == "sample"
+  file = paste0(
+    "tests/testthat/testdata/for-validate_input_data/",
+    "flu_example_mean_model_output.rds"
   )
-
-saveRDS(example_sample_model_output,
-  file = "tests/testthat/testdata/flu_example_sample_model_output.rds"
 )
 
 # example pmf model output
@@ -75,19 +57,10 @@ example_pmf_model_output <- example_complex_model_output |>
   )
 
 saveRDS(example_pmf_model_output,
-  file = "tests/testthat/testdata/flu_example_pmf_model_output.rds"
-)
-
-# example cdf model output
-example_cdf_model_output <- example_complex_model_output |>
-  dplyr::filter(
-    horizon %in% c(1, 3),
-    location %in% c("25", "US"),
-    output_type == "cdf"
+  file = paste0(
+    "tests/testthat/testdata/for-validate_input_data/",
+    "flu_example_pmf_model_output.rds"
   )
-
-saveRDS(example_cdf_model_output,
-  file = "tests/testthat/testdata/flu_example_cdf_model_output.rds"
 )
 
 # example target data (true values)
@@ -95,5 +68,8 @@ flu_example_target_data <-
   read.csv(paste0(hub_path, "/target-data/oracle-output.csv"))
 
 saveRDS(flu_example_target_data,
-  file = "tests/testthat/testdata/flu_example_target_data.rds"
+  file = paste0(
+    "tests/testthat/testdata/for-validate_input_data/",
+    "flu_example_target_data.rds"
+  )
 )

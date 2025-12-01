@@ -2,25 +2,13 @@
 % Please edit documentation in R/split_data_by_task.R
 \name{split_data_by_task}
 \alias{split_data_by_task}
-\title{Split the input data by a single task.}
+\title{Split the input data by a single task make a list of data sets}
 \usage{
-split_data_by_task(valid_tbl, weighted, training_window_length)
+split_data_by_task(valid_tbl)
 }
 \arguments{
 \item{valid_tbl}{A data.frame containing forecast data and target data,
 processed by the function \code{validate_input_data()}.}
-
-\item{weighted}{Boolean indicating whether model weighting should be done
-when building an ensemble using the \code{ensemble_fun}.
-\itemize{
-\item If \code{FALSE}, all models are given equal weight.
-\item If \code{TRUE}, model weights are estimated.
-}}
-
-\item{training_window_length}{An integer value representing the time interval
-of historical data used during the training process
-to estimate model weights.
-Default is \code{0}, meaning that no prior data is available for training.}
 }
 \value{
 A list of data sets, each corresponding to a single task.
