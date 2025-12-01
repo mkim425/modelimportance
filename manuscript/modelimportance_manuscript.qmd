@@ -42,8 +42,9 @@ keywords-formatted: [ensemble, forecast, prediction, model importance, Shapley v
 
 ```{r}
 #| echo: false
+#| message: false
 library(hubEnsembles)
-library(hubUtils)
+# library(hubUtils)
 library(hubExamples)
 library(readr)
 library(dplyr)
@@ -53,7 +54,7 @@ library(here)
 library(ggplot2)
 library(kableExtra)
 # install.packages("devtools")
-devtools::install_github("mkim425/modelimportance")
+# devtools::install_github("mkim425/modelimportance")
 library(modelimportance)
 options(tibble.width = Inf)
 ```
@@ -356,13 +357,14 @@ Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to implement LO
 In this section, we describe the usage of the function `model_importance()`, where multiple options are available to customize the evaluation framework (@tbl-arguments).
 
 ```r
-R> model_importance(forecast_data, oracle_output_data, ensemble_fun, weighted,
-                    training_window_length, importance_algorithm, subset_wt, 
-                    na_action, min_log_score, ...)
+R> model_importance(forecast_data, oracle_output_data, ensemble_fun, 
+                    importance_algorithm, subset_wt, na_action, min_log_score, 
+                    ...)
 ```
 
-`forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
+The `forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
 
+The `oracle_output_data` is a data frame containing the actual observed values of the variables used to specify modeling targets. Details are provided in Section \ref{subsec:oracle_output_data}.
 
 The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance, which relies on implementations in the \pkg{hubEnsembles} package (@Rpackage-hubEnsembles).
 The currently supported methods are `"simple_ensemble"` and `"linear_pool"`. 
@@ -379,8 +381,7 @@ When `"linear_pool"` is specified, ensemble model outputs are created as a linea
 tbl_argument <- data.frame(
   "Argument" = c(
     "\\texttt{forecast\\_data}", "\\texttt{oracle\\_output\\_data}",
-    "\\texttt{ensemble\\_fun}", "\\texttt{weighted}",
-    "\\texttt{training\\_window\\_length}",
+    "\\texttt{ensemble\\_fun}", 
     "\\texttt{importance\\_algorithm}", "\\texttt{subset\\_wt}",
     "\\texttt{na\\_action}", "\\texttt{min\\_log\\_score}", "\\texttt{...}"
   ),
@@ -388,8 +389,6 @@ tbl_argument <- data.frame(
     "Forecasts",
     "Ground truth data",
     "Ensemble method",
-    "Whether to use model weighting when building an ensemble",
-    "Time interval of historical data used during the training process",
     "Algorithm to calculate importance",
     "Method for assigning weight to subsets when using LASOMO algorithm",
     "Method to handle missing data",
@@ -400,8 +399,6 @@ tbl_argument <- data.frame(
     "Must be the model output format",
     "Must be the oracle output format",
     "\\texttt{\"simple\\_ensemble\"}, \\texttt{\"linear\\_pool\"}",
-    "Logical: \\texttt{TRUE}, \\texttt{FALSE}",
-    "Non-negative integer",
     "\\texttt{\"lomo\", \"lasomo\"}",
     "\\texttt{\"equal\", \"perm\\_based\"}",
     "\\texttt{\"worst\", \"average\", \"drop\"}",
@@ -412,12 +409,10 @@ tbl_argument <- data.frame(
     "N/A",
     "N/A",
     "\\texttt{\"simple\\_ensemble\"}",
-    "\\texttt{FALSE}",
-    "0",
     "\\texttt{\"lomo\"}",
     "\\texttt{\"equal\"}",
     "\\texttt{\"worst\"}",
-    "-10",
+    -10,
     "\\texttt{agg\\_fun=\"mean\"}"
   ),
   check.names = FALSE
@@ -426,14 +421,10 @@ tbl_argument <- data.frame(
 
 tbl_argument |>
   knitr::kable(format = "latex", booktabs = TRUE, escape = FALSE) |>
-  column_spec(c(2, 3, 4), width = c("3.8cm", "3.5cm", "2.7cm")) |>
+  column_spec(c(2, 3, 4), width = c("3.8cm", "3.3cm", "2.8cm")) |>
   kable_styling(latex_options = c("striped", "t"), font_size = 10.5)
 ```
 
-
-
-The `weighted` argument is a logical value that indicates whether model weighting should be done when building an ensemble using the specified `ensemble_fun`. The value of `FALSE` means that all component models are equally weighted in the ensemble construction.
-If it is set to `TRUE`, model weights are estimated based on the previous performance of each model using historical data within a training window defined by the `training_window_length` argument. The non-negative value of `training_window_length` specifies the number of most recent time units (e.g., days or weeks) to consider when evaluating past model performance. Its default value is `0`, indicating no training for model weighting, thus it is equivalent to setting `weighted = FALSE`.
 
 The `importance_algorithm` argument specifies the algorithm for model importance calculation, which can be either `"lomo"` (leave one model out) and `"lasomo"` (leave all subsets of models out). The `subset_wt` argument is employed only for the `"lasomo"` algorithm. This argument has two options: `"equal"` assigns equal weight to all subsets and `"perm_based"` assigns weight averaged over all possible permutations as in
 the formula of Shapley values (Algorithm \ref{alg:lasomo}). The default values of `importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`, respectively.
@@ -573,14 +564,13 @@ Overall, the forecasts tend to have larger prediction errors for the target end 
 
 
 We can quantify the contribution of each model within the ensemble using the `model_importance()` function. 
-The following code evaluates the importance of each model in the simple mean ensemble using the LOMO algorithm, without training the ensemble (`weighted = FALSE`); training is infeasible in this example as the data available for training is limited. The `na_action` argument is set to `"drop"`, which represents that any missing values in the forecasts will be excluded from the evaluation. 
+The following code evaluates the importance of each model in the simple mean ensemble using the LOMO algorithm. The `na_action` argument is set to `"drop"`, which represents that any missing values in the forecasts will be excluded from the evaluation. 
 
 ```r
 R> model_importance(
                     forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
-                    weighted = FALSE,
                     importance_algorithm = "lomo", 
                     na_action = "drop"
                    )
@@ -606,13 +596,16 @@ The column name `mean_importance` indicates the average of task-specific importa
 \small
 ```{r}
 #| echo: false
-model_importance(
+#| message: false
+suppressMessages(model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
-  ensemble_fun = "simple_ensemble", weighted = FALSE,
+  ensemble_fun = "simple_ensemble", 
   importance_algorithm = "lomo",
   na_action = "drop"
 )
+)
 ```
+
 \normalsize
 The results show that the model 'Flusight-baseline' has the highest importance score, followed by 'PSI-DICE' and 'MOBS-GLEAM_FLUH'.
 That is, 'Flusight-baseline' contributes the most to improving the ensemble's predictive performance, whereas MOBS-GLEAM_FLUH, which has a negative score, detracts from the ensemble’s performance.
@@ -626,7 +619,6 @@ R> model_importance(
                     forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
-                    weighted = FALSE,
                     importance_algorithm = "lomo", 
                     na_action = "worst"
                    )
@@ -637,7 +629,7 @@ R> model_importance(
 #| echo: false
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
-  ensemble_fun = "simple_ensemble", weighted = FALSE,
+  ensemble_fun = "simple_ensemble", 
   importance_algorithm = "lomo", na_action = "worst"
 )
 ```
@@ -657,7 +649,6 @@ R> model_importance(
                     forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
-                    weighted = FALSE,
                     importance_algorithm = "lomo", 
                     na_action = "average"
                    )
@@ -668,7 +659,7 @@ R> model_importance(
 #| echo: false
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
-  ensemble_fun = "simple_ensemble", weighted = FALSE,
+  ensemble_fun = "simple_ensemble", 
   importance_algorithm = "lomo", na_action = "average"
 )
 ```
@@ -687,7 +678,6 @@ R> model_importance(
                     forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
-                    weighted = FALSE,
                     importance_algorithm = "lasomo", 
                     na_action = "drop",
                     subset_wt = "equal"

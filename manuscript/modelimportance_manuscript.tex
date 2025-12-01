@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, breakable, borderline west={3pt}{0pt}{shadecolor}, sharp corners, interior hidden, frame hidden, enhanced]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, frame hidden, enhanced, interior hidden, breakable]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -730,12 +730,12 @@ In this section, we describe the usage of the function
 customize the evaluation framework (Table~\ref{tbl-arguments}).
 
 \begin{verbatim}
-R> model_importance(forecast_data, oracle_output_data, ensemble_fun, weighted,
-                    training_window_length, importance_algorithm, subset_wt, 
-                    na_action, min_log_score, ...)
+R> model_importance(forecast_data, oracle_output_data, ensemble_fun, 
+                    importance_algorithm, subset_wt, na_action, min_log_score, 
+                    ...)
 \end{verbatim}
 
-\texttt{forecast\_data} is a data frame containing predictions and
+The \texttt{forecast\_data} is a data frame containing predictions and
 should be or can be coerced to a \texttt{model\_out\_tbl} format, which
 is the standard S3 class model output format defined by the hubverse
 convention. If it fails to be coerced to a \texttt{model\_out\_tbl}
@@ -743,6 +743,10 @@ format, an error message will be returned from \pkg{hubUtils}, which
 provides the function \texttt{as\_model\_out\_tbl()} for this purpose.
 Users may need to manually transform their data to meet the hubverse
 standards.
+
+The \texttt{oracle\_output\_data} is a data frame containing the actual
+observed values of the variables used to specify modeling targets.
+Details are provided in Section \ref{subsec:oracle_output_data}.
 
 The \texttt{ensemble\_fun} argument specifies the ensemble method to be
 used for evaluating model importance, which relies on implementations in
@@ -765,18 +769,16 @@ outputs. This method supports only an \texttt{output\_type} of
 
 \centering\begingroup\fontsize{10.5}{12.5}\selectfont
 
-\begin{tabular}{l>{\raggedright\arraybackslash}p{3.8cm}>{\raggedright\arraybackslash}p{3.5cm}>{\raggedright\arraybackslash}p{2.7cm}}
+\begin{tabular}{l>{\raggedright\arraybackslash}p{3.8cm}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.8cm}}
 \toprule
 Argument & Description & Possible Values & Default\\
 \midrule
 \cellcolor{gray!10}{\texttt{forecast\_data}} & \cellcolor{gray!10}{Forecasts} & \cellcolor{gray!10}{Must be the model output format} & \cellcolor{gray!10}{N/A}\\
 \texttt{oracle\_output\_data} & Ground truth data & Must be the oracle output format & N/A\\
 \cellcolor{gray!10}{\texttt{ensemble\_fun}} & \cellcolor{gray!10}{Ensemble method} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}, \texttt{"linear\_pool"}} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}}\\
-\texttt{weighted} & Whether to use model weighting when building an ensemble & Logical: \texttt{TRUE}, \texttt{FALSE} & \texttt{FALSE}\\
-\cellcolor{gray!10}{\texttt{training\_window\_length}} & \cellcolor{gray!10}{Time interval of historical data used during the training process} & \cellcolor{gray!10}{Non-negative integer} & \cellcolor{gray!10}{0}\\
-\addlinespace
 \texttt{importance\_algorithm} & Algorithm to calculate importance & \texttt{"lomo", "lasomo"} & \texttt{"lomo"}\\
 \cellcolor{gray!10}{\texttt{subset\_wt}} & \cellcolor{gray!10}{Method for assigning weight to subsets when using LASOMO algorithm} & \cellcolor{gray!10}{\texttt{"equal", "perm\_based"}} & \cellcolor{gray!10}{\texttt{"equal"}}\\
+\addlinespace
 \texttt{na\_action} & Method to handle missing data & \texttt{"worst", "average", "drop"} & \texttt{"worst"}\\
 \cellcolor{gray!10}{\texttt{min\_log\_score}} & \cellcolor{gray!10}{Minimum value to replace for log score} & \cellcolor{gray!10}{Non-positive numeric} & \cellcolor{gray!10}{-10}\\
 \texttt{...} & Optional arguments for \texttt{"simple\_ensemble"} & Varies & \texttt{agg\_fun="mean"}\\
@@ -791,19 +793,6 @@ Argument & Description & Possible Values & Default\\
 values, and default settings.}
 
 \end{table}%
-
-The \texttt{weighted} argument is a logical value that indicates whether
-model weighting should be done when building an ensemble using the
-specified \texttt{ensemble\_fun}. The value of \texttt{FALSE} means that
-all component models are equally weighted in the ensemble construction.
-If it is set to \texttt{TRUE}, model weights are estimated based on the
-previous performance of each model using historical data within a
-training window defined by the \texttt{training\_window\_length}
-argument. The non-negative value of \texttt{training\_window\_length}
-specifies the number of most recent time units (e.g., days or weeks) to
-consider when evaluating past model performance. Its default value is
-\texttt{0}, indicating no training for model weighting, thus it is
-equivalent to setting \texttt{weighted\ =\ FALSE}.
 
 The \texttt{importance\_algorithm} argument specifies the algorithm for
 model importance calculation, which can be either \texttt{"lomo"} (leave
@@ -964,18 +953,15 @@ accurate compared to those for Texas, which tend to have higher errors
 We can quantify the contribution of each model within the ensemble using
 the \texttt{model\_importance()} function. The following code evaluates
 the importance of each model in the simple mean ensemble using the LOMO
-algorithm, without training the ensemble (\texttt{weighted\ =\ FALSE});
-training is infeasible in this example as the data available for
-training is limited. The \texttt{na\_action} argument is set to
-\texttt{"drop"}, which represents that any missing values in the
-forecasts will be excluded from the evaluation.
+algorithm. The \texttt{na\_action} argument is set to \texttt{"drop"},
+which represents that any missing values in the forecasts will be
+excluded from the evaluation.
 
 \begin{verbatim}
 R> model_importance(
                     forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
-                    weighted = FALSE,
                     importance_algorithm = "lomo", 
                     na_action = "drop"
                    )
@@ -1004,7 +990,43 @@ ordered from most to least importance. The column name
 \texttt{mean\_importance} indicates the average of task-specific
 importance scores.
 
+\begin{verbatim}
+quiet <- function(x) { 
+  sink(tempfile())
+  on.exit(sink())
+  suppressMessages(suppressWarnings(x))
+}
+
+res <- quiet(model_importance(
+  forecast_data = forecast_data, oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble", 
+  importance_algorithm = "lomo",
+  na_action = "drop"
+))
+res
+\end{verbatim}
+
+\begin{verbatim}
+# A tibble: 3 x 2
+  model_id          mean_importance
+  <chr>                       <dbl>
+1 PSI-DICE                     37.2
+2 Flusight-baseline            28.4
+3 MOBS-GLEAM_FLUH             -75  
+\end{verbatim}
+
 \small
+
+\begin{verbatim}
+Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
+The available model IDs are:
+     Flusight-baseline
+     MOBS-GLEAM_FLUH
+     PSI-DICE 
+(a total of 3 models)
+Note: This function uses 'furrr' and 'future' for parallelization.
+To enable parallel execution, please set future::plan(multisession).
+\end{verbatim}
 
 \begin{verbatim}
 # A tibble: 3 x 2
@@ -1038,13 +1060,23 @@ R> model_importance(
                     forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
-                    weighted = FALSE,
                     importance_algorithm = "lomo", 
                     na_action = "worst"
                    )
 \end{verbatim}
 
 \small
+
+\begin{verbatim}
+Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
+The available model IDs are:
+     Flusight-baseline
+     MOBS-GLEAM_FLUH
+     PSI-DICE 
+(a total of 3 models)
+Note: This function uses 'furrr' and 'future' for parallelization.
+To enable parallel execution, please set future::plan(multisession).
+\end{verbatim}
 
 \begin{verbatim}
 # A tibble: 3 x 2
@@ -1090,13 +1122,23 @@ R> model_importance(
                     forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
-                    weighted = FALSE,
                     importance_algorithm = "lomo", 
                     na_action = "average"
                    )
 \end{verbatim}
 
 \small
+
+\begin{verbatim}
+Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
+The available model IDs are:
+     Flusight-baseline
+     MOBS-GLEAM_FLUH
+     PSI-DICE 
+(a total of 3 models)
+Note: This function uses 'furrr' and 'future' for parallelization.
+To enable parallel execution, please set future::plan(multisession).
+\end{verbatim}
 
 \begin{verbatim}
 # A tibble: 3 x 2
@@ -1123,7 +1165,6 @@ R> model_importance(
                     forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
-                    weighted = FALSE,
                     importance_algorithm = "lasomo", 
                     na_action = "drop",
                     subset_wt = "equal"
@@ -1131,6 +1172,17 @@ R> model_importance(
 \end{verbatim}
 
 \small
+
+\begin{verbatim}
+Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
+The available model IDs are:
+     Flusight-baseline
+     MOBS-GLEAM_FLUH
+     PSI-DICE 
+(a total of 3 models)
+Note: This function uses 'furrr' and 'future' for parallelization.
+To enable parallel execution, please set future::plan(multisession).
+\end{verbatim}
 
 \begin{verbatim}
 # A tibble: 3 x 2
@@ -1144,6 +1196,17 @@ R> model_importance(
 \normalsize
 
 \small
+
+\begin{verbatim}
+Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
+The available model IDs are:
+     Flusight-baseline
+     MOBS-GLEAM_FLUH
+     PSI-DICE 
+(a total of 3 models)
+Note: This function uses 'furrr' and 'future' for parallelization.
+To enable parallel execution, please set future::plan(multisession).
+\end{verbatim}
 
 \begin{verbatim}
 # A tibble: 3 x 2
