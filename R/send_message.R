@@ -38,9 +38,9 @@ send_message <- function(status, ...) {
   if (status %in% names(messages)) {
     msg <- messages[[status]]
     if (is.function(msg)) {
-      cat(msg(...))
+      message(msg(...))
     } else {
-      cat(msg)
+      message(msg)
     }
   } else {
     stop("Invalid status for send_message().")
