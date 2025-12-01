@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, frame hidden, enhanced, interior hidden, breakable]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, sharp corners, enhanced, frame hidden, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, interior hidden]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -850,8 +850,7 @@ example forecast and target data from the \pkg{hubExamples} package,
 which provides sample datasets for multiple modeling hubs in the
 hubverse format.
 
-\subsection{Evaluation using untrained ensemble in LOMO algorithm for
-mean forecasts}\label{sec:untrained-lomo-mean}
+\subsection{Example data}\label{sec:example-data}
 
 The forecast data used here contains forecasts of weekly incident
 influenza hospitalizations in the US for Massachusetts (FIPS code 25)
@@ -950,21 +949,21 @@ Additionally, the forecasts for Massachusetts are relatively more
 accurate compared to those for Texas, which tend to have higher errors
 (Figure~\ref{fig-example-mean-lomo}).
 
-We can quantify the contribution of each model within the ensemble using
-the \texttt{model\_importance()} function. The following code evaluates
-the importance of each model in the simple mean ensemble using the LOMO
+\subsection{Evaluation using LOMO algorithm}\label{sec:example-lomo}
+
+We quantify the contribution of each model within the ensemble using the
+\texttt{model\_importance()} function. The following code evaluates the
+importance of each model in the simple mean ensemble using the LOMO
 algorithm. The \texttt{na\_action} argument is set to \texttt{"drop"},
 which represents that any missing values in the forecasts will be
 excluded from the evaluation.
 
 \begin{verbatim}
-R> model_importance(
-                    forecast_data = forecast_data, 
+R> model_importance(forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
                     importance_algorithm = "lomo", 
-                    na_action = "drop"
-                   )
+                    na_action = "drop")
 \end{verbatim}
 
 This call generates both the result and informative messages,
@@ -990,43 +989,7 @@ ordered from most to least importance. The column name
 \texttt{mean\_importance} indicates the average of task-specific
 importance scores.
 
-\begin{verbatim}
-quiet <- function(x) { 
-  sink(tempfile())
-  on.exit(sink())
-  suppressMessages(suppressWarnings(x))
-}
-
-res <- quiet(model_importance(
-  forecast_data = forecast_data, oracle_output_data = target_data,
-  ensemble_fun = "simple_ensemble", 
-  importance_algorithm = "lomo",
-  na_action = "drop"
-))
-res
-\end{verbatim}
-
-\begin{verbatim}
-# A tibble: 3 x 2
-  model_id          mean_importance
-  <chr>                       <dbl>
-1 PSI-DICE                     37.2
-2 Flusight-baseline            28.4
-3 MOBS-GLEAM_FLUH             -75  
-\end{verbatim}
-
 \small
-
-\begin{verbatim}
-Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
-The available model IDs are:
-     Flusight-baseline
-     MOBS-GLEAM_FLUH
-     PSI-DICE 
-(a total of 3 models)
-Note: This function uses 'furrr' and 'future' for parallelization.
-To enable parallel execution, please set future::plan(multisession).
-\end{verbatim}
 
 \begin{verbatim}
 # A tibble: 3 x 2
@@ -1039,16 +1002,16 @@ To enable parallel execution, please set future::plan(multisession).
 
 \normalsize
 
-The results show that the model `Flusight-baseline' has the highest
-importance score, followed by `PSI-DICE' and `MOBS-GLEAM\_FLUH'. That
-is, `Flusight-baseline' contributes the most to improving the ensemble's
-predictive performance, whereas MOBS-GLEAM\_FLUH, which has a negative
-score, detracts from the ensemble's performance. The low importance
-score of `MOBS-GLEAM\_FLUH' is mainly due to a substantially larger
-prediction error for Texas on the target end date of December 10, 2022,
-compared to other models, while its missing forecast for Massachusetts
-for November 26, 2022, was not factored into the evaluation. This single
-large error significantly affected its contribution score.
+The results show that the model `PSI-DICE' has the highest importance
+score, followed by `Flusight-baseline' and `MOBS-GLEAM\_FLUH'. That is,
+`PSI-DICE' contributes the most to improving the ensemble's predictive
+performance, whereas `MOBS-GLEAM\_FLUH', which has a negative score,
+detracts from the ensemble's performance. The low importance score of
+`MOBS-GLEAM\_FLUH' is mainly due to a substantially larger prediction
+error for Texas on the target end date of December 10, 2022, compared to
+other models, while its missing forecast for Massachusetts for November
+26, 2022, was not factored into the evaluation. This single large error
+significantly affected its contribution score.
 
 Another approach to handling missing values is to use the
 \texttt{"worst"} option for \texttt{na\_action}, which replaces missing
@@ -1056,27 +1019,14 @@ values with the worst (i.e., minimum) score among the other models for
 the same task.
 
 \begin{verbatim}
-R> model_importance(
-                    forecast_data = forecast_data, 
+R> model_importance(forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
                     importance_algorithm = "lomo", 
-                    na_action = "worst"
-                   )
+                    na_action = "worst")
 \end{verbatim}
 
 \small
-
-\begin{verbatim}
-Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
-The available model IDs are:
-     Flusight-baseline
-     MOBS-GLEAM_FLUH
-     PSI-DICE 
-(a total of 3 models)
-Note: This function uses 'furrr' and 'future' for parallelization.
-To enable parallel execution, please set future::plan(multisession).
-\end{verbatim}
 
 \begin{verbatim}
 # A tibble: 3 x 2
@@ -1118,27 +1068,14 @@ mitigating the influence of the missing data without overly penalizing
 or overlooking them.
 
 \begin{verbatim}
-R> model_importance(
-                    forecast_data = forecast_data, 
+R> model_importance(forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
                     importance_algorithm = "lomo", 
-                    na_action = "average"
-                   )
+                    na_action = "average")
 \end{verbatim}
 
 \small
-
-\begin{verbatim}
-Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
-The available model IDs are:
-     Flusight-baseline
-     MOBS-GLEAM_FLUH
-     PSI-DICE 
-(a total of 3 models)
-Note: This function uses 'furrr' and 'future' for parallelization.
-To enable parallel execution, please set future::plan(multisession).
-\end{verbatim}
 
 \begin{verbatim}
 # A tibble: 3 x 2
@@ -1151,38 +1088,28 @@ To enable parallel execution, please set future::plan(multisession).
 
 \normalsize
 
-In this simple example with only three models, the ranking of the
-importance scores remains unchanged. However, in more complex scenarios
-with a larger number of models, the choice of \texttt{na\_action} can
-impact the importance scores and their interpretation. A more extensive
-application can be found in \citet{kim2024}.
+\subsection{Evaluation using LASOMO algorithm}\label{sec:example-lasomo}
 
-\subsection{Evaluation using untrained ensemble in LASOMO algorithm for
-mean forecasts}\label{sec:untrained-lasomo-mean}
+Now we demonstrate the use of the LASOMO algorithm in the evaluation of
+model importance. As we explored the difference of \texttt{na\_action}
+options in the previous LOMO example (Section \ref{sec:example-lomo}),
+we focus on options for \texttt{subset\_wt}, which specifies how weights
+are assigned to subsets of models when calculating importance scores,
+with \texttt{na\_action} fixed to \texttt{"drop"}.
+
+The following code and corresponding outputs illustrate the evaluation
+using each weighting scheme.
 
 \begin{verbatim}
-R> model_importance(
-                    forecast_data = forecast_data, 
+R> model_importance(forecast_data = forecast_data, 
                     oracle_output_data = target_data,
                     ensemble_fun = "simple_ensemble", 
-                    importance_algorithm = "lasomo", 
-                    na_action = "drop",
-                    subset_wt = "equal"
-                   )
+                    importance_algorithm = "lasomo",
+                    subset_wt = "equal", 
+                    na_action = "drop")
 \end{verbatim}
 
 \small
-
-\begin{verbatim}
-Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
-The available model IDs are:
-     Flusight-baseline
-     MOBS-GLEAM_FLUH
-     PSI-DICE 
-(a total of 3 models)
-Note: This function uses 'furrr' and 'future' for parallelization.
-To enable parallel execution, please set future::plan(multisession).
-\end{verbatim}
 
 \begin{verbatim}
 # A tibble: 3 x 2
@@ -1195,18 +1122,16 @@ To enable parallel execution, please set future::plan(multisession).
 
 \normalsize
 
-\small
-
 \begin{verbatim}
-Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
-The available model IDs are:
-     Flusight-baseline
-     MOBS-GLEAM_FLUH
-     PSI-DICE 
-(a total of 3 models)
-Note: This function uses 'furrr' and 'future' for parallelization.
-To enable parallel execution, please set future::plan(multisession).
+R> model_importance(forecast_data = forecast_data, 
+                    oracle_output_data = target_data,
+                    ensemble_fun = "simple_ensemble", 
+                    importance_algorithm = "lasomo",
+                    subset_wt = "perm_based", 
+                    na_action = "drop")
 \end{verbatim}
+
+\small
 
 \begin{verbatim}
 # A tibble: 3 x 2
@@ -1219,10 +1144,31 @@ To enable parallel execution, please set future::plan(multisession).
 
 \normalsize
 
-\subsection{Evaluation using trained ensemble in LASOMO algorithm for
-quantile-based forecasts}\label{sec:trained-lomo-qntl}
+The subset weights are assigned equally or based on their sizes as
+described in Algorithm \ref{alg:lasomo}. Recall the formulas for these
+weights:
+\[\frac{1}{2^{n-1}-1} \quad\text{and}\quad \frac{1}{(n-1)\binom{n-1}{k}},\]
+where \(k\) is the size of each subset and \(n\) is the total number of
+models. In this example, there are only three models (\(n=3\)), and the
+weights do not differ significantly between the two methods. Therefore,
+the resulting outputs do not show large differences. However, in
+general, with a large number of models, the two weighting schemes may
+produce different importance scores for each model. More specifically,
+while the weights under the equal weighting scheme decreases
+exponentially with \(n\), the permutation-based weights decreases
+polynomially. In addition, the equal scheme treats all subsets equally,
+so the influence of medium-sized subsets is large in the final result as
+there are many such subsets. In contrast, the permutation-based scheme
+adjusts the weights according to the different sizes of the subsets,
+giving the largest weight to the smaller and larger subsets. Therefore,
+when \(n\) is large, middle-sized subsets dominate in equal weighting
+scheme while extreme sized subsets dominate in permutation-based
+weighting scheme.
 
-TO DO
+In this section, we explored each component model's contribution to the
+ensemble accuracy with only three models. An extensive application in
+more complex scenarios with a larger number of models can be found in
+\citet{kim2024}.
 
 \section{Summary and discussion}\label{sec:discussion}
 
