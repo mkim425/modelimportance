@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, sharp corners, boxrule=0pt, enhanced, interior hidden, frame hidden, breakable]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, boxrule=0pt, frame hidden, enhanced, borderline west={3pt}{0pt}{shadecolor}, interior hidden, breakable]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -1130,6 +1130,8 @@ R> model_importance(forecast_data = forecast_data,
 3 MOBS-GLEAM_FLUH             -79.8
 \end{verbatim}
 
+~~
+
 \normalsize
 
 \begin{verbatim}
@@ -1220,7 +1222,10 @@ the scope of applications in real-world forecasting tasks.
 \addcontentsline{toc}{section}{Acknowledgements}
 
 We acknowledge Zhian N. Kamvar for debugging and resolving coding issues
-while developing the package.
+while developing the package. We are also grateful to Mattew Cornell for
+his advice on unit testing, which greatly helped us improve the
+structure and testing our code with a solid understanding of unit
+testing practices.
 
 \section*{Appendix}\label{appendix}
 \addcontentsline{toc}{section}{Appendix}

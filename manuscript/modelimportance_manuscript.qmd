@@ -821,11 +821,7 @@ final_lomo_res <- res_1 |>
 
 
 
-
-
-
-
-
+\ \ 
 
 \normalsize
 
@@ -879,7 +875,7 @@ These extensions would aim to broaden the scope of applications in real-world fo
 
 ## Acknowledgements {.unnumbered}
 
-We acknowledge Zhian N. Kamvar for debugging and resolving coding issues while developing the package.
+We acknowledge Zhian N. Kamvar for debugging and resolving coding issues while developing the package. We are also grateful to Mattew Cornell for his advice on unit testing, which greatly helped us improve the structure and testing our code with a solid understanding of unit testing practices. 
 
 
 ## Appendix {.unnumbered}
