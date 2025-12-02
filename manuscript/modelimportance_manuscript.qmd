@@ -4,7 +4,7 @@ format:
   jss-pdf:
     keep-tex: true
     header-includes:
-        - \usepackage{algorithm, algcompatible, setspace}
+        - \usepackage{algorithm, algcompatible, setspace, amsmath, hyperref, cleveref}
         - \renewcommand{\algorithmicrequire}{\textbf{Input:}}
         - \renewcommand{\algorithmicensure}{\textbf{Output:}}
     journal:
@@ -90,24 +90,23 @@ The [modelimportance]{.pkg} package can even strengthen the benefits of a multi-
 
 We highlight some strong development practices we employed, such as unit testing of individual functions, continuous integration testing on different operating systems, and independent code review. This emphasis on quality control is a key strength of this work and distinguishes it from other academic software development projects.
 
-The paper proceeds as follows. Section \ref{sec:data} describes how the \pkg{modelimportance} package relates to the hubverse framework, including its dependencies, the model output formats defined within hubverse, and the structure of data presentation for both forecasts and actual observations. 
-Section \ref{sec:algorithms} presents two
+The paper proceeds as follows. \hyperref[sec:data]{Section~\ref{sec:data}} describes how the \pkg{modelimportance} package relates to the hubverse framework, including its dependencies, the model output formats defined within hubverse, and the structure of data presentation for both forecasts and actual observations. 
+\hyperref[sec:algorithms]{Section~\ref{sec:algorithms}} presents two
 algorithms implemented in \pkg{modelimportance} for calculating the
 model importance metric: leave-one-model-out and
 leave-all-subsets-of-models-out. We demonstrate the various
-functionalities \pkg{modelimportance} supports in Section \ref{sec:main-function} and highlight our quality assurance measures and its open access in Section \ref{sec:implementation-and-availability}. Some examples are provided in Section \ref{sec:examples}. We close this paper with some concluding remarks and a discussion of possible extensions.
+functionalities \pkg{modelimportance} supports in \hyperref[sec:main-function]{Section~\ref{sec:main-function}} and highlight our quality assurance measures and its open access in \hyperref[sec:implementation-and-availability]{Section~\ref{sec:implementation-and-availability}}. Some examples are provided in \hyperref[sec:examples]{Section~\ref{sec:examples}}. We close this paper with some concluding remarks and a discussion of possible extensions.
  
-
 
 ## Data {#sec:data}
 
 ### Relationship and dependencies on hubverse {#subsec:dependence_hubverse}
 
 The [modelimportance]{.pkg} package is designed to work with the hubverse framework and, accordingly, depends on several packages in the hubverse ecosystem, such as [hubUtils]{.pkg} (@Rpackage-hubUtils), [hubEnsembles]{.pkg} (@Rpackage-hubEnsembles), [hubEvals]{.pkg} (@Rpackage-hubEvals), and [hubExamples]{.pkg} (@Rpackage-hubExamples). 
-[modelimportance]{.pkg} uses a `model_out_tbl` S3 class as the model output format defined in [hubUtils]{.pkg}, which consists of utility functions to standardize prediction files and data formats (details in Section \ref{subsec:model_output_format}).
+[modelimportance]{.pkg} uses a `model_out_tbl` S3 class as the model output format defined in [hubUtils]{.pkg}, which consists of utility functions to standardize prediction files and data formats (details in \hyperref[subsec:model_output_format]{Section~\ref{subsec:model_output_format}}).
 Ensembling predictions from multiple models relies on [hubEnsembles]{.pkg}, which offers a broadly applicable framework to construct multi-model ensembles using various ensemble methods.
 Calculation of forecast accuracy using various metrics is based on [hubEvals]{.pkg}, which internally leverages [scoringutils]{.pkg}.
-We use the example datasets from [hubExamples]{.pkg}  for testing and demonstration purposes (see Section \ref{sec:examples}). 
+We use the example datasets from [hubExamples]{.pkg}  for testing and demonstration purposes (see \hyperref[sec:examples]{Section~\ref{sec:examples}}). 
 
 
 ### Model output format {#subsec:model_output_format}
@@ -286,7 +285,7 @@ This section provides a brief description of the leave one model out (LOMO) and 
 
 LOMO involves creating an ensemble by excluding one component model from the entire set of models. 
 Let ${\cal A}$ be a set of $n$ models and $F^i$ be a forecast produced by model $i$, where $i = 1,2, \dots, n.$
-Each ensemble excludes exactly one model while including all the others. Denoting by $F^{{\cal A}^{-i}}$ an ensemble forecast constructed without $F^i$ and by $F^{\cal A}$ the ensemble forecast built from the entire set of models, the importance score using LOMO is calculated as the difference in accuracy, as measured by a specific score, between $F^{{\cal A}^{-i}}$ and $F^{\cal A}$  (Algorithm \ref{alg:lomo}). 
+Each ensemble excludes exactly one model while including all the others. Denoting by $F^{{\cal A}^{-i}}$ an ensemble forecast constructed without $F^i$ and by $F^{\cal A}$ the ensemble forecast built from the entire set of models, the importance score using LOMO is calculated as the difference in accuracy, as measured by a specific score, between $F^{{\cal A}^{-i}}$ and $F^{\cal A}$  (\hyperref[alg:lomo]{Algorithm~\ref{alg:lomo}}). 
 For example, when evaluating model 1 within an ensemble of three models ($n=3$), LOMO creates an ensemble forecast $F^{\{2,3\}}$ using only $F^2$ and $F^3$. The performance of this reduced ensemble is then compared to the full ensemble forecast $F^{\{1,2,3\}}$, which incorporates all three models. We note that a model can make an ensemble better or worse, and thus the importance score for model 1 can be positive or negative accordingly.
 
 \begin{algorithm}[b!]
@@ -311,7 +310,7 @@ For example, when evaluating model 1 within an ensemble of three models ($n=3$),
  \end{spacing}
 \end{algorithm}
 
-On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays a role of ${\cal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (Algorithm \ref{alg:lasomo}).
+On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays a role of ${\cal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}).
 For example, using the earlier setup of three forecast models, LASOMO considers three subsets, which we denote by $S_1=\{2\}$, $S_2=\{3\}$, and $S_3=\{2, 3\}$, to calculate the importance score of model 1 (excluding all subsets that include model 1). The ensemble forecasts $F^{\{2\}}, F^{\{3\}}$, and $F^{\{2,3\}}$ are then compared to $F^{\{1,2\}}, F^{\{1,3\}}$, and $F^{\{1,2,3\}}$, respectively. The performance differences attributable to model 1's inclusion are aggregated, which results in the importance score for model 1. We note that the subsets (e.g., $S_1, S_2,$ and $S_3$) may have different weights during the aggregating process. 
 The [modelimportance]{.pkg} package offers two weighting options for subsets: one assigns equal (uniform) weights to all subsets, and the other assigns weights based on their size, similar to the concept of Shapley values in cooperative game theory, which measure a player’s average contribution to all possible coalitions (@Shapley1953). Users can choose one to evaluate the contribution of each model in a manner suited to their preferred framework.
 
@@ -364,7 +363,7 @@ R> model_importance(forecast_data, oracle_output_data, ensemble_fun,
 
 The `forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
 
-The `oracle_output_data` is a data frame containing the actual observed values of the variables used to specify modeling targets. Details are provided in Section \ref{subsec:oracle_output_data}.
+The `oracle_output_data` is a data frame containing the actual observed values of the variables used to specify modeling targets. Details are provided in \hyperref[subsec:oracle_output_data]{Section~\ref{subsec:oracle_output_data}}.
 
 The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance, which relies on implementations in the \pkg{hubEnsembles} package (@Rpackage-hubEnsembles).
 The currently supported methods are `"simple_ensemble"` and `"linear_pool"`. 
@@ -427,7 +426,7 @@ tbl_argument |>
 
 
 The `importance_algorithm` argument specifies the algorithm for model importance calculation, which can be either `"lomo"` (leave one model out) and `"lasomo"` (leave all subsets of models out). The `subset_wt` argument is employed only for the `"lasomo"` algorithm. This argument has two options: `"equal"` assigns equal weight to all subsets and `"perm_based"` assigns weight averaged over all possible permutations as in
-the formula of Shapley values (Algorithm \ref{alg:lasomo}). The default values of `importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`, respectively.
+the formula of Shapley values (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}). The default values of `importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`, respectively.
 
 
 The `na_action` argument allows for specifying how to handle missing values in the `forecast_data`. 
@@ -445,7 +444,7 @@ We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] 
 
 ## Examples {#sec:examples}
 
-The examples in this section illustrate the use of the `model_importance()` function to evaluate the importance of component models within an ensemble, using various combinations of the arguments described in Section \ref{sec:main-function}. We use some example forecast and target data from the [hubExamples]{.pkg} package, which provides sample datasets for multiple modeling hubs in the hubverse format. 
+The examples in this section illustrate the use of the `model_importance()` function to evaluate the importance of component models within an ensemble, using various combinations of the arguments described in \hyperref[sec:main-function]{Section~\ref{sec:main-function}}. We use some example forecast and target data from the [hubExamples]{.pkg} package, which provides sample datasets for multiple modeling hubs in the hubverse format. 
 
 ### Example data {#sec:example-data}
 
@@ -661,7 +660,7 @@ model_importance(
 
 ### Evaluation using LASOMO algorithm {#sec:example-lasomo}
 
-Now we demonstrate the use of the LASOMO algorithm in the evaluation of model importance. As we explored the difference of `na_action` options in the previous LOMO example (Section \ref{sec:example-lomo}), we focus on options for `subset_wt`, which specifies how weights are assigned to subsets of models when calculating importance scores, with `na_action` fixed to `"drop"`.
+Now we demonstrate the use of the LASOMO algorithm in the evaluation of model importance. As we explored the difference of `na_action` options in the previous LOMO example (\hyperref[sec:example-lomo]{Section~\ref{sec:example-lomo}}), we focus on options for `subset_wt`, which specifies how weights are assigned to subsets of models when calculating importance scores, with `na_action` fixed to `"drop"`.
 
 The following code and corresponding outputs illustrate the evaluation using each weighting scheme.
 
@@ -857,13 +856,13 @@ model_importance(
 \normalsize
 
 
-The subset weights are assigned equally or based on their sizes as described in Algorithm \ref{alg:lasomo}. Recall the formulas for these weights:
+The subset weights are assigned equally or based on their sizes as described in \hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}. Recall the formulas for these weights:
 $$\frac{1}{2^{n-1}-1} \quad\text{and}\quad \frac{1}{(n-1)\binom{n-1}{k}},$$
 where $k$ is the size of each subset and $n$ is the total number of models. 
-In this example, there are only three models ($n=3$), and the weights do not differ significantly between the two methods. Therefore, the resulting outputs do not show large differences. However, in general, with a large number of models, the two weighting schemes may produce different importance scores for each model.
-More specifically, while the weights under the equal weighting scheme decreases exponentially with $n$, the  permutation-based weights decreases polynomially.
-In addition, the equal scheme treats all subsets equally, so the influence of medium-sized subsets is large in the final result as there are many such subsets. In contrast, the permutation-based scheme adjusts the weights according to the different sizes of the subsets, giving the largest weight to the smaller and larger subsets. Therefore, when $n$ is large, middle-sized subsets dominate in equal weighting scheme while extreme sized subsets dominate in permutation-based weighting scheme.
-
+In this example, there are only three models ($n=3$), and the weights do not differ significantly between the two methods. Therefore, the resulting outputs show little difference. However, in general, with a larger number of models, the two weighting schemes may yield different importance scores for each model.
+More specifically, the equal scheme treats all subsets equally, so medium-sized subsets have considerable influence in the final result, as there are many such subsets. In contrast, the permutation-based scheme adjusts the weights according to the subset size, giving the greatest weight to both the smallest and largest subsets while assigning small weights to the mid-sized subsets. 
+Moreover, the weights assigned to the mid-sized subsets under the permutation-based approach decrease much faster with $n$ than those under the equal weighting scheme (see 
+\hyperref[sec:appendix]{Appendix~\ref{sec:appendix}} for details). Consequently, when $n$ is large, middle-sized subsets play a dominant role in determining the importance scores under the equal weighting scheme, whereas extreme-sized subsets primarily drive the scores under the permutation-based weighting approach.
 
 In this section, we explored each component model's contribution to the ensemble accuracy with only three models. An extensive application in more complex scenarios with a larger number of models can be found in @kim2024.
 
@@ -883,4 +882,30 @@ These extensions would aim to broaden the scope of applications in real-world fo
 We acknowledge Zhian N. Kamvar for debugging and resolving coding issues while developing the package.
 
 
+## Appendix {.unnumbered}
+\appendix
+
+## Weights for subsets in LASOMO {#sec:appendix}
+
+In the LASOMO algorithm, two weighting schemes are available for subsets of models in the calculation of model importance scores: equal weights and permutation-based weights.
+
+Let $n$ be the total number of models and $k$ be the size of a subset that does not include the model being evaluated. The formulas for the weights under each scheme are as follows:
+\begin{align*}
+w^{\text{eq}} &= \frac{1}{2^{n-1}-1}, \\
+w^{\text{perm}} &= \frac{1}{(n-1)\binom{n-1}{k}},
+\end{align*}
+where the superscripts "eq" and "perm" denote the equal and permutation-based weighting schemes, respectively.
+The maximum weight under the permutation-based scheme occurs when $k=n-1$, which is ${1}/{(n-1)}$. The minimum weight occurs when the subset size is around ${(n-1)}/{2}$ (i.e., $k=\lfloor (n-1)/2 \rfloor$), which is approximately $\displaystyle\frac{\sqrt{\pi(n-1)/2}}{(n-1)2^{n-1}}$ by Stirling's approximation.
+
+Given a fixed mid-sized subset, as $n$ increases, the weight assigned to this subset under the equal weighting scheme decreases at a rate of $O({1}/{2^n})$, while under the permutation-based scheme, it decreases at a much faster rate of $O({1}/({\sqrt{n}\,2^n}))$. This indicates that as the number of models grows, that mid-sized subset becomes significantly less influential in determining model importance scores when using the permutation-based weighting scheme compared to the equal weighting scheme.
+
+On the other hand, for subsets of extreme sizes (e.g., $k=1$ or $k=n-1$), the weights under permutation-based weighting scheme decrease only at $O({1}/{n})$, much slower under the equal weighting scheme. This implies that in scenarios with a large number of models, the contributions of these extreme-sized subsets play a relatively larger role in the calculation of model importance scores when using permutation-based weights compared to the equal weighting approach.
+
 ## References {.unnumbered}
+
+
+
+
+
+
+
