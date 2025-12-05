@@ -35,7 +35,7 @@ execute:
   message: false
 bibliography: references.bib
 abstract: |
-  Ensemble forecasts are commonly used to support decision-making and policy planning across various fields because they often offer improved accuracy and stability compared to individual models. As each model has its own unique characteristics, understanding and measuring the value each constituent model adds to the overall accuracy of the ensemble can support the construction of effective ensembles. The [R]{.proglang} package [modelimportance]{.pkg}  provides tools to quantify how each component model contributes to the acccuracy of ensemble performance for both point and probabilistic forecasts. It supports multiple functionalities; it allows users to specify which ensemble approach to implement and which model importance metric to use. Additionally, the software offers customizable options for handling missing values. These features enable the package to serve as a versatile tool for researchers and practitioners. It helps not only in constructing an effective ensemble model across a wide range of forecasting tasks, but also in understanding the role of each model within the ensemble and gaining insights into individual models themselves. This package follows the 'hubverse' framework, which is a collection of open-source software and tools developed to promote collaborative modeling hub efforts and simplify their setup and operation. Doing so enables seamless integration and flexibility with other forecasting tools and systems, allowing many analyses to be performed on existing and ongoing hubs.  
+  Ensemble forecasts are commonly used to support decision-making and policy planning across various fields because they often offer improved accuracy and stability compared to individual models. As each model has its own unique characteristics, understanding and measuring the value each constituent model adds to the overall accuracy of the ensemble can support the construction of effective ensembles. The [R]{.proglang} package [modelimportance]{.pkg} provides tools to quantify how each component model contributes to the accuracy of ensemble performance for both point and probabilistic forecasts. It supports multiple functionalities; it allows users to specify which ensemble approach to implement and which model importance metric to use. Additionally, the software offers customizable options for handling missing values. These features enable the package to serve as a versatile tool for researchers and practitioners. It helps not only in constructing an effective ensemble model across a wide range of forecasting tasks, but also in understanding the role of each model within the ensemble and gaining insights into individual models themselves. This package follows the 'hubverse' framework, which is a collection of open-source software and tools developed to promote collaborative modeling hub efforts and simplify their setup and operation. Doing so enables seamless integration and flexibility with other forecasting tools and systems, allowing many analyses to be performed on existing and ongoing hubs.  
 keywords: [ensemble, forecast, prediction, model importance, Shapley value, R]
 keywords-formatted: [ensemble, forecast, prediction, model importance, Shapley value, R]
 ---
@@ -247,7 +247,8 @@ Probabilistic forecasts, on the other hand, provide a probability distribution o
 The `output_type` and `output_type_id` columns in the model output format, as defined by the hubverse convention, specify the forecast structure. 
 Only one `output_type` is allowed, and it must be one of the 'mean', 'median', 'quantile', or 'pmf' in the [modelimportance]{.pkg} package: 'mean' or 'median' for point forecasts and 'quantile' or 'pmf' for probabilistic forecasts. 
 As aforementioned, `output_type_id` column  identifies addtional detailed information, such as specific quantile levels (e.g., "0.1", "0.25", "0.5", "0.75", and "0.9") for the 'quantile' output type and categorical values (e.g., "low", "moderate", "high", and "very high") for the 'pmf' output type. The predicted values for `pmf` are constrained to be between 0 and 1, indicating the probability at each categorical level, while they are unbounded numeric otherwise.
-Different output types correspond to different scoring rules for evaluating a model's prediction performance. @tbl-pair-output-scoringrule presents the output types and their associated scoring rules supported by the [modelimportance]{.pkg} package.
+Different output types correspond to different scoring rules for evaluating a model's prediction performance.
+@tbl-pair-output-scoringrule presents the output types and their associated scoring rules supported by the [modelimportance]{.pkg} package.
 
 
 ```{r}
@@ -312,9 +313,6 @@ For example, when evaluating model 1 within an ensemble of three models ($n=3$),
 
 On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays a role of ${\cal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}).
 For example, using the earlier setup of three forecast models, LASOMO considers three subsets, which we denote by $S_1=\{2\}$, $S_2=\{3\}$, and $S_3=\{2, 3\}$, to calculate the importance score of model 1 (excluding all subsets that include model 1). The ensemble forecasts $F^{\{2\}}, F^{\{3\}}$, and $F^{\{2,3\}}$ are then compared to $F^{\{1,2\}}, F^{\{1,3\}}$, and $F^{\{1,2,3\}}$, respectively. The performance differences attributable to model 1's inclusion are aggregated, which results in the importance score for model 1. We note that the subsets (e.g., $S_1, S_2,$ and $S_3$) may have different weights during the aggregating process. 
-The [modelimportance]{.pkg} package offers two weighting options for subsets: one assigns equal (uniform) weights to all subsets, and the other assigns weights based on their size, similar to the concept of Shapley values in cooperative game theory, which measure a player’s average contribution to all possible coalitions (@Shapley1953). Users can choose one to evaluate the contribution of each model in a manner suited to their preferred framework.
-
-Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to implement LOMO and LASOMO for a single prediction task, respectively.
 
 
 \begin{algorithm}[t!]
@@ -349,8 +347,10 @@ Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to implement LO
  \end{spacing}
 \end{algorithm}
 
+The [modelimportance]{.pkg} package offers two weighting options for subsets: one assigns equal (uniform) weights to all subsets, and the other assigns weights based on their size, similar to the concept of Shapley values in cooperative game theory, which measure a player’s average contribution to all possible coalitions (or, equivalently, over all permutations of players) (@Shapley1953). Users can choose one to evaluate the contribution of each model in a manner suited to their preferred framework.
 
-\newpage
+Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to implement LOMO and LASOMO for a single prediction task, respectively.
+
 ## Main function: Evaluating ensemble members {#sec:main-function}
 
 In this section, we describe the usage of the function `model_importance()`, where multiple options are available to customize the evaluation framework (@tbl-arguments).
@@ -503,7 +503,7 @@ print(target_data, width = Inf)
 ```{r fig-example-median-lomo, fig.pos="t"}
 #| echo: false
 #| label: fig-example-mean-lomo
-#| fig-cap: "Plot of three point forecasts (mean) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing."
+#| fig-cap: "Plot of three point forecasts (median) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing."
 
 forecast_data |>
   ggplot(aes(x = target_end_date)) +
@@ -855,7 +855,7 @@ model_importance(
 The subset weights are assigned equally or based on their sizes as described in \hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}. Recall the formulas for these weights:
 $$\frac{1}{2^{n-1}-1} \quad\text{and}\quad \frac{1}{(n-1)\binom{n-1}{k}},$$
 where $k$ is the size of each subset and $n$ is the total number of models. 
-In this example, there are only three models ($n=3$), and the weights do not differ significantly between the two methods. Therefore, the resulting outputs show little difference. However, in general, with a larger number of models, the two weighting schemes may yield different importance scores for each model.
+In this example, there are only three models ($n=3$), and the resulting outputs show little difference. However, in general, with a larger number of models, the two weighting schemes may yield different importance scores for each model.
 More specifically, the equal scheme treats all subsets equally, so medium-sized subsets have considerable influence in the final result, as there are many such subsets. In contrast, the permutation-based scheme adjusts the weights according to the subset size, giving the greatest weight to both the smallest and largest subsets while assigning small weights to the mid-sized subsets. 
 Moreover, the weights assigned to the mid-sized subsets under the permutation-based approach decrease much faster with $n$ than those under the equal weighting scheme (see 
 \hyperref[sec:appendix]{Appendix~\ref{sec:appendix}} for details). Consequently, when $n$ is large, middle-sized subsets play a dominant role in determining the importance scores under the equal weighting scheme, whereas extreme-sized subsets primarily drive the scores under the permutation-based weighting approach.
@@ -897,11 +897,5 @@ Given a fixed mid-sized subset, as $n$ increases, the weight assigned to this su
 
 On the other hand, for subsets of extreme sizes (e.g., $k=1$ or $k=n-1$), the weights under permutation-based weighting scheme decrease only at $O({1}/{n})$, much slower under the equal weighting scheme. This implies that in scenarios with a large number of models, the contributions of these extreme-sized subsets play a relatively larger role in the calculation of model importance scores when using permutation-based weights compared to the equal weighting approach.
 
+\newpage
 ## References {.unnumbered}
-
-
-
-
-
-
-
