@@ -9,7 +9,7 @@ future::plan("sequential") # Set up sequential plan for testing
 # forecast data list
 f_all_data <- readRDS(
   testthat::test_path(
-    "testdata/for-model_importance-untrained/forecast_data_all_outputs.rds"
+    "testdata/for-model_importance/forecast_data_all_outputs.rds"
   )
 )
 data_list <- list(
@@ -21,20 +21,20 @@ data_list <- list(
 # target data
 target_data <- readRDS(
   testthat::test_path(
-    "testdata/for-model_importance-untrained/target_data_all_outputs.rds"
+    "testdata/for-model_importance/target_data_all_outputs.rds"
   )
 )
 
 # list of expected values for testing
 exp_file_names <- c(
-  exp_overall_imp_mean_untrained = "exp_overall_imp_mean_untrained.rds",
-  exp_overall_imp_quantile_untrained = "exp_overall_imp_quantile_untrained.rds",
-  exp_overall_imp_median_untrained = "exp_overall_imp_median_untrained.rds",
-  exp_overall_imp_pmf_untrained = "exp_overall_imp_pmf_untrained.rds"
+  exp_overall_imp_mean = "exp_overall_imp_mean.rds",
+  exp_overall_imp_quantile = "exp_overall_imp_quantile.rds",
+  exp_overall_imp_median = "exp_overall_imp_median.rds",
+  exp_overall_imp_pmf = "exp_overall_imp_pmf.rds"
 )
 exp_imp_list <- map(
   exp_file_names,
-  ~ readRDS(testthat::test_path("testdata/for-model_importance-untrained", .x))
+  ~ readRDS(testthat::test_path("testdata/for-model_importance", .x))
 )
 
 # combination of arguments
@@ -71,7 +71,7 @@ pmap(
       # get the data corresponding to the arguments
       selected_data <- data_list[[paste0("dat_", output_type)]]
       selected_expected_importance <- exp_imp_list[[paste0(
-        "exp_overall_imp_", output_type, "_untrained"
+        "exp_overall_imp_", output_type
       )]]
       # calculate importance scores with the given arguments
       if (ens_fun != "linear_pool") {

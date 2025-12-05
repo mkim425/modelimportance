@@ -8,8 +8,7 @@ file_names <- c(
   "median-case3-missing-simple-agg_mean.R"
 )
 root <- paste0(
-  "./inst/get-testdata/",
-  "for-score_untrained-fn/exp_imp_median_untrained_lasomo/"
+  "./inst/get-testdata/exp_imp_median_lasomo/"
 )
 for (i in 1:3) source(paste0(root, file_names[i]))
 
@@ -23,6 +22,6 @@ exp_imp_median <- rbind(
 saveRDS(exp_imp_median,
   file = paste0(
     "tests/testthat/testdata/for-score_untrained/",
-    "exp_imp_median_untrained_lasomo.rds"
+    "exp_imp_median_lasomo.rds"
   )
 )

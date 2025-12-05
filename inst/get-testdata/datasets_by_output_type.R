@@ -38,7 +38,7 @@ target_data_mean$oracle_value[idx] <- 10
 
 # save data
 saveRDS(dat_mean,
-  file = "tests/testthat/testdata/for-score_untrained/dat_mean.rds"
+  file = "tests/testthat/testdata/for-compute_importance/dat_mean.rds"
 )
 
 saveRDS(
@@ -47,7 +47,7 @@ saveRDS(
       output_type == unique(dat_mean$output_type) &
       location %in% unique(dat_mean$location)
   ),
-  file = "tests/testthat/testdata/for-score_untrained/target_mean.rds"
+  file = "tests/testthat/testdata/for-compute_importance/target_mean.rds"
 )
 
 ##### median output ########################################
@@ -85,7 +85,7 @@ idx <- with(
 target_data_median$oracle_value[idx] <- 10
 # save data
 saveRDS(dat_median,
-  file = "tests/testthat/testdata/for-score_untrained/dat_median.rds"
+  file = "tests/testthat/testdata/for-compute_importance/dat_median.rds"
 )
 
 saveRDS(
@@ -94,7 +94,7 @@ saveRDS(
       output_type == unique(dat_median$output_type) &
       location %in% unique(dat_median2$location)
   ),
-  file = "tests/testthat/testdata/for-score_untrained/target_median.rds"
+  file = "tests/testthat/testdata/for-compute_importance/target_median.rds"
 )
 ##### quantile output ########################################
 # target data
@@ -107,7 +107,7 @@ target_data_qntl <- readRDS(
 ## forecast data with quantile output
 forecast_qntl <- readRDS(
   testthat::test_path(
-    "testdata/for-validate_input_data/flu_example_quantile_model_output.rds"
+    "testdata/for-validate_input_data/flu_example_qntl_model_output.rds"
   )
 )
 valid_tbl_qntl <- validate_input_data(forecast_qntl, target_data_qntl)
@@ -127,7 +127,7 @@ saveRDS(
       output_type == unique(dat_qntl$output_type) &
       location %in% unique(dat_qntl$location)
   ),
-  file = "tests/testthat/testdata/for-score_untrained/target_qntl.rds"
+  file = "tests/testthat/testdata/for-compute_importance/target_qntl.rds"
 )
 ##### pmf output ########################################
 # target data
@@ -151,7 +151,7 @@ dat_pmf <- pmf_data_list[[16]]
 
 # save data
 saveRDS(dat_pmf,
-  file = "tests/testthat/testdata/for-score_untrained/dat_pmf.rds"
+  file = "tests/testthat/testdata/for-compute_importance/dat_pmf.rds"
 )
 saveRDS(
   target_data_pmf |> filter(
@@ -159,5 +159,5 @@ saveRDS(
       output_type == unique(dat_pmf$output_type) &
       location %in% unique(dat_pmf$location)
   ),
-  file = "tests/testthat/testdata/for-score_untrained/target_pmf.rds"
+  file = "tests/testthat/testdata/for-compute_importance/target_pmf.rds"
 )

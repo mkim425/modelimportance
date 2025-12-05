@@ -9,8 +9,7 @@ file_names <- c(
   "qntl-case4-missing-simple-agg_mean.R"
 )
 root <- paste0(
-  "./inst/get-testdata/",
-  "for-score_untrained-fn/exp_imp_qntl_untrained_lasomo/"
+  "./inst/get-testdata/exp_imp_qntl_lasomo/"
 )
 for (i in 1:4) source(paste0(root, file_names[i]))
 
@@ -25,6 +24,6 @@ exp_imp_qntl <- rbind(
 saveRDS(exp_imp_qntl,
   file = paste0(
     "tests/testthat/testdata/for-compute_importance/",
-    "exp_imp_qntl_untrained_lasomo.rds"
+    "exp_imp_qntl_lasomo.rds"
   )
 )

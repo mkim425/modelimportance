@@ -136,6 +136,6 @@ exp_imp_median <- rbind(
 saveRDS(exp_imp_median,
   file = paste0(
     "tests/testthat/testdata/for-score_untrained/",
-    "exp_imp_median_untrained_lomo.rds"
+    "exp_imp_median_lomo.rds"
   )
 )

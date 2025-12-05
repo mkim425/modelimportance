@@ -1,11 +1,11 @@
 ## Generate expected importance scores for the untrained ensemble models
 ## with quantile output in LASOMO
-## Case 2: no missing data and 'simple_ensemble' using agg_fun = mean
+## Case 3: no missing data and 'simple_ensemble' using agg_fun = median
 # ----------------------------------------------------------------------------
 # load the package to make its internal functions available
 devtools::load_all()
 source(system.file(
-  "get-testdata/for-compute_importance-fn/helper-exp_imp.R",
+  "get-testdata/helper-exp_imp.R",
   package = "modelimportance"
 ))
 # target data
@@ -30,7 +30,7 @@ dat_all_ens <- purrr::map_dfr(
   subsets,
   function(subset) {
     simple_ens_untrained_lasomo(models, subset, subsets, n,
-      d = dat_qntl, aggfun = "mean"
+      d = dat_qntl, aggfun = "median"
     )
   }
 )
@@ -72,20 +72,20 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   out
 })
 
-exp_imp_qntl_case2perm <- model_imp_scores |>
+exp_imp_qntl_case3perm <- model_imp_scores |>
   filter(subset_wt == "perm") |>
   mutate(
-    ens_mthd = "simple_ensemble-mean",
+    ens_mthd = "simple_ensemble-median",
     algorithm = "lasomo",
     test_purp = "properly assigned",
     subset_wt = "perm_based"
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)
 
-exp_imp_qntl_case2eq <- model_imp_scores |>
+exp_imp_qntl_case3eq <- model_imp_scores |>
   filter(subset_wt == "eq") |>
   mutate(
-    ens_mthd = "simple_ensemble-mean",
+    ens_mthd = "simple_ensemble-median",
     algorithm = "lasomo",
     test_purp = "properly assigned",
     subset_wt = "equal"

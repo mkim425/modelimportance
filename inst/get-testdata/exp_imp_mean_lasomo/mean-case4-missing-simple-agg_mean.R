@@ -1,11 +1,11 @@
 ## Generate expected importance scores for the untrained ensemble models
 ## with mean output in LASOMO
-## Case 3: no missing data and 'simple_ensemble' using agg_fun = median
+## Case 4: a missing data and 'simple_mean' ensemble
 # ----------------------------------------------------------------------------
 # load the package to make its internal functions available
 devtools::load_all()
 source(system.file(
-  "get-testdata/for-compute_importance-fn/helper-exp_imp.R",
+  "get-testdata/helper-exp_imp.R",
   package = "modelimportance"
 ))
 # target data
@@ -17,8 +17,11 @@ target_data_mean <- readRDS(
 dat_mean <- readRDS(
   testthat::test_path("testdata/dat_mean.rds")
 )
+model_id_list <- unique(dat_mean$model_id)
 
-models <- dat_mean$model_id
+# data with missing values
+sub_dat_mean <- dat_mean |> filter(model_id %in% model_id_list[1:3])
+models <- sub_dat_mean$model_id
 # number of models
 n <- length(models)
 # Power set of {1,2,...,n} not including the empty set.
@@ -30,7 +33,8 @@ dat_all_ens <- purrr::map_dfr(
   subsets,
   function(subset) {
     simple_ens_untrained_lasomo(models, subset, subsets, n,
-      d = dat_mean, aggfun = "median"
+      d = sub_dat_mean,
+      aggfun = "mean"
     )
   }
 )
@@ -69,22 +73,24 @@ model_imp_scores <- furrr::future_map_dfr(1:n, function(j) {
   out
 })
 
-exp_imp_mean_case3perm <- model_imp_scores |>
+exp_imp_mean_case4perm <- model_imp_scores |>
   filter(subset_wt == "perm") |>
+  right_join(data.frame(model_id = model_id_list), by = "model_id") |>
   mutate(
-    ens_mthd = "simple_ensemble-median",
+    ens_mthd = "simple_ensemble-mean",
     algorithm = "lasomo",
-    test_purp = "properly assigned",
+    test_purp = "missing data",
     subset_wt = "perm_based"
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)
 
-exp_imp_mean_case3eq <- model_imp_scores |>
+exp_imp_mean_case4eq <- model_imp_scores |>
   filter(subset_wt == "eq") |>
+  right_join(data.frame(model_id = model_id_list), by = "model_id") |>
   mutate(
-    ens_mthd = "simple_ensemble-median",
+    ens_mthd = "simple_ensemble-mean",
     algorithm = "lasomo",
-    test_purp = "properly assigned",
+    test_purp = "missing data",
     subset_wt = "equal"
   ) |>
   select(model_id, importance, ens_mthd, algorithm, subset_wt, test_purp)

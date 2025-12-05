@@ -18,7 +18,7 @@ forecast_means <- readRDS(
 )
 forecast_quantiles <- readRDS(
   testthat::test_path(
-    "testdata/for-validate_input_data/flu_example_quantile_model_output.rds"
+    "testdata/for-validate_input_data/flu_example_qntl_model_output.rds"
   )
 )
 

@@ -190,6 +190,6 @@ exp_imp_pmf <- rbind(
 saveRDS(exp_imp_pmf,
   file = paste0(
     "tests/testthat/testdata/for-score_untrained/",
-    "exp_imp_pmf_untrained_lomo.rds"
+    "exp_imp_pmf_lomo.rds"
   )
 )
