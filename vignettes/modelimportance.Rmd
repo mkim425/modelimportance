@@ -80,10 +80,9 @@ entire set of models.
 Let ${A}$ be a set of $n$ models and $F^i$ be a forecast produced by model $i$, 
 where $i = 1,2, \dots, n.$
 Each ensemble excludes exactly one model while including all the others. 
-Denoting by $F^{{A}^{-i}}$ an ensemble forecast constructed without $F^i$ and 
-by $F^{A}$ the ensemble forecast built from the entire set of models, 
-the importance score using LOMO is calculated as the difference in accuracy, 
-as measured by a specific score, between $F^{{A}^{-i}}$ and $F^{A}$. 
+$F^{{A}^{-i}}$ denotes the ensemble forecast constructed using all forecasts $F^{A}$ 
+**except** $F^i$. Its importance score using LOMO is calculated as the difference in 
+accuracy, as measured by a specific score, between $F^{{A}^{-i}}$ and $F^{A}$. 
 For example, when evaluating model 1 within an ensemble of three models ($n=3$),
 LOMO creates an ensemble forecast $F^{\{2,3\}}$ using only $F^2$ and $F^3$. 
 The performance of this reduced ensemble is then compared to the full ensemble 
