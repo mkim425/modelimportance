@@ -2,7 +2,7 @@
 % Please edit documentation in R/split_data_by_task.R
 \name{split_data_by_task}
 \alias{split_data_by_task}
-\title{Split the input data by a single task make a list of data sets}
+\title{Split the input data by a single task and make a list of data sets}
 \usage{
 split_data_by_task(valid_tbl)
 }

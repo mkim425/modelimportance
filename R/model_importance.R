@@ -63,6 +63,7 @@
 #' @return A data.frame with columns
 #' `task_id`, `output_type`, `model_id`, `importance_score`.
 #' @import hubExamples
+#' @importFrom methods is
 #' @export
 #' @details
 #' The `oracle_output_data` in the oracle output format should contain
@@ -194,7 +195,7 @@ model_importance <- function(forecast_data,
 
   # NA handling
   if (na_action == "worst") {
-    importance_result <- score_result |>
+    score_result |>
       group_by(location, horizon, target_end_date) |>
       mutate(across(
         importance,
@@ -204,7 +205,7 @@ model_importance <- function(forecast_data,
       summarise(mean_importance = mean(importance), .groups = "drop") |>
       arrange(desc(.data$mean_importance))
   } else if (na_action == "average") {
-    importance_result <- score_result |>
+    score_result |>
       group_by(location, horizon, target_end_date) |>
       mutate(across(
         importance,
@@ -214,12 +215,10 @@ model_importance <- function(forecast_data,
       summarise(mean_importance = mean(importance), .groups = "drop") |>
       arrange(desc(.data$mean_importance))
   } else {
-    importance_result <- score_result |>
+    score_result |>
       filter(!is.na(importance)) |>
       group_by(model_id) |>
       summarise(mean_importance = mean(importance), .groups = "drop") |>
       arrange(desc(.data$mean_importance))
   }
-
-  return(importance_result)
 }
