@@ -221,6 +221,6 @@ model_importance <- function(forecast_data,
       summarise(mean_importance = mean(importance), .groups = "drop") |>
       arrange(desc(.data$mean_importance))
   }
-  # nolint
+  # lintr: suppress_next_line return_linter
   return(importance_result)
 }
