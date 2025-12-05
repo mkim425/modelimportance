@@ -180,7 +180,7 @@ data.frame(
 In this section, we describe the usage of the function `model_importance()`, 
 where multiple options are available to customize the evaluation framework.
 
-```{r eval=FALSE}
+```r
 > model_importance(forecast_data, oracle_output_data, ensemble_fun, 
                     importance_algorithm, subset_wt, na_action, min_log_score, 
                     ...)
