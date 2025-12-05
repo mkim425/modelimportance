@@ -29,7 +29,7 @@ example_quantile_model_output <- example_complex_model_output |>
 saveRDS(example_quantile_model_output,
   file = paste0(
     "tests/testthat/testdata/for-validate_input_data/",
-    "flu_example_quantile_model_output.rds"
+    "flu_example_qntl_model_output.rds"
   )
 )
 
