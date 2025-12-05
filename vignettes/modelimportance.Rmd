@@ -125,7 +125,8 @@ weighting schemes, respectively.
 
 The maximum weight under the permutation-based scheme occurs when $k=n-1$, which
 is ${1}/{(n-1)}$. The minimum weight occurs when the subset size is around 
-${(n-1)}/{2}$ (i.e., $k=\lfloor (n-1)/2 \rfloor$), which is approximately $\frac{\sqrt{\pi(n-1)/2}}{(n-1)2^{n-1}}$ by Stirling's approximation.
+${(n-1)}/{2}$ (i.e., $k=\lfloor (n-1)/2 \rfloor$), which is approximately 
+$\frac{\sqrt{\pi(n-1)/2}}{(n-1)2^{n-1}}$ by Stirling's approximation.
 
 Given a fixed mid-sized subset, as $n$ increases, the weight assigned to this 
 subset under the equal weighting scheme decreases at a rate of $O({1}/{2^n})$, 
