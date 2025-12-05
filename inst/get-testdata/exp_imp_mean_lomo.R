@@ -178,6 +178,6 @@ exp_imp_mean <- rbind(
 saveRDS(exp_imp_mean,
   file = paste0(
     "tests/testthat/testdata/for-score_untrained/",
-    "exp_imp_mean_untrained_lomo.rds"
+    "exp_imp_mean_lomo.rds"
   )
 )

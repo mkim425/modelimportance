@@ -10,7 +10,7 @@ file_names <- c(
 )
 root <- paste0(
   "./inst/get-testdata/",
-  "for-score_untrained-fn/exp_imp_mean_untrained_lasomo/"
+  "for-score_untrained-fn/exp_imp_mean_lasomo/"
 )
 for (i in 1:4) source(paste0(root, file_names[i]))
 
@@ -25,6 +25,6 @@ exp_imp_mean <- rbind(
 saveRDS(exp_imp_mean,
   file = paste0(
     "tests/testthat/testdata/for-score_untrained/",
-    "exp_imp_mean_untrained_lasomo.rds"
+    "exp_imp_mean_lasomo.rds"
   )
 )
