@@ -286,7 +286,9 @@ This section provides a brief description of the leave one model out (LOMO) and 
 
 LOMO involves creating an ensemble by excluding one component model from the entire set of models. 
 Let ${\cal A}$ be a set of $n$ models and $F^i$ be a forecast produced by model $i$, where $i = 1,2, \dots, n.$
-Each ensemble excludes exactly one model while including all the others. Denoting by $F^{{\cal A}^{-i}}$ an ensemble forecast constructed without $F^i$ and by $F^{\cal A}$ the ensemble forecast built from the entire set of models, the importance score using LOMO is calculated as the difference in accuracy, as measured by a specific score, between $F^{{\cal A}^{-i}}$ and $F^{\cal A}$  (\hyperref[alg:lomo]{Algorithm~\ref{alg:lomo}}). 
+Each ensemble excludes exactly one model while including all the others. 
+$F^{{\cal A}^{-i}}$ denotes the ensemble forecast constructed using all forecasts $F^{\cal A}$ except $F^i$. 
+Model $i$'s importance score using LOMO is calculated as the difference in accuracy, as measured by a specific score, between $F^{{\cal A}^{-i}}$ and $F^{\cal A}$  (\hyperref[alg:lomo]{Algorithm~\ref{alg:lomo}}). 
 For example, when evaluating model 1 within an ensemble of three models ($n=3$), LOMO creates an ensemble forecast $F^{\{2,3\}}$ using only $F^2$ and $F^3$. The performance of this reduced ensemble is then compared to the full ensemble forecast $F^{\{1,2,3\}}$, which incorporates all three models. We note that a model can make an ensemble better or worse, and thus the importance score for model 1 can be positive or negative accordingly.
 
 \begin{algorithm}[b!]

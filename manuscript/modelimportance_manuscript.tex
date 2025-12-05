@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, borderline west={3pt}{0pt}{shadecolor}, interior hidden, sharp corners, breakable, enhanced, boxrule=0pt]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, interior hidden, breakable, enhanced, boxrule=0pt, frame hidden, sharp corners]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -631,11 +631,11 @@ LOMO involves creating an ensemble by excluding one component model from
 the entire set of models. Let \({\cal A}\) be a set of \(n\) models and
 \(F^i\) be a forecast produced by model \(i\), where
 \(i = 1,2, \dots, n.\) Each ensemble excludes exactly one model while
-including all the others. Denoting by \(F^{{\cal A}^{-i}}\) an ensemble
-forecast constructed without \(F^i\) and by \(F^{\cal A}\) the ensemble
-forecast built from the entire set of models, the importance score using
-LOMO is calculated as the difference in accuracy, as measured by a
-specific score, between \(F^{{\cal A}^{-i}}\) and \(F^{\cal A}\)
+including all the others. \(F^{{\cal A}^{-i}}\) denotes the ensemble
+forecast constructed using all forecasts \(F^{\cal A}\) except \(F^i\).
+Model \(i\)'s importance score using LOMO is calculated as the
+difference in accuracy, as measured by a specific score, between
+\(F^{{\cal A}^{-i}}\) and \(F^{\cal A}\)
 (\hyperref[alg:lomo]{Algorithm~\ref{alg:lomo}}). For example, when
 evaluating model 1 within an ensemble of three models (\(n=3\)), LOMO
 creates an ensemble forecast \(F^{\{2,3\}}\) using only \(F^2\) and
