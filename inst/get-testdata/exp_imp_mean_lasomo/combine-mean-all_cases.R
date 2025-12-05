@@ -9,8 +9,7 @@ file_names <- c(
   "mean-case4-missing-simple-agg_mean.R"
 )
 root <- paste0(
-  "./inst/get-testdata/",
-  "for-score_untrained-fn/exp_imp_mean_lasomo/"
+  "./inst/get-testdata/exp_imp_mean_lasomo/"
 )
 for (i in 1:4) source(paste0(root, file_names[i]))
 
