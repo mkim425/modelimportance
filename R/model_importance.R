@@ -63,6 +63,7 @@
 #' @return A data.frame with columns
 #' `task_id`, `output_type`, `model_id`, `importance_score`.
 #' @import hubExamples
+#' @importFrom methods is
 #' @export
 #' @details
 #' The `oracle_output_data` in the oracle output format should contain

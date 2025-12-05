@@ -10,19 +10,24 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports:
     hubUtils (>= 0.4.0),
     dplyr (>= 1.1.4),
     hubExamples (>= 0.1.0),
     hubEvals (>= 0.0.0.9001),
     hubEnsembles (>= 0.1.9),
+    methods,
     purrr (>= 1.0.4),
     furrr (>= 0.3.1),
-    future (>= 1.49.0)
+    future (>= 1.49.0),
 Depends: 
     R (>= 2.10)
 Suggests: 
+    knitr,
+    rmarkdown,
+    ggplot2,
+    kableExtra,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Remotes:
@@ -30,3 +35,4 @@ Remotes:
     hubverse-org/hubExamples,
     hubverse-org/hubEvals,
     hubverse-org/hubEnsembles
+VignetteBuilder: knitr
