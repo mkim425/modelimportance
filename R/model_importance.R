@@ -1,5 +1,5 @@
 #' @title Quantify overall contributions of ensemble component model to ensemble
-#' prediction accuracy
+#' prediction accuracy across multiple forecast tasks
 #' @description
 #' Evaluate ensemble component model's importance based on a measure of their
 #' contribution to ensemble prediction accuracy for each combination of
