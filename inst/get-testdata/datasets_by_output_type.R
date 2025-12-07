@@ -1,4 +1,4 @@
-## Get data for testing the score_untrained.R by output type
+## Get data for testing the 'compute_importance()' function by output type
 # load the package to make its internal functions available
 devtools::load_all()
 
