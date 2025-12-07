@@ -6,11 +6,11 @@ devtools::load_all()
 
 # target data
 target_data_median <- readRDS(
-  testthat::test_path("testdata/for-score_untrained/target_median.rds")
+  testthat::test_path("testdata/for-compute_importance/target_median.rds")
 )
 # forecast data with mean output
 dat_median <- readRDS(
-  testthat::test_path("testdata/for-score_untrained/dat_median.rds")
+  testthat::test_path("testdata/for-compute_importance/dat_median.rds")
 )
 model_id_list <- unique(dat_median$model_id)
 
@@ -135,7 +135,7 @@ exp_imp_median <- rbind(
 # save data
 saveRDS(exp_imp_median,
   file = paste0(
-    "tests/testthat/testdata/for-score_untrained/",
+    "tests/testthat/testdata/for-compute_importance/",
     "exp_imp_median_lomo.rds"
   )
 )

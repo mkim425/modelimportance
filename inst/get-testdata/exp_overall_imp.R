@@ -4,12 +4,14 @@
 # load the package to make its internal functions available
 devtools::load_all()
 source(system.file(
-  "get-testdata/for-model_importance-fn/helper-exp_overall_imp.R",
+  "get-testdata/helper-exp_overall_imp.R",
   package = "modelimportance"
 ))
 
 target_data <- readRDS(
-  testthat::test_path("testdata/target_data_all_outputs.rds")
+  testthat::test_path(
+    "testdata/for-model_importance/target_data_all_outputs.rds"
+  )
 )
 
 output_types <- c("mean", "quantile", "median", "pmf")
@@ -18,7 +20,9 @@ measures <- c("se_point", "wis", "ae_point", "log_score")
 # loop over the output types and corresponding measures
 for (k in seq_along(output_types)) {
   f_data <- readRDS(
-    testthat::test_path("testdata/forecast_data_all_outputs.rds")
+    testthat::test_path(
+      "testdata/for-model_importance/forecast_data_all_outputs.rds"
+    )
   ) |> dplyr::filter(output_type == output_types[k])
 
   model_ids <- unique(f_data$model_id)
@@ -106,7 +110,7 @@ for (k in seq_along(output_types)) {
   }
   # save the result
   file_name <- paste0(
-    "testdata/exp_overall_imp_", output_types[k], "_untrained.rds"
+    "testdata/for-model_importance/exp_overall_imp_", output_types[k], ".rds"
   )
   saveRDS(final_df, file = testthat::test_path(file_name))
 }

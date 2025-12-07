@@ -10,12 +10,12 @@ source(system.file(
 ))
 # target data
 target_data_median <- readRDS(
-  testthat::test_path("testdata/target_median.rds")
+  testthat::test_path("testdata/for-compute_importance/target_median.rds")
 )
 
 # forecast data with median output
 dat_median <- readRDS(
-  testthat::test_path("testdata/dat_median.rds")
+  testthat::test_path("testdata/for-compute_importance/dat_median.rds")
 )
 model_id_list <- unique(dat_median$model_id)
 

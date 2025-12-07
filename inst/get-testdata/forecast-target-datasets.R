@@ -26,8 +26,12 @@ target_data <- hubExamples::forecast_oracle_output |>
 
 # save the data
 saveRDS(forecast_data,
-  file = testthat::test_path("testdata/forecast_data_all_outputs.rds")
+  file = testthat::test_path(
+    "testdata/for-model_importance/forecast_data_all_outputs.rds"
+  )
 )
 saveRDS(target_data,
-  file = testthat::test_path("testdata/target_data_all_outputs.rds")
+  file = testthat::test_path(
+    "testdata/for-model_importance/target_data_all_outputs.rds"
+  )
 )

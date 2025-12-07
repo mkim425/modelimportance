@@ -10,12 +10,12 @@ source(system.file(
 ))
 # target data
 target_data_mean <- readRDS(
-  testthat::test_path("testdata/target_mean.rds")
+  testthat::test_path("testdata/for-compute_importance/target_mean.rds")
 )
 
 # forecast data with mean output
 dat_mean <- readRDS(
-  testthat::test_path("testdata/dat_mean.rds")
+  testthat::test_path("testdata/for-compute_importance/dat_mean.rds")
 )
 model_id_list <- unique(dat_mean$model_id)
 

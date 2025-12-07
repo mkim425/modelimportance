@@ -21,7 +21,7 @@ exp_imp_median <- rbind(
 # save data
 saveRDS(exp_imp_median,
   file = paste0(
-    "tests/testthat/testdata/for-score_untrained/",
+    "tests/testthat/testdata/for-compute_importance/",
     "exp_imp_median_lasomo.rds"
   )
 )

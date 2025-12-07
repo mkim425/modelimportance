@@ -23,7 +23,7 @@ exp_imp_pmf <- rbind(
 # save data
 saveRDS(exp_imp_pmf,
   file = paste0(
-    "tests/testthat/testdata/for-score_untrained/",
+    "tests/testthat/testdata/for-compute_importance/",
     "exp_imp_pmf_lasomo.rds"
   )
 )

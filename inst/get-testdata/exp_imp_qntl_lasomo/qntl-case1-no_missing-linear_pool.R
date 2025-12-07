@@ -10,12 +10,12 @@ source(system.file(
 ))
 # target data
 target_data_qntl <- readRDS(
-  testthat::test_path("testdata/target_qntl.rds")
+  testthat::test_path("testdata/for-compute_importance/target_qntl.rds")
 )
 
 # forecast data with qntl output
 dat_qntl <- readRDS(
-  testthat::test_path("testdata/dat_qntl.rds")
+  testthat::test_path("testdata/for-compute_importance/dat_qntl.rds")
 )
 
 models <- unique(dat_qntl$model_id)
