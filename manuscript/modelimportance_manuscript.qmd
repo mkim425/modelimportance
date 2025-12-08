@@ -430,10 +430,17 @@ tbl_argument |>
 The `importance_algorithm` argument specifies the algorithm for model importance calculation, which can be either `"lomo"` (leave one model out) and `"lasomo"` (leave all subsets of models out). The `subset_wt` argument is employed only for the `"lasomo"` algorithm. This argument has two options: `"equal"` assigns equal weight to all subsets and `"perm_based"` assigns weight averaged over all possible permutations as in
 the formula of Shapley values (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}). The default values of `importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`, respectively.
 
-
-The `na_action` argument allows for specifying how to handle missing values in the `forecast_data`. 
+The `na_action` argument allows for specifying how to handle `NA` values 
+generated during importance score calculation for each task, occurring when a 
+model did not contribute to the ensemble prediction for a given task by missing 
+its forecast submission.
 Three options are available: `"worst"`, `"average"`, and `"drop"`. 
-In each specific prediction task, if a model has any missing predictions, the `"worst"` option replaces those missing values with the smallest value from the other models, while the `"average"` option replaces them with the average of the other models' predictions in that task. The `"drop"` option removes missing values, which results in the exclusion of the model from the evaluation for that task.
+In each specific prediction task, if a model has any missing predictions, the 
+`"worst"` option replaces the `NA` values with the smallest value among other 
+models' importance metrics, while the `"average"` option replaces them with the 
+average of the other models' importance metrics in that task. 
+The `"drop"` option removes the `NA` values, which results in the exclusion of 
+the model from the evaluation for that task.
 
 The `min_log_score` argument is relevant only for the `output_type` of `"pmf"`, which uses Log Score as a scoring rule. It sets a minimum threshold for log scores to avoid issues with extremely low probabilities assigned to the true outcome, which can lead to undefined or negative infinite log scores. Any probability lower than this threshold will be adjusted to this minimum value before calculating the importance metric based on the log score. The default value is set to -10, which is an arbitrary choice. Users may choose a different value based on their practical needs. 
 
@@ -504,7 +511,7 @@ print(target_data, width = Inf)
 
 ```{r fig-example-median-lomo, fig.pos="t"}
 #| echo: false
-#| label: fig-example-mean-lomo
+#| label: fig-example-median-lomo
 #| fig-cap: "Plot of three point forecasts (median) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing."
 
 forecast_data |>
