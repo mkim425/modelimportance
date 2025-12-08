@@ -3,7 +3,7 @@
 \name{model_importance}
 \alias{model_importance}
 \title{Quantify overall contributions of ensemble component model to ensemble
-prediction accuracy}
+prediction accuracy across multiple forecast tasks}
 \usage{
 model_importance(
   forecast_data,
@@ -18,9 +18,12 @@ model_importance(
 }
 \arguments{
 \item{forecast_data}{A data.frame with the predictions that is or can be
-coerced to a model_out_tbl format. Only one \code{output_type} is allowed in the
-data.frame, and it must be one of the following:
-\code{mean}, \code{median}, \code{quantile}, or \code{pmf}.}
+coerced to a \code{model_out_tbl} format, which is the standard S3 class model
+output format defined by the 'hubverse' convention
+(https://docs.hubverse.io/en/latest/#). If it fails to be coerced to a
+\code{model_out_tbl} format, an error message will be returned.
+Only one \code{output_type} is allowed in the data.frame, and it must be one of
+the following: \code{mean}, \code{median}, \code{quantile}, or \code{pmf}.}
 
 \item{oracle_output_data}{Ground truth data for the variables that are used
 to define modeling targets. This data must follow the oracle output format.
@@ -52,18 +55,27 @@ the Shapley value.
 Ignored if \code{lomo} method is used. Default is \code{"equal"}, if not specified.
 }}
 
-\item{na_action}{A character string specifying treatment for missing data;
+\item{na_action}{A character string specifying how to handle \code{NA} values
+generated during importance score calculation for each task, occurring when a
+model did not contribute to the ensemble prediction for a given task by
+missing its forecast submission. Three options are available:
 \verb{c("worst," "average," "drop").}
+For each specific prediction task,
 \itemize{
-\item \code{"worst"} replaces missing values with the smallest value from the other
-models.
-\item \code{"average"} replaces missing values with the average value from the other
-models.
-\item \code{"drop"} removes missing values.
+\item \code{"worst"} replaces \code{NA}s with the smallest value among other models'
+importance metrics.
+\item \code{"average"} replaces \code{NA}s with the average value from the other
+models' importance metrics.
+\item \code{"drop"} removes \code{NA}s.
 }}
 
-\item{min_log_score}{A numeric value specifying the minimum log score when
-\code{Inf} is returned during the log score calculation for the \code{pmf} output}
+\item{min_log_score}{A numeric value specifying a minimum threshold for log
+scores for the \code{pmf} output to avoid issues with extremely low probabilities
+assigned to the true outcome, which can lead to undefined or negative
+infinite log scores. Any probability lower than this threshold will be
+adjusted to this minimum value. The default value is set to -10, which is an
+arbitrary choice. Users may choose a different value based on their practical
+needs.}
 
 \item{...}{Optional arguments passed to \code{ensemble_fun} when it is specified
 as \code{"simple_ensemble"}. See 'Details'.}
@@ -73,38 +85,48 @@ A data.frame with columns
 \code{task_id}, \code{output_type}, \code{model_id}, \code{importance_score}.
 }
 \description{
-Evaluate ensemble component model's importance based on a measure of their
-contribution to ensemble prediction accuracy for each combination of
-model task.
+We measure each ensemble component model's contribution to the ensemble
+prediction accuracy for each model task. Then, we aggregate the contributions
+across all tasks to quantify each component model's overall importance.
 
 This function requires that one column represent the forecast date (or
 a date from which each forecast originates or is made in reference to) and
-that it be named one of \code{forecast_date}, \code{origin_date}, and \code{reference_date}.
+that column be named one of \code{forecast_date}, \code{origin_date}, and
+\code{reference_date}.
 
 For each \code{output_type}, the corresponding scoring rule applied to calculate
 the importance is as follows.
-\tabular{ll}{
-\strong{Output Type} \tab \strong{Scoring Rule} \cr
-median \tab ae_point \cr
-mean \tab rse_point \cr
-quantile \tab wis \cr
-pmf \tab log_score \cr
+
+\tabular{lll}{
+\strong{Output Type} \tab \strong{Scoring Rule} \tab \strong{Description}
+\cr
+mean \tab rse_point \tab evaluate using the root squared error \cr
+median \tab ae_point\tab evaluate using the absolute error \cr
+quantile \tab wis \tab evaluate using the weighted interval score\cr
+pmf \tab log_score \tab
+{evaluate using the logarithm of the probability assigned to the true
+outcome} \cr
 }
-where \code{ae_point} represents the absolute error,
-\code{rse_point} the root squared error,
-\code{wis} the weighted interval score, and
-\code{log_score} the logarithmic score.
 }
 \details{
-The \code{oracle_output_data} in the oracle output format should contain
-independent task ID columns (e.g. \code{location}, \code{target_date}, and \code{age_group})
-, \code{output_type} and \code{output_type_id} columns if the output is either \code{pmf} or
-\code{cdf}, and \code{oracle_value} column for the observed values.
-TBD for more details.
+The \code{oracle_output_data} is a data frame that contains the ground truth
+values for the variables used to define modeling targets. It is referred to
+as “oracle” because it is formatted as if an oracle made a perfect point
+prediction equal to the truth. This data must follow the oracle output format
+defined in the hubverse standard, which includes independent task ID columns
+(e.g., \code{location}, \code{target_date}), the \code{output_type} column specifying the
+output type of the predictions and an \code{oracle_value} column for the observed
+values. As in the forecast data, if the \code{output_type} is either \code{"quantile"}
+or \code{"pmf"}, the \code{output_type_id} column is often required to provide further
+identifying information.
+
+The \code{model_out_tbl} and \code{oracle_output_data} must have the same task ID
+columns and \code{output_type}, including \code{output_type_id} if necessary, which are
+used to match the predictions with the ground truth data.
 
 Additional argument in \code{...} is \code{agg_fun}, which is a character string name
 for a function specifying aggregation method of component model outputs.
-Default is \code{mean}, meaning that equally (or weighted) mean is calculated
+Default is \code{mean}, indicating that equally weighted mean is calculated
 across all component model outputs for each unique \code{output_type_id}.
 This can be \code{median} or a custom function (e.g., geometric_mean. Details
 can be found in

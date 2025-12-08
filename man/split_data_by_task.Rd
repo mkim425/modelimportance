@@ -15,5 +15,6 @@ A list of data sets, each corresponding to a single task.
 }
 \description{
 This function splits the input data by a single task with a
-combination of horizon, location, and target_end_date
+combination of task IDs and returns a list of data sets, each corresponding
+to a single task.
 }
