@@ -232,15 +232,17 @@ weight to all subsets and `"perm_based"` assigns weight averaged over all
 possible permutations as in the formula of Shapley values. The default values of
 `importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`, respectively.
 
-The `na_action` argument allows for specifying how to handle missing values in 
-the `forecast_data`. 
+The `na_action` argument allows for specifying how to handle `NA` values 
+generated during importance score calculation for each task, occurring when a 
+model did not contribute to the ensemble prediction for a given task by missing 
+its forecast submission.
 Three options are available: `"worst"`, `"average"`, and `"drop"`. 
 In each specific prediction task, if a model has any missing predictions, the 
-`"worst"` option replaces those missing values with the smallest value from the 
-other models, while the `"average"` option replaces them with the average of the
-other models' predictions in that task. The `"drop"` option removes missing 
-values, which results in the exclusion of the model from the evaluation for that
-task.
+`"worst"` option replaces the `NA` values with the smallest value among other 
+models' importance metrics, while the `"average"` option replaces them with the 
+average of the other models' importance metrics in that task. 
+The `"drop"` option removes the `NA` values, which results in the exclusion of 
+the model from the evaluation for that task.
 
 The `min_log_score` argument is relevant only for the `output_type` of `"pmf"`, 
 which uses Log Score as a scoring rule. It sets a minimum threshold for log 
