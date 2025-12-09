@@ -59,11 +59,11 @@
 #' missing its forecast submission.
 #' Three options are available: `c("worst", "average", "drop").`
 #' For each specific prediction task,
-#' * `"worst"` replaces `NA`s with the smallest value among other models'
+#' * `"worst"`- replaces `NA`s with the smallest value among other models'
 #' importance metrics.
-#' * `"average"` replaces `NA`s with the average value from the other
+#' * `"average"`- replaces `NA`s with the average value from the other
 #' models' importance metrics.
-#' * `"drop"` removes `NA`s.
+#' * `"drop"`- removes `NA`s.
 #' @param min_log_score A numeric value specifying a minimum threshold for log
 #' scores for the `pmf` output to avoid issues with extremely low probabilities
 #' assigned to the true outcome, which can lead to undefined or negative
