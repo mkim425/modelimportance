@@ -60,13 +60,13 @@ generated during importance score calculation for each task, occurring when a
 model did not contribute to the ensemble prediction for a given task by
 missing its forecast submission.
 Three options are available: \verb{c("worst", "average", "drop").}
-For each specific prediction task,
+For each specific prediction task, each option works as follows:
 \itemize{
-\item \code{"worst"}- replaces \code{NA}s with the smallest value among other models'
+\item \code{"worst"} replaces \code{NA}s with the smallest value among other models'
 importance metrics.
-\item \code{"average"}- replaces \code{NA}s with the average value from the other
+\item \code{"average"} replaces \code{NA}s with the average value from the other
 models' importance metrics.
-\item \code{"drop"}- removes \code{NA}s.
+\item \code{"drop"} removes \code{NA}s.
 }}
 
 \item{min_log_score}{A numeric value specifying a minimum threshold for log
