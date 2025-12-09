@@ -353,6 +353,73 @@ The [modelimportance]{.pkg} package offers two weighting options for subsets: on
 
 Algorithms \ref{alg:lomo} and \ref{alg:lasomo} outline the steps to implement LOMO and LASOMO for a single prediction task, respectively.
 
+
+### Comparison of weighting schemes in LASOMO
+
+The differences in how the two weighting schemes influence the importance scores become more pronounced as the number of models increases.
+As described in \hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}, the formulas for their subset weights are 
+$$\frac{1}{2^{n-1}-1} \quad\text{and}\quad \frac{1}{(n-1)\binom{n-1}{k}},$$ 
+where $k$ is the size of each subset and $n$ is the total number of models.
+The equal scheme treats all subsets equally, so medium-sized subsets have considerable influence in the final result, as there are many such subsets. In contrast, the permutation-based scheme adjusts the weights according to the subset size, giving the greatest weight to both the smallest and largest subsets while assigning small weights to the mid-sized subsets. 
+Moreover, the weights assigned to the mid-sized subsets under the permutation-based approach decrease much faster with $n$ than those under the equal weighting scheme (see 
+\hyperref[sec:appendix]{Appendix~\ref{sec:appendix}} for details). Consequently, when $n$ is large, middle-sized subsets play a dominant role in determining the importance scores under the equal weighting scheme, whereas extreme-sized subsets primarily drive the scores under the permutation-based weighting approach.
+
+
+Overall, the difference between the two weighting schemes is likely to arise 
+mainly from the the extreme-sized subsets when $n$ is large.
+This is because the weights given to the mid-sized subsets become increasingly similar, which are very small  values on the order of $10^{-3}$ even when $n=8$, while the weights assigned to the smallest and largest subsets remain substantially different (@fig-lasomo-weights).
+
+
+```{r plot-lasomo-weights, fig.pos="t"}
+#| echo: false
+#| label: fig-lasomo-weights
+#| fig-cap: "Comparison of weights assigned to a subset. The plot shows the weights assigned to a subset as the number of models $n$ increases from 2 to 10. The red line represents the weights under the equal weighting scheme, while the blue and green lines represent the minimum and maximum weights, respectively, under the permutation-based weighting scheme. The minimum weight occurs when the subset size is around $(n-1)/2$, and the maximum weight occurs when the subset size is $n-1$. As the number of models increases, the weights assigned by the two schemes become increasingly similar for mid-sized subsets whereas substantial differences remain for extreme-sized subsets."
+
+data.frame(n = 2:10) |>
+  mutate(
+    w_eq = 1 / (2^(n - 1) - 1),
+    w_perm_min = 1 / ((n - 1) * choose(n - 1, floor((n - 1) / 2))),
+    w_perm_max = 1 / (n - 1)
+  ) |>
+  ggplot(aes(x = n)) +
+  geom_line(aes(y = w_eq, color = "eq"), size = 1) +
+  geom_line(aes(y = w_perm_min, color = "perm_min"), size = 1) +
+  geom_line(aes(y = w_perm_max, color = "perm_max"), size = 1) +
+  scale_color_manual(
+    name = "Weights",
+    values = c(
+      "eq" = "#F8766D",
+      "perm_min" = "#619CFF",
+      "perm_max" = "#00BA38"
+    ),
+    labels = c(
+      eq = expression(w^{eq}),
+      perm_min = expression(w^{perm-min}),
+      perm_max = expression(w^{perm-max})
+    )
+  )+
+  scale_x_continuous(breaks = 2:10) +
+  labs(
+    x = "Number of models (n)",
+    y = "Weight assigned to a subset",
+    color = "Weighting Scheme"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.title = element_text(size = 9),
+    legend.position = "bottom",
+    legend.spacing.x = unit(0.25, "mm"),
+    legend.key.width = unit(0.4, "cm")
+  )
+```
+
+
+
+
+
+
+
+
 ## Main function: Evaluating ensemble members {#sec:main-function}
 
 In this section, we describe the usage of the function `model_importance()`, where multiple options are available to customize the evaluation framework (@tbl-arguments).
@@ -505,9 +572,7 @@ target_data <- hubExamples::forecast_target_ts |>
 print(target_data, width = Inf)
 ```
 
-
 \normalsize
-
 
 ```{r fig-example-median-lomo, fig.pos="t"}
 #| echo: false
@@ -858,65 +923,16 @@ model_importance(
   subset_wt = "perm_based"
 )
 ```
+
 \normalsize
 
 \ \ 
 
-In general, the differences in how the two weighting schemes influence the importance scores become more pronounced as the number of models increases.
-Recall that the formulas for their subset weights are 
-$$\frac{1}{2^{n-1}-1} \quad\text{and}\quad \frac{1}{(n-1)\binom{n-1}{k}},$$ 
-where $k$ is the size of each subset and $n$ is the total number of models, as described in \hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}.
-The equal scheme treats all subsets equally, so medium-sized subsets have considerable influence in the final result, as there are many such subsets. In contrast, the permutation-based scheme adjusts the weights according to the subset size, giving the greatest weight to both the smallest and largest subsets while assigning small weights to the mid-sized subsets. 
-Moreover, the weights assigned to the mid-sized subsets under the permutation-based approach decrease much faster with $n$ than those under the equal weighting scheme (see 
-\hyperref[sec:appendix]{Appendix~\ref{sec:appendix}} for details). Consequently, when $n$ is large, middle-sized subsets play a dominant role in determining the importance scores under the equal weighting scheme, whereas extreme-sized subsets primarily drive the scores under the permutation-based weighting approach.
-This describes the mathematical behavior of the two weighting schemes, however, 
-in practice, the difference between the two weighting schemes may arise primarily from the the extreme-sized subsets when $n$ is large. 
-This is because the weights given to the mid-sized subsets become increasingly similar, which are very small  values on the order of $10^{-3}$ even when $n=8$, while the weights assigned to the smallest and largest subsets remain substantially different (@fig-lasomo-weights).
-
-
-```{r plot-lasomo-weights, fig.pos="t"}
-#| echo: false
-#| label: fig-lasomo-weights
-#| fig-cap: "Comparison of weights assigned to a subset. The plot shows the weights assigned to a subset as the number of models $n$ increases from 2 to 10. The red line represents the weights under the equal weighting scheme, while the blue and green lines represent the minimum and maximum weights, respectively, under the permutation-based weighting scheme. The minimum weight occurs when the subset size is around $(n-1)/2$, and the maximum weight occurs when the subset size is $n-1$. As the number of models increases, the weights assigned by the two schemes become increasingly similar for mid-sized subsets whereas substantial differences remain for extreme-sized subsets."
-
-data.frame(n = 2:10) |>
-  mutate(
-    w_eq = 1 / (2^(n - 1) - 1),
-    w_perm_min = 1 / ((n - 1) * choose(n - 1, floor((n - 1) / 2))),
-    w_perm_max = 1 / (n - 1)
-  ) |>
-  ggplot(aes(x = n)) +
-  geom_line(aes(y = w_eq, color = "eq"), size = 1) +
-  geom_line(aes(y = w_perm_min, color = "perm_min"), size = 1) +
-  geom_line(aes(y = w_perm_max, color = "perm_max"), size = 1) +
-  scale_color_manual(
-    name = "Weights",
-    values = c(
-      "eq" = "#F8766D",
-      "perm_min" = "#619CFF",
-      "perm_max" = "#00BA38"
-    ),
-    labels = c(
-      eq = expression(w^{eq}),
-      perm_min = expression(w^{perm-min}),
-      perm_max = expression(w^{perm-max})
-    )
-  )+
-  scale_x_continuous(breaks = 2:10) +
-  labs(
-    x = "Number of models (n)",
-    y = "Weight assigned to a subset",
-    color = "Weighting Scheme"
-  ) +
-  theme_minimal() +
-  theme(
-    legend.title = element_text(size = 9),
-    legend.position = "bottom",
-    legend.spacing.x = unit(0.25, "mm"),
-    legend.key.width = unit(0.4, "cm")
-  )
-```
-
+In this example, there are only three models ($n = 3$), and the weights do not 
+differ significantly between the two weighting schemes. 
+Therefore, the resulting outputs show little difference. 
+However, in general, with a larger number of models, the two weighting schemes 
+may yield quite different importance scores for each model.
 
 In this section, we explored each component model's contribution to the ensemble accuracy with only three models. An extensive application in more complex scenarios with a larger number of models can be found in @kim2024.
 
