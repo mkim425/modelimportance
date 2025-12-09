@@ -56,8 +56,8 @@
 #' @param na_action A character string specifying how to handle `NA` values
 #' generated during importance score calculation for each task, occurring when a
 #' model did not contribute to the ensemble prediction for a given task by
-#' missing its forecast submission. Three options are available:
-#' `c("worst," "average," "drop").`
+#' missing its forecast submission.
+#' Three options are available: `c("worst", "average", "drop").`
 #' For each specific prediction task,
 #' * `"worst"` replaces `NA`s with the smallest value among other models'
 #' importance metrics.

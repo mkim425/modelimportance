@@ -59,7 +59,7 @@ Ignored if \code{lomo} method is used. Default is \code{"equal"}, if not specifi
 generated during importance score calculation for each task, occurring when a
 model did not contribute to the ensemble prediction for a given task by
 missing its forecast submission. Three options are available:
-\verb{c("worst," "average," "drop").}
+\verb{c("worst", "average", "drop").}
 For each specific prediction task,
 \itemize{
 \item \code{"worst"} replaces \code{NA}s with the smallest value among other models'
