@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, frame hidden, boxrule=0pt, interior hidden, breakable, enhanced, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, boxrule=0pt, enhanced, borderline west={3pt}{0pt}{shadecolor}, interior hidden, frame hidden, breakable]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -1159,15 +1159,15 @@ R> model_importance(forecast_data = forecast_data,
 
 \normalsize
 
-The subset weights are assigned equally or based on their sizes as
-described in \hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}. Recall
-the formulas for these weights:
+~~
+
+In general, the differences in how the two weighting schemes influence
+the importance scores become more pronounced as the number of models
+increases. Recall that the formulas for their subset weights are
 \[\frac{1}{2^{n-1}-1} \quad\text{and}\quad \frac{1}{(n-1)\binom{n-1}{k}},\]
 where \(k\) is the size of each subset and \(n\) is the total number of
-models. In this example, there are only three models (\(n=3\)), and the
-resulting outputs show little difference. However, in general, with a
-larger number of models, the two weighting schemes may yield different
-importance scores for each model. More specifically, the equal scheme
+models, as described in
+\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}. The equal scheme
 treats all subsets equally, so medium-sized subsets have considerable
 influence in the final result, as there are many such subsets. In
 contrast, the permutation-based scheme adjusts the weights according to
@@ -1180,7 +1180,37 @@ under the equal weighting scheme (see
 Consequently, when \(n\) is large, middle-sized subsets play a dominant
 role in determining the importance scores under the equal weighting
 scheme, whereas extreme-sized subsets primarily drive the scores under
-the permutation-based weighting approach.
+the permutation-based weighting approach. This describes the
+mathematical behavior of the two weighting schemes, however, in
+practice, the difference between the two weighting schemes may arise
+primarily from the the extreme-sized subsets when \(n\) is large. This
+is because the weights given to the mid-sized subsets become
+increasingly similar, which are very small values on the order of
+\(10^{-3}\) even when \(n=8\), while the weights assigned to the
+smallest and largest subsets remain substantially different
+(Figure~\ref{fig-lasomo-weights}).
+
+\begin{figure}[t]
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{modelimportance_manuscript_files/figure-pdf/fig-lasomo-weights-1.pdf}}
+
+}
+
+\caption{\label{fig-lasomo-weights}Comparison of weights assigned to a
+subset. The plot shows the weights assigned to a subset as the number of
+models \(n\) increases from 2 to 10. The red line represents the weights
+under the equal weighting scheme, while the blue and green lines
+represent the minimum and maximum weights, respectively, under the
+permutation-based weighting scheme. The minimum weight occurs when the
+subset size is around \((n-1)/2\), and the maximum weight occurs when
+the subset size is \(n-1\). As the number of models increases, the
+weights assigned by the two schemes become increasingly similar for
+mid-sized subsets whereas substantial differences remain for
+extreme-sized subsets.}
+
+\end{figure}%
 
 In this section, we explored each component model's contribution to the
 ensemble accuracy with only three models. An extensive application in
