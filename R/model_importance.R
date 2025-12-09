@@ -57,10 +57,10 @@
 #' generated during importance score calculation for each task, occurring when a
 #' model did not contribute to the ensemble prediction for a given task by
 #' missing its forecast submission.
-#' Three options are available: `c("worst", "average", "drop").`
+#' Three options are available: `c("worst", "average", "drop")`.
 #' For each specific prediction task, each option works as follows:
-#' * `"worst"` replaces `NA`s with the smallest value among other models'
-#' importance metrics.
+#' * `"worst"` replaces `NA`s with the smallest value among importance metrics
+#' of the other models.
 #' * `"average"` replaces `NA`s with the average value from the other
 #' models' importance metrics.
 #' * `"drop"` removes `NA`s.
