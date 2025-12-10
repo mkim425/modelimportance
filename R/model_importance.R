@@ -1,9 +1,8 @@
-#' @title Quantify overall contributions of ensemble component model to ensemble
-#' prediction accuracy across multiple forecast tasks
+#' @title Quantifies the contribution of ensemble component models to ensemble
+#' prediction accuracy for each prediction task.
 #' @description
 #' We measure each ensemble component model's contribution to the ensemble
-#' prediction accuracy for each model task. Then, we aggregate the contributions
-#' across all tasks to quantify each component model's overall importance.
+#' prediction accuracy for each model task.
 #'
 #' This function requires that one column represent the forecast date (or
 #' a date from which each forecast originates or is made in reference to) and
@@ -53,17 +52,6 @@
 #' * When `"linear_pool"` is specified, ensemble model outputs are created as
 #' a linear pool of component model outputs. This method supports only
 #' an `output_type` of `mean`, `quantile`, or `pmf`.
-#' @param na_action A character string specifying how to handle `NA` values
-#' generated during importance score calculation for each task, occurring when a
-#' model did not contribute to the ensemble prediction for a given task by
-#' missing its forecast submission.
-#' Three options are available: `c("worst", "average", "drop")`.
-#' For each specific prediction task, each option works as follows:
-#' * `"worst"` replaces `NA`s with the smallest value among importance metrics
-#' of the other models.
-#' * `"average"` replaces `NA`s with the average value from the other
-#' models' importance metrics.
-#' * `"drop"` removes `NA`s.
 #' @param min_log_score A numeric value specifying a minimum threshold for log
 #' scores for the `pmf` output to avoid issues with extremely low probabilities
 #' assigned to the true outcome, which can lead to undefined or negative
@@ -73,11 +61,18 @@
 #' needs.
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
-#' @return A data.frame with columns
-#' `task_id`, `output_type`, `model_id`, `importance_score`.
+#'
+#' @return A data.frame with columns `model_id`, `reference_date`,
+#' `output_type`, and `importance`, along with any task ID columns (e.g.,
+#' `location`, `horizon`, and `target_end_date`) present in the input
+#' `forecast_data`.
+#' Note that `reference_date` is used as the name for the forecast date column,
+#' regardless of its original name in the input `forecast_data`.
+#'
 #' @import hubExamples
 #' @importFrom methods is
 #' @export
+#'
 #' @details
 #' The `oracle_output_data` is a data frame that contains the ground truth
 #' values for the variables used to define modeling targets. It is referred to
@@ -129,14 +124,13 @@
 #' model_importance(
 #'   forecast_data = forecast_data, oracle_output_data = target_data,
 #'   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
-#'   subset_wt = "equal", na_action = "drop"
+#'   subset_wt = "equal"
 #' )
 #' # Example with the additional argument in `...`.
 #' model_importance(
 #'   forecast_data = forecast_data, oracle_output_data = target_data,
 #'   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
-#'   subset_wt = "equal", na_action = "drop",
-#'   agg_fun = median
+#'   subset_wt = "equal", agg_fun = median
 #' )
 #' }
 model_importance <- function(forecast_data,
@@ -144,19 +138,17 @@ model_importance <- function(forecast_data,
                              ensemble_fun = c("simple_ensemble", "linear_pool"),
                              importance_algorithm = c("lomo", "lasomo"),
                              subset_wt = c("equal", "perm_based"),
-                             na_action = c("worst", "average", "drop"),
                              min_log_score = -10,
                              ...) {
   # set defaults
   ensemble_fun <- match.arg(ensemble_fun)
   importance_algorithm <- match.arg(importance_algorithm)
   subset_wt <- match.arg(subset_wt)
-  na_action <- match.arg(na_action)
 
   # validate inputs
   validate_inputs(
     forecast_data, oracle_output_data, ensemble_fun, importance_algorithm,
-    subset_wt, na_action, min_log_score
+    subset_wt, min_log_score
   )
 
   # validate input data: get a model_out_tbl format with a single output type
@@ -214,33 +206,14 @@ model_importance <- function(forecast_data,
       )
     }
   )
-
-  # NA handling
-  if (na_action == "worst") {
-    score_result |>
-      group_by(location, horizon, target_end_date) |>
-      mutate(across(
-        importance,
-        ~ coalesce(., min(., na.rm = TRUE))
-      )) |>
-      group_by(model_id) |>
-      summarise(mean_importance = mean(importance), .groups = "drop") |>
-      arrange(desc(.data$mean_importance))
-  } else if (na_action == "average") {
-    score_result |>
-      group_by(location, horizon, target_end_date) |>
-      mutate(across(
-        importance,
-        ~ coalesce(., mean(., na.rm = TRUE))
-      )) |>
-      group_by(model_id) |>
-      summarise(mean_importance = mean(importance), .groups = "drop") |>
-      arrange(desc(.data$mean_importance))
-  } else {
-    score_result |>
-      filter(!is.na(importance)) |>
-      group_by(model_id) |>
-      summarise(mean_importance = mean(importance), .groups = "drop") |>
-      arrange(desc(.data$mean_importance))
-  }
+  # Reorder columns to place `model_id` and `reference_date` first,
+  # task-related columns in the middle, and `output_type` and `importance` last.
+  score_result |>
+    dplyr::select(
+      "model_id", "reference_date",
+      dplyr::everything()
+    ) |>
+    dplyr::relocate(c("output_type", "importance"),
+      .after = dplyr::last_col()
+    )
 }

@@ -2,8 +2,8 @@
 % Please edit documentation in R/model_importance.R
 \name{model_importance}
 \alias{model_importance}
-\title{Quantify overall contributions of ensemble component model to ensemble
-prediction accuracy across multiple forecast tasks}
+\title{Quantifies the contribution of ensemble component models to ensemble
+prediction accuracy for each prediction task.}
 \usage{
 model_importance(
   forecast_data,
@@ -11,7 +11,6 @@ model_importance(
   ensemble_fun = c("simple_ensemble", "linear_pool"),
   importance_algorithm = c("lomo", "lasomo"),
   subset_wt = c("equal", "perm_based"),
-  na_action = c("worst", "average", "drop"),
   min_log_score = -10,
   ...
 )
@@ -55,20 +54,6 @@ the Shapley value.
 Ignored if \code{lomo} method is used. Default is \code{"equal"}, if not specified.
 }}
 
-\item{na_action}{A character string specifying how to handle \code{NA} values
-generated during importance score calculation for each task, occurring when a
-model did not contribute to the ensemble prediction for a given task by
-missing its forecast submission.
-Three options are available: \code{c("worst", "average", "drop")}.
-For each specific prediction task, each option works as follows:
-\itemize{
-\item \code{"worst"} replaces \code{NA}s with the smallest value among importance metrics
-of the other models.
-\item \code{"average"} replaces \code{NA}s with the average value from the other
-models' importance metrics.
-\item \code{"drop"} removes \code{NA}s.
-}}
-
 \item{min_log_score}{A numeric value specifying a minimum threshold for log
 scores for the \code{pmf} output to avoid issues with extremely low probabilities
 assigned to the true outcome, which can lead to undefined or negative
@@ -81,13 +66,16 @@ needs.}
 as \code{"simple_ensemble"}. See 'Details'.}
 }
 \value{
-A data.frame with columns
-\code{task_id}, \code{output_type}, \code{model_id}, \code{importance_score}.
+A data.frame with columns \code{model_id}, \code{reference_date},
+\code{output_type}, and \code{importance}, along with any task ID columns (e.g.,
+\code{location}, \code{horizon}, and \code{target_end_date}) present in the input
+\code{forecast_data}.
+Note that \code{reference_date} is used as the name for the forecast date column,
+regardless of its original name in the input \code{forecast_data}.
 }
 \description{
 We measure each ensemble component model's contribution to the ensemble
-prediction accuracy for each model task. Then, we aggregate the contributions
-across all tasks to quantify each component model's overall importance.
+prediction accuracy for each model task.
 
 This function requires that one column represent the forecast date (or
 a date from which each forecast originates or is made in reference to) and
@@ -160,14 +148,13 @@ target_data <- hubExamples::forecast_target_ts |>
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
-  subset_wt = "equal", na_action = "drop"
+  subset_wt = "equal"
 )
 # Example with the additional argument in `...`.
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
-  subset_wt = "equal", na_action = "drop",
-  agg_fun = median
+  subset_wt = "equal", agg_fun = median
 )
 }
 }
