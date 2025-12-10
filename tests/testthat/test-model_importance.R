@@ -1,7 +1,7 @@
 # Unit tests for `model_importance()` with untrained ensembles
 
 library(dplyr)
-library(hubEnsembles)
+# library(hubEnsembles)
 library(hubEvals)
 library(purrr)
 future::plan("sequential") # Set up sequential plan for testing
@@ -27,10 +27,10 @@ target_data <- readRDS(
 
 # list of expected values for testing
 exp_file_names <- c(
-  exp_overall_imp_mean = "exp_overall_imp_mean.rds",
-  exp_overall_imp_quantile = "exp_overall_imp_quantile.rds",
-  exp_overall_imp_median = "exp_overall_imp_median.rds",
-  exp_overall_imp_pmf = "exp_overall_imp_pmf.rds"
+  exp_raw_imp_mean = "exp_raw_imp_scores_mean.rds",
+  exp_raw_imp_quantile = "exp_raw_imp_scores_quantile.rds",
+  exp_raw_imp_median = "exp_raw_imp_scores_median.rds",
+  exp_raw_imp_pmf = "exp_raw_imp_scores_pmf.rds"
 )
 exp_imp_list <- map(
   exp_file_names,
@@ -44,7 +44,6 @@ params <- expand.grid(
   agg_fun = c("mean", "median"),
   algorithm = c("lomo", "lasomo"),
   subset_weight = c("equal", "perm_based"),
-  na_method = c("worst", "average", "drop"),
   stringsAsFactors = FALSE
 ) |>
   # adjustments: no agg_fun for linear_pool, subset_weight only for lasomo
@@ -59,19 +58,18 @@ params <- expand.grid(
 ## Test: model_importance function works properly, given no missing data
 pmap(
   params,
-  function(output_type, ens_fun, agg_fun, algorithm, subset_weight, na_method) {
+  function(output_type, ens_fun, agg_fun, algorithm, subset_weight) {
     test_that(paste(
       "Testing if the function works properly with output type:", output_type,
       "/ensemble function:", ens_fun,
       "/aggregation function:", agg_fun,
       "/algorithm:", algorithm,
-      "/subset_weight:", subset_weight,
-      "/na method:", na_method
+      "/subset_weight:", subset_weight
     ), {
       # get the data corresponding to the arguments
       selected_data <- data_list[[paste0("dat_", output_type)]]
       selected_expected_importance <- exp_imp_list[[paste0(
-        "exp_overall_imp_", output_type
+        "exp_raw_imp_", output_type
       )]]
       # calculate importance scores with the given arguments
       if (ens_fun != "linear_pool") {
@@ -81,7 +79,6 @@ pmap(
           ensemble_fun = ens_fun,
           importance_algorithm = algorithm,
           subset_wt = subset_weight,
-          na_action = na_method,
           agg_fun = agg_fun,
           min_log_score = -10
         ))
@@ -92,25 +89,21 @@ pmap(
           ensemble_fun = ens_fun,
           importance_algorithm = algorithm,
           subset_wt = subset_weight,
-          na_action = na_method,
           min_log_score = -10
         ))
       }
-      # expected values
-      expected_value <- selected_expected_importance |>
+      # expected data frame of importance scores
+      expected_df <- selected_expected_importance |>
         filter(
-          ens_mthd == paste0(
-            "untrained-", ens_fun, "-", agg_fun, "-", algorithm, "-",
-            subset_weight
-          ),
-          na_action == na_method
+          calc_args == paste0(
+            output_type, "_output-", ens_fun, "-", algorithm, "-",
+            subset_weight, "-", agg_fun
+          )
         ) |>
-        dplyr::select(model_id, mean_importance) |>
-        as.data.frame() |>
-        arrange(desc(mean_importance))
+        select(-calc_args)
       # test: compare the calculated importance with the expected importance,
       # ignoring their attributes
-      expect_equal(calculated, expected_value,
+      expect_equal(calculated, expected_df,
         tolerance = 1e-1, ignore_attr = TRUE
       )
     })
