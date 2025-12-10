@@ -7,7 +7,6 @@ validate_inputs <- function(forecast_data, oracle_output_data,
                             ensemble_fun = c("simple_ensemble", "linear_pool"),
                             importance_algorithm = c("lomo", "lasomo"),
                             subset_wt = c("equal", "perm_based"),
-                            na_action = c("worst", "average", "drop"),
                             min_log_score = -10) {
   # validate inputs
   if (!is.data.frame(forecast_data)) {
