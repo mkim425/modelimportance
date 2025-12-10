@@ -2,7 +2,7 @@
 % Please edit documentation in R/model_importance_summary.R
 \name{model_importance_summary}
 \alias{model_importance_summary}
-\title{Summarize model importance scores produced by model_importance()
+\title{Summarize model importance scores produced by \code{model_importance()}
 across tasks}
 \usage{
 model_importance_summary(

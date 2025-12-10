@@ -140,16 +140,15 @@ model_importance <- function(forecast_data,
                              subset_wt = c("equal", "perm_based"),
                              min_log_score = -10,
                              ...) {
-  # set defaults
-  ensemble_fun <- match.arg(ensemble_fun)
-  importance_algorithm <- match.arg(importance_algorithm)
-  subset_wt <- match.arg(subset_wt)
-
   # validate inputs
   validate_inputs(
     forecast_data, oracle_output_data, ensemble_fun, importance_algorithm,
     subset_wt, min_log_score
   )
+  # set defaults
+  ensemble_fun <- match.arg(ensemble_fun)
+  importance_algorithm <- match.arg(importance_algorithm)
+  subset_wt <- match.arg(subset_wt)
 
   # validate input data: get a model_out_tbl format with a single output type
   valid_tbl <- validate_input_data(forecast_data, oracle_output_data)
