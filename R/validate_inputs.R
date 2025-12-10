@@ -23,5 +23,4 @@ validate_inputs <- function(forecast_data, oracle_output_data,
   ensemble_fun <- match.arg(ensemble_fun)
   importance_algorithm <- match.arg(importance_algorithm)
   subset_wt <- match.arg(subset_wt)
-  na_action <- match.arg(na_action)
 }
