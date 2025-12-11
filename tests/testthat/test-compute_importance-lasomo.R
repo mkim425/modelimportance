@@ -32,10 +32,10 @@ target_data_list <- map(
 )
 # list of expected values for testing
 exp_file_names <- c(
-  exp_imp_mean_lasomo = "exp_imp_mean_untrained_lasomo.rds",
-  exp_imp_median_lasomo = "exp_imp_median_untrained_lasomo.rds",
-  exp_imp_quantile_lasomo = "exp_imp_qntl_untrained_lasomo.rds",
-  exp_imp_pmf_lasomo = "exp_imp_pmf_untrained_lasomo.rds"
+  exp_imp_mean_lasomo = "exp_imp_mean_lasomo.rds",
+  exp_imp_median_lasomo = "exp_imp_median_lasomo.rds",
+  exp_imp_quantile_lasomo = "exp_imp_qntl_lasomo.rds",
+  exp_imp_pmf_lasomo = "exp_imp_pmf_lasomo.rds"
 )
 exp_imp_list <- map(
   exp_file_names,

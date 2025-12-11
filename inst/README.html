@@ -354,33 +354,31 @@ display: none;
 
 <div id="inst-directory" class="section level1">
 <h1>inst Directory</h1>
-<div id="testhubs" class="section level2">
-<h2>testhubs</h2>
+<div id="get-testdata" class="section level2">
+<h2><code>get-testdata</code></h2>
+<p>This directory contains scripts to generate test datasets used in the
+package’s unit tests. The test datasets are stored in the
+sub-directories under <code>tests/testthat/testdata</code>, with each
+subdirectory named after the function being tested.</p>
 <ul>
-<li>example-simple-forecast-hub: copied files from <a href="https://github.com/hubverse-org/example-simple-forecast-hub" class="uri">https://github.com/hubverse-org/example-simple-forecast-hub</a></li>
-<li>example-complex-forecast-hub: copied files from <a href="https://github.com/hubverse-org/example-complex-forecast-hub/tree/main" class="uri">https://github.com/hubverse-org/example-complex-forecast-hub/tree/main</a></li>
-</ul>
-</div>
-<div id="r-files" class="section level2">
-<h2>R files</h2>
+<li><code>complex_hub.R</code> generates test data for the
+<code>validate_input_data()</code> and <code>split_data_by_task()</code>
+functions.</li>
+<li>Test data sets for the <code>compute_importance()</code> function
+are generated from:
 <ul>
-<li><code>get_testdata_simple_hub.R</code>: Get test datasets from
-example-simple-forecast-hub</li>
-<li><code>get_testdata_complex_hub.R</code>: Get test datasets from
-example-complex-forecast-hub</li>
-</ul>
-</div>
-<div id="testdata" class="section level2">
-<h2>testdata</h2>
+<li>four top-level scripts matching the pattern
+<code>exp_imp_*_lomo.R</code></li>
+<li>scripts under <code>exp_imp_*_lasomo/</code> directories</li>
+<li>a helper script, <code>helper-exp_imp.R</code></li>
+</ul></li>
+<li>Test data for the <code>model_performance()</code> function is
+generated from:
 <ul>
-<li><code>simple_example_mean_model_output.rds</code>: test dataset with
-mean model output from example-simple-forecast-hub</li>
-<li><code>simple_example_median_model_output.rds</code>: test dataset
-with median model output from example-simple-forecast-hub</li>
-<li><code>simple_example_quantile_model_output.rds</code>: test dataset
-with quantile model output from example-simple-forecast-hub</li>
-<li><code>simple_example_target_data.rds</code>: test dataset with
-target data (true values) from example-simple-forecast-hub</li>
+<li><code>forecast-target-datasets.R</code></li>
+<li><code>exp_overall_imp.R</code></li>
+<li>a helper script, <code>helper-exp_overall_imp.R</code></li>
+</ul></li>
 </ul>
 </div>
 </div>
