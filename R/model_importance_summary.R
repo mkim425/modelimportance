@@ -1,4 +1,4 @@
-#' Summarize model importance scores produced by model_importance()
+#' Summarize model importance scores produced by `model_importance()`
 #' across tasks
 #'
 #' @description `model_importance_summary` summarizes model importance scores
@@ -36,7 +36,7 @@
 #' (e.g., `importance_score_mean` when `fun = mean`).
 #' The output is sorted in descending order of the summary importance scores.
 #' @export
-#'
+#' @importFrom checkmate assert_data_frame assert_subset assert_function
 #' @examples \dontrun{
 #' library(dplyr)
 #' library(hubExamples)
@@ -78,34 +78,36 @@ model_importance_summary <- function(importance_scores, by = "model_id",
   # task specific columns
   task_id_cols <- setdiff(colnames(importance_scores), required_cols)
   # column name for the summary importance score
+  fun_args <- list(...)
   colname <- paste0("importance_score_", deparse(substitute(fun)), sep = "")
 
-  # NA handling and summarization
+  # NA handling
   if (na_action == "worst") {
-    importance_scores |>
+    imputed_scores <- importance_scores |>
       dplyr::group_by(across(all_of(task_id_cols))) |>
       dplyr::mutate(across(
         importance,
         ~ coalesce(., min(., na.rm = TRUE))
       )) |>
-      dplyr::group_by(model_id) |>
-      dplyr::summarise(!!colname := fun(.data$importance), .groups = "drop") |>
-      dplyr::arrange(desc(!!sym(colname)))
+      ungroup()
   } else if (na_action == "average") {
-    importance_scores |>
+    imputed_scores <- importance_scores |>
       dplyr::group_by(across(all_of(task_id_cols))) |>
       dplyr::mutate(across(
         importance,
         ~ coalesce(., mean(., na.rm = TRUE))
       )) |>
-      dplyr::group_by(model_id) |>
-      dplyr::summarise(!!colname := fun(.data$importance), .groups = "drop") |>
-      dplyr::arrange(desc(!!sym(colname)))
+      ungroup()
   } else {
-    importance_scores |>
+    imputed_scores <- importance_scores |>
       dplyr::filter(!is.na(importance)) |>
-      dplyr::group_by(model_id) |>
-      dplyr::summarise(!!colname := fun(.data$importance), .groups = "drop") |>
-      dplyr::arrange(desc(!!sym(colname)))
+      ungroup()
   }
+  # summarize importance scores by the specified grouping variable(s)
+  imputed_scores |>
+    dplyr::group_by(!!sym(by)) |>
+    dplyr::summarise(!!colname := {
+      do.call(fun, list(x = .data$importance, !!!fun_args))
+    }, .groups = "drop") |>
+    dplyr::arrange(desc(!!sym(colname)))
 }
