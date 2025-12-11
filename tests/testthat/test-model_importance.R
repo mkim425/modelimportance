@@ -1,7 +1,6 @@
-# Unit tests for `model_importance()` with untrained ensembles
+# Unit tests for `model_importance()` function
 
 library(dplyr)
-# library(hubEnsembles)
 library(hubEvals)
 library(purrr)
 future::plan("sequential") # Set up sequential plan for testing
@@ -55,7 +54,8 @@ params <- expand.grid(
   distinct() |>
   arrange(algorithm, output_type, ens_fun, agg_fun, subset_weight)
 
-## Test: model_importance function works properly, given no missing data
+## Test: model_importance() function works properly with different combinations
+## of arguments
 pmap(
   params,
   function(output_type, ens_fun, agg_fun, algorithm, subset_weight) {
