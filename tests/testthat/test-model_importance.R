@@ -109,3 +109,36 @@ pmap(
     })
   }
 )
+
+## Test: `simple_ensemble` and `linear_pool` perform the same calculation for
+## `mean` and `pmf`
+test_that(
+  "simple_ensemble and linear_pool give same results for mean and pmf",
+  {
+    for (output_type in c("mean", "pmf")) {
+      selected_data <- data_list[[paste0("dat_", output_type)]]
+      # calculate importance scores with simple_ensemble
+      imp_simple_ens <- suppressMessages(model_importance(
+        forecast_data = selected_data,
+        oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble",
+        importance_algorithm = "lomo",
+        subset_wt = "equal",
+        min_log_score = -10
+      ))
+      # calculate importance scores with linear_pool
+      imp_linear_pool <- suppressMessages(model_importance(
+        forecast_data = selected_data,
+        oracle_output_data = target_data,
+        ensemble_fun = "linear_pool",
+        importance_algorithm = "lomo",
+        subset_wt = "equal",
+        min_log_score = -10
+      ))
+      # test: compare the two importance scores
+      expect_equal(imp_simple_ens, imp_linear_pool,
+        tolerance = 1e-1, ignore_attr = TRUE
+      )
+    }
+  }
+)
