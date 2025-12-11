@@ -64,8 +64,13 @@ Note that for the \code{mean} output type, \code{se_point} is used by default,
 but we convert it to \code{rse_point} to ensure consistency in the units of
 importance score.}
 
-\item{min_log_score}{A numeric value specifying the minimum log score when
-\code{Inf} is returned during the log score calculation for the \code{pmf} output}
+\item{min_log_score}{A numeric value specifying a minimum threshold for log
+scores for the \code{pmf} output to avoid issues with extremely low probabilities
+assigned to the true outcome, which can lead to undefined or negative
+infinite log scores. Any probability lower than this threshold will be
+adjusted to this minimum value. The default value is set to -10, which is an
+arbitrary choice. Users may choose a different value based on their practical
+needs.}
 
 \item{...}{Optional arguments passed to \code{ensemble_fun} when it is specified
 as \code{"simple_ensemble"}. See 'Details'.}
@@ -80,15 +85,24 @@ contribution to the prediction accuracy of an ensemble for each combination
 of model task.
 }
 \details{
-The \code{oracle_output_data} in the oracle output format should contain
-independent task ID columns (e.g. \code{location}, \code{target_date}, and \code{age_group})
-, \code{output_type} and \code{output_type_id} columns if the output is either \code{pmf} or
-\code{cdf}, and \code{oracle_value} column for the observed values.
-TBD for more details.
+The \code{oracle_output_data} is a data frame that contains the ground truth
+values for the variables used to define modeling targets. It is referred to
+as “oracle” because it is formatted as if an oracle made a perfect point
+prediction equal to the truth. This data must follow the oracle output format
+defined in the hubverse standard, which includes independent task ID columns
+(e.g., \code{location}, \code{target_date}), the \code{output_type} column specifying the
+output type of the predictions and an \code{oracle_value} column for the observed
+values. As in the forecast data, if the \code{output_type} is either \code{"quantile"}
+or \code{"pmf"}, the \code{output_type_id} column is often required to provide further
+identifying information.
+
+The \code{model_out_tbl} and \code{oracle_output_data} must have the same task ID
+columns and \code{output_type}, including \code{output_type_id} if necessary, which are
+used to match the predictions with the ground truth data.
 
 Additional argument in \code{...} is \code{agg_fun}, which is a character string name
 for a function specifying aggregation method of component model outputs.
-Default is \code{mean}, meaning that equally (or weighted) mean is calculated
+Default is \code{mean}, indicating that equally weighted mean is calculated
 across all component model outputs for each unique \code{output_type_id}.
 This can be \code{median} or a custom function (e.g., geometric_mean. Details
 can be found in

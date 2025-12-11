@@ -2,7 +2,7 @@
 % Please edit documentation in R/split_data_by_task.R
 \name{split_data_by_task}
 \alias{split_data_by_task}
-\title{Split the input data by a single task make a list of data sets}
+\title{Split the input data by a single task and make a list of data sets}
 \usage{
 split_data_by_task(valid_tbl)
 }
@@ -15,5 +15,6 @@ A list of data sets, each corresponding to a single task.
 }
 \description{
 This function splits the input data by a single task with a
-combination of horizon, location, and target_end_date
+combination of task IDs and returns a list of data sets, each corresponding
+to a single task.
 }

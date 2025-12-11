@@ -1,7 +1,8 @@
 #' Split the input data by a single task and make a list of data sets
 #'
 #' @description This function splits the input data by a single task with a
-#' combination of horizon, location, and target_end_date
+#' combination of task IDs and returns a list of data sets, each corresponding
+#' to a single task.
 #'
 #' @param valid_tbl A data.frame containing forecast data and target data,
 #' processed by the function `validate_input_data()`.

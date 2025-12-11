@@ -1,32 +1,35 @@
-#' @title Quantify overall contributions of ensemble component model to ensemble
-#' prediction accuracy
+#' @title Quantifies the contribution of ensemble component models to ensemble
+#' prediction accuracy for each prediction task.
 #' @description
-#' Evaluate ensemble component model's importance based on a measure of their
-#' contribution to ensemble prediction accuracy for each combination of
-#' model task.
+#' We measure each ensemble component model's contribution to the ensemble
+#' prediction accuracy for each model task.
 #'
 #' This function requires that one column represent the forecast date (or
 #' a date from which each forecast originates or is made in reference to) and
-#' that it be named one of `forecast_date`, `origin_date`, and `reference_date`.
+#' that column be named one of `forecast_date`, `origin_date`, and
+#' `reference_date`.
 #'
 #' For each `output_type`, the corresponding scoring rule applied to calculate
 #' the importance is as follows.
-#' \tabular{ll}{
-#'   \strong{Output Type} \tab \strong{Scoring Rule} \cr
-#'   median \tab ae_point \cr
-#'   mean \tab rse_point \cr
-#'   quantile \tab wis \cr
-#'   pmf \tab log_score \cr
+#'
+#' \tabular{lll}{
+#'   \strong{Output Type} \tab \strong{Scoring Rule} \tab \strong{Description}
+#'   \cr
+#'   mean \tab rse_point \tab evaluate using the root squared error \cr
+#'   median \tab ae_point\tab evaluate using the absolute error \cr
+#'   quantile \tab wis \tab evaluate using the weighted interval score\cr
+#'   pmf \tab log_score \tab
+#'   {evaluate using the logarithm of the probability assigned to the true
+#'   outcome} \cr
 #' }
-#' where `ae_point` represents the absolute error,
-#' `rse_point` the root squared error,
-#' `wis` the weighted interval score, and
-#' `log_score` the logarithmic score.
 #'
 #' @param forecast_data A data.frame with the predictions that is or can be
-#' coerced to a model_out_tbl format. Only one `output_type` is allowed in the
-#' data.frame, and it must be one of the following:
-#' `mean`, `median`, `quantile`, or `pmf`.
+#' coerced to a `model_out_tbl` format, which is the standard S3 class model
+#' output format defined by the 'hubverse' convention
+#' (https://docs.hubverse.io/en/latest/#). If it fails to be coerced to a
+#' `model_out_tbl` format, an error message will be returned.
+#' Only one `output_type` is allowed in the data.frame, and it must be one of
+#' the following: `mean`, `median`, `quantile`, or `pmf`.
 #' @param oracle_output_data Ground truth data for the variables that are used
 #' to define modeling targets. This data must follow the oracle output format.
 #' See 'Details'.
@@ -49,31 +52,46 @@
 #' * When `"linear_pool"` is specified, ensemble model outputs are created as
 #' a linear pool of component model outputs. This method supports only
 #' an `output_type` of `mean`, `quantile`, or `pmf`.
-#' @param na_action A character string specifying treatment for missing data;
-#' `c("worst," "average," "drop").`
-#' * `"worst"` replaces missing values with the smallest value from the other
-#' models.
-#' * `"average"` replaces missing values with the average value from the other
-#' models.
-#' * `"drop"` removes missing values.
-#' @param min_log_score A numeric value specifying the minimum log score when
-#' `Inf` is returned during the log score calculation for the `pmf` output
+#' @param min_log_score A numeric value specifying a minimum threshold for log
+#' scores for the `pmf` output to avoid issues with extremely low probabilities
+#' assigned to the true outcome, which can lead to undefined or negative
+#' infinite log scores. Any probability lower than this threshold will be
+#' adjusted to this minimum value. The default value is set to -10, which is an
+#' arbitrary choice. Users may choose a different value based on their practical
+#' needs.
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
-#' @return A data.frame with columns
-#' `task_id`, `output_type`, `model_id`, `importance_score`.
+#'
+#' @return A data.frame with columns `model_id`, `reference_date`,
+#' `output_type`, and `importance`, along with any task ID columns (e.g.,
+#' `location`, `horizon`, and `target_end_date`) present in the input
+#' `forecast_data`.
+#' Note that `reference_date` is used as the name for the forecast date column,
+#' regardless of its original name in the input `forecast_data`.
+#'
 #' @import hubExamples
+#' @importFrom methods is
 #' @export
+#'
 #' @details
-#' The `oracle_output_data` in the oracle output format should contain
-#' independent task ID columns (e.g. `location`, `target_date`, and `age_group`)
-#' , `output_type` and `output_type_id` columns if the output is either `pmf` or
-#' `cdf`, and `oracle_value` column for the observed values.
-#' TBD for more details.
+#' The `oracle_output_data` is a data frame that contains the ground truth
+#' values for the variables used to define modeling targets. It is referred to
+#' as “oracle” because it is formatted as if an oracle made a perfect point
+#' prediction equal to the truth. This data must follow the oracle output format
+#' defined in the hubverse standard, which includes independent task ID columns
+#' (e.g., `location`, `target_date`), the `output_type` column specifying the
+#' output type of the predictions and an `oracle_value` column for the observed
+#' values. As in the forecast data, if the `output_type` is either `"quantile"`
+#' or `"pmf"`, the `output_type_id` column is often required to provide further
+#' identifying information.
+#'
+#' The `model_out_tbl` and `oracle_output_data` must have the same task ID
+#' columns and `output_type`, including `output_type_id` if necessary, which are
+#' used to match the predictions with the ground truth data.
 #'
 #' Additional argument in `...` is `agg_fun`, which is a character string name
 #' for a function specifying aggregation method of component model outputs.
-#' Default is `mean`, meaning that equally (or weighted) mean is calculated
+#' Default is `mean`, indicating that equally weighted mean is calculated
 #' across all component model outputs for each unique `output_type_id`.
 #' This can be `median` or a custom function (e.g., geometric_mean. Details
 #' can be found in
@@ -106,14 +124,13 @@
 #' model_importance(
 #'   forecast_data = forecast_data, oracle_output_data = target_data,
 #'   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
-#'   subset_wt = "equal", na_action = "drop"
+#'   subset_wt = "equal"
 #' )
 #' # Example with the additional argument in `...`.
 #' model_importance(
 #'   forecast_data = forecast_data, oracle_output_data = target_data,
 #'   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
-#'   subset_wt = "equal", na_action = "drop",
-#'   agg_fun = median
+#'   subset_wt = "equal", agg_fun = median
 #' )
 #' }
 model_importance <- function(forecast_data,
@@ -121,20 +138,17 @@ model_importance <- function(forecast_data,
                              ensemble_fun = c("simple_ensemble", "linear_pool"),
                              importance_algorithm = c("lomo", "lasomo"),
                              subset_wt = c("equal", "perm_based"),
-                             na_action = c("worst", "average", "drop"),
                              min_log_score = -10,
                              ...) {
+  # validate inputs
+  validate_inputs(
+    forecast_data, oracle_output_data, ensemble_fun, importance_algorithm,
+    subset_wt, min_log_score
+  )
   # set defaults
   ensemble_fun <- match.arg(ensemble_fun)
   importance_algorithm <- match.arg(importance_algorithm)
   subset_wt <- match.arg(subset_wt)
-  na_action <- match.arg(na_action)
-
-  # validate inputs
-  validate_inputs(
-    forecast_data, oracle_output_data, ensemble_fun, importance_algorithm,
-    subset_wt, na_action, min_log_score
-  )
 
   # validate input data: get a model_out_tbl format with a single output type
   valid_tbl <- validate_input_data(forecast_data, oracle_output_data)
@@ -191,35 +205,14 @@ model_importance <- function(forecast_data,
       )
     }
   )
-
-  # NA handling
-  if (na_action == "worst") {
-    importance_result <- score_result |>
-      group_by(location, horizon, target_end_date) |>
-      mutate(across(
-        importance,
-        ~ coalesce(., min(., na.rm = TRUE))
-      )) |>
-      group_by(model_id) |>
-      summarise(mean_importance = mean(importance), .groups = "drop") |>
-      arrange(desc(.data$mean_importance))
-  } else if (na_action == "average") {
-    importance_result <- score_result |>
-      group_by(location, horizon, target_end_date) |>
-      mutate(across(
-        importance,
-        ~ coalesce(., mean(., na.rm = TRUE))
-      )) |>
-      group_by(model_id) |>
-      summarise(mean_importance = mean(importance), .groups = "drop") |>
-      arrange(desc(.data$mean_importance))
-  } else {
-    importance_result <- score_result |>
-      filter(!is.na(importance)) |>
-      group_by(model_id) |>
-      summarise(mean_importance = mean(importance), .groups = "drop") |>
-      arrange(desc(.data$mean_importance))
-  }
-
-  return(importance_result)
+  # Reorder columns to place `model_id` and `reference_date` first,
+  # task-related columns in the middle, and `output_type` and `importance` last.
+  score_result |>
+    dplyr::select(
+      "model_id", "reference_date",
+      dplyr::everything()
+    ) |>
+    dplyr::relocate(c("output_type", "importance"),
+      .after = dplyr::last_col()
+    )
 }
