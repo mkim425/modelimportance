@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, frame hidden, sharp corners, breakable, enhanced, interior hidden, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, boxrule=0pt, breakable, interior hidden, frame hidden, borderline west={3pt}{0pt}{shadecolor}, sharp corners]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -402,12 +402,12 @@ algorithms implemented in \pkg{modelimportance} for calculating the
 model importance metric: leave-one-model-out and
 leave-all-subsets-of-models-out. We demonstrate the various
 functionalities \pkg{modelimportance} supports in
-\hyperref[sec:main-function]{Section~\ref{sec:main-function}} and
+\hyperref[sec:main-functions]{Section~\ref{sec:main-functions}} and
 highlight our quality assurance measures and its open access in
 \hyperref[sec:implementation-and-availability]{Section~\ref{sec:implementation-and-availability}}.
 Some examples are provided in
 \hyperref[sec:examples]{Section~\ref{sec:examples}}. We close this paper
-with some concluding remarks and a discussion of possible extensions.
+with concluding remarks and a discussion of possible extensions.
 
 \section{Data}\label{sec:data}
 
@@ -783,16 +783,25 @@ extreme-sized subsets.}
 
 \end{figure}%
 
-\section{Main function: Evaluating ensemble
-members}\label{sec:main-function}
+\section{Main functions}\label{sec:main-functions}
 
 In this section, we describe the usage of the function
 \texttt{model\_importance()}, where multiple options are available to
-customize the evaluation framework (Table~\ref{tbl-arguments}).
+customize the evaluation framework (Table~\ref{tbl-arguments1},
+Table~\ref{tbl-arguments2}).
+
+\subsection{model\_importance( )}\label{model_importance}
+
+The \texttt{model\_importance()} function calculates the importance
+scores of ensemble component models based on their contributions to
+improving ensemble prediction accuracy for each prediction task. It
+returns a single data frame of importance scores combined across all
+tasks. If a model missed predictions for a specific task, an \texttt{NA}
+value will be assigned for that task.
 
 \begin{verbatim}
-R> model_importance(forecast_data, oracle_output_data, ensemble_fun, 
-                    importance_algorithm, subset_wt, na_action, min_log_score, 
+> model_importance(forecast_data, oracle_output_data, ensemble_fun, 
+                    importance_algorithm, subset_wt, min_log_score, 
                     ...)
 \end{verbatim}
 
@@ -841,16 +850,15 @@ Argument & Description & Possible Values & Default\\
 \texttt{importance\_algorithm} & Algorithm to calculate importance & \texttt{"lomo", "lasomo"} & \texttt{"lomo"}\\
 \cellcolor{gray!10}{\texttt{subset\_wt}} & \cellcolor{gray!10}{Method for assigning weight to subsets when using LASOMO algorithm} & \cellcolor{gray!10}{\texttt{"equal", "perm\_based"}} & \cellcolor{gray!10}{\texttt{"equal"}}\\
 \addlinespace
-\texttt{na\_action} & Method to handle missing data & \texttt{"worst", "average", "drop"} & \texttt{"worst"}\\
-\cellcolor{gray!10}{\texttt{min\_log\_score}} & \cellcolor{gray!10}{Minimum value to replace for log score} & \cellcolor{gray!10}{Non-positive numeric} & \cellcolor{gray!10}{-10}\\
-\texttt{...} & Optional arguments for \texttt{"simple\_ensemble"} & Varies & \texttt{agg\_fun="mean"}\\
+\texttt{min\_log\_score} & Minimum value to replace for log score & Non-positive numeric & -10\\
+\cellcolor{gray!10}{\texttt{...}} & \cellcolor{gray!10}{Optional arguments for \texttt{"simple\_ensemble"}} & \cellcolor{gray!10}{Varies} & \cellcolor{gray!10}{\texttt{agg\_fun="mean"}}\\
 \bottomrule
 \end{tabular}
 \endgroup{}
 
 }
 
-\caption{\label{tbl-arguments}Description of the arguments for the
+\caption{\label{tbl-arguments1}Description of the arguments for the
 \texttt{model\_importance()} function, including their purpose, possible
 values, and default settings.}
 
@@ -868,6 +876,38 @@ permutations as in the formula of Shapley values
 of \texttt{importance\_algorithm} and \texttt{subset\_wt} are
 \texttt{"lomo"} and \texttt{"equal"}, respectively.
 
+The \texttt{min\_log\_score} argument is relevant only for the
+\texttt{output\_type} of \texttt{"pmf"}, which uses Log Score as a
+scoring rule. It sets a minimum threshold for log scores to avoid issues
+with extremely low probabilities assigned to the true outcome, which can
+lead to undefined or negative infinite log scores. Any probability lower
+than this threshold will be adjusted to this minimum value before
+calculating the importance metric based on the log score. The default
+value is set to -10, which is an arbitrary choice. Users may choose a
+different value based on their practical needs.
+
+\subsection{model\_importance\_summary(
+)}\label{model_importance_summary}
+
+The \texttt{model\_importance\_summary()} function summarizes the
+importance scores produced by \texttt{model\_importance()} across tasks
+for each model.
+
+\begin{verbatim}
+> model_importance_summary(importance_scores, by = "model_id",
+                           na_action = c("drop", "worst", "average"),
+                           fun = mean, ...)
+\end{verbatim}
+
+The \texttt{importance\_scores} is a data frame containing model
+importance scores for individual prediction tasks, as produced by the
+\texttt{model\_importance()} function.
+
+The \texttt{by} argument specifies the grouping variable(s) for
+summarization. The default is \texttt{"model\_id"} to summarize
+importance scores for each model. Users can also specify other columns
+present in the \texttt{importance\_scores} data frame as needed.
+
 The \texttt{na\_action} argument allows for specifying how to handle
 \texttt{NA} values generated during importance score calculation for
 each task, occurring when a model did not contribute to the ensemble
@@ -881,15 +921,39 @@ with the average of the other models' importance metrics in that task.
 The \texttt{"drop"} option removes the \texttt{NA} values, which results
 in the exclusion of the model from the evaluation for that task.
 
-The \texttt{min\_log\_score} argument is relevant only for the
-\texttt{output\_type} of \texttt{"pmf"}, which uses Log Score as a
-scoring rule. It sets a minimum threshold for log scores to avoid issues
-with extremely low probabilities assigned to the true outcome, which can
-lead to undefined or negative infinite log scores. Any probability lower
-than this threshold will be adjusted to this minimum value before
-calculating the importance metric based on the log score. The default
-value is set to -10, which is an arbitrary choice. Users may choose a
-different value based on their practical needs.
+The \texttt{fun} argument specifies a function used to summarize
+importance scores. \texttt{fun\ =\ mean} is a default choice, but other
+summary functions are also applicable (e.g., \texttt{fun\ =\ median}).
+Additional arguments can be passed to the summary function \texttt{fun}
+through \texttt{...} if needed (e.g.,
+\texttt{fun\ =\ quantile,\ probs\ =\ 0.25} for a quartile summary).
+
+\begin{table}
+
+\centering{
+
+\centering\begingroup\fontsize{10.5}{12.5}\selectfont
+
+\begin{tabular}{l>{\raggedright\arraybackslash}p{4cm}>{\raggedright\arraybackslash}p{3.7cm}>{\raggedright\arraybackslash}p{2cm}}
+\toprule
+Argument & Description & Possible Values & Default\\
+\midrule
+\cellcolor{gray!10}{\texttt{importance\_scores}} & \cellcolor{gray!10}{Model importance scores produced by \texttt{model\_importance()}} & \cellcolor{gray!10}{data frame} & \cellcolor{gray!10}{N/A}\\
+\texttt{by} & Grouping variable(s) for summarization & grouping variable(s) & \texttt{"model\_id"}\\
+\cellcolor{gray!10}{\texttt{na\_action}} & \cellcolor{gray!10}{Method to handle \texttt{NA} values} & \cellcolor{gray!10}{\texttt{"drop", "worst", "average"}} & \cellcolor{gray!10}{\texttt{"drop"}}\\
+\texttt{fun} & Function to summarize importance scores & summary function & \texttt{mean}\\
+\cellcolor{gray!10}{\texttt{...}} & \cellcolor{gray!10}{Optional arguments for \texttt{"fun"}} & \cellcolor{gray!10}{depends on \texttt{fun}} & \cellcolor{gray!10}{N/A}\\
+\bottomrule
+\end{tabular}
+\endgroup{}
+
+}
+
+\caption{\label{tbl-arguments2}Description of the arguments for the
+\texttt{model\_importance\_summary()} function, including their purpose,
+possible values, and default settings.}
+
+\end{table}%
 
 \section{Implementation and
 availability}\label{sec:implementation-and-availability}
@@ -911,7 +975,7 @@ The examples in this section illustrate the use of the
 \texttt{model\_importance()} function to evaluate the importance of
 component models within an ensemble, using various combinations of the
 arguments described in
-\hyperref[sec:main-function]{Section~\ref{sec:main-function}}. We use
+\hyperref[sec:main-functions]{Section~\ref{sec:main-functions}}. We use
 some example forecast and target data from the \pkg{hubExamples}
 package, which provides sample datasets for multiple modeling hubs in
 the hubverse format.
@@ -932,7 +996,7 @@ MOBS-GLEAM\_FLUH's forecast for Massachusetts on November 26, 2022, and
 PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 
 \begin{verbatim}
-R> forecast_data
+> forecast_data
 \end{verbatim}
 
 \small
@@ -965,13 +1029,15 @@ R> forecast_data
 10 2022-11-26      median      <NA>            1226
 \end{verbatim}
 
+\vspace{0.35cm}
+
 \normalsize
 
 The corresponding target data contains the observed hospitalization
 counts for these dates and locations.
 
 \begin{verbatim}
-R> target_data
+> target_data
 \end{verbatim}
 
 \small
@@ -1008,28 +1074,29 @@ December 10, 2022, are missing.}
 
 \end{figure}%
 
+\vspace{0.35cm}
+
 Overall, the forecasts tend to have larger prediction errors for the
 target end date of December 10, 2022, compared to November 26, 2022,
 which is expected due to increased uncertainty at longer horizons.
 Additionally, the forecasts for Massachusetts are relatively more
 accurate compared to those for Texas, which tend to have higher errors
-(\textbf{?@fig-example-mean-lomo}).
+(Figure~\ref{fig-example-median-lomo}).
 
 \subsection{Evaluation using LOMO algorithm}\label{sec:example-lomo}
 
 We quantify the contribution of each model within the ensemble using the
 \texttt{model\_importance()} function. The following code evaluates the
-importance of each model in the simple mean ensemble using the LOMO
-algorithm. The \texttt{na\_action} argument is set to \texttt{"drop"},
-which represents that any missing values in the forecasts will be
-excluded from the evaluation.
+importance of each ensemble member in the simple mean ensemble using the
+LOMO algorithm.
 
 \begin{verbatim}
-R> model_importance(forecast_data = forecast_data, 
-                    oracle_output_data = target_data,
-                    ensemble_fun = "simple_ensemble", 
-                    importance_algorithm = "lomo", 
-                    na_action = "drop")
+> model_importance(
+        forecast_data = forecast_data,
+        oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble",
+        importance_algorithm = "lomo"
+)
 \end{verbatim}
 
 This call generates both the result and informative messages,
@@ -1047,25 +1114,82 @@ The available model IDs are:
 (a total of 3 models)
 \end{verbatim}
 
+\vspace{0.35cm} 
 \normalsize
 
-The function output is a data frame containing model IDs and their
-corresponding importance scores in the \texttt{mean\_importance} column,
-ordered from most to least importance. The column name
-\texttt{mean\_importance} indicates the average of task-specific
-importance scores.
+The function output is a data frame containing model ids and their
+corresponding importance scores for each prediction task, along with
+task id columns.
+
+\small
+
+\begin{verbatim}
+            model_id reference_date          target horizon location
+1  Flusight-baseline     2022-11-19 wk inc flu hosp       1       25
+2    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25
+3           PSI-DICE     2022-11-19 wk inc flu hosp       1       25
+4  Flusight-baseline     2022-11-19 wk inc flu hosp       1       48
+5    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       48
+6           PSI-DICE     2022-11-19 wk inc flu hosp       1       48
+7  Flusight-baseline     2022-11-19 wk inc flu hosp       3       25
+8    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       25
+9           PSI-DICE     2022-11-19 wk inc flu hosp       3       25
+10 Flusight-baseline     2022-11-19 wk inc flu hosp       3       48
+11   MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       48
+12          PSI-DICE     2022-11-19 wk inc flu hosp       3       48
+   target_end_date output_type importance
+1       2022-11-26      median  -19.50000
+2       2022-11-26      median         NA
+3       2022-11-26      median   19.50000
+4       2022-11-26      median  -32.33333
+5       2022-11-26      median  -22.33333
+6       2022-11-26      median   54.66667
+7       2022-12-10      median  -16.66667
+8       2022-12-10      median  -20.66667
+9       2022-12-10      median   37.33333
+10      2022-12-10      median  182.00000
+11      2022-12-10      median -182.00000
+12      2022-12-10      median         NA
+\end{verbatim}
+
+\vspace{0.35cm} 
+\normalsize
+
+For models that missed forecasts for certain tasks, \texttt{NA} values
+were assigned in the importance column for those tasks.
+
+We summarize the importance scores for each model by averaging across
+all tasks. \texttt{NA} values are removed during the averaging process
+by setting the \texttt{na\_action} argument to \texttt{"drop"}.
+
+\begin{verbatim}
+> scores_lomo <- model_importance(
+        forecast_data = forecast_data,
+        oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble",
+        importance_algorithm = "lomo"
+)
+
+> model_importance_summary(
+        importance_scores = scores_lomo, 
+        by = "model_id", 
+        na_action = "drop", 
+        fun = mean
+)
+\end{verbatim}
 
 \small
 
 \begin{verbatim}
 # A tibble: 3 x 2
-  model_id          mean_importance
-  <chr>                       <dbl>
-1 PSI-DICE                     37.2
-2 Flusight-baseline            28.4
-3 MOBS-GLEAM_FLUH             -75  
+  model_id          importance_score_mean
+  <chr>                             <dbl>
+1 PSI-DICE                           37.2
+2 Flusight-baseline                  28.4
+3 MOBS-GLEAM_FLUH                   -75  
 \end{verbatim}
 
+\vspace{0.35cm} 
 \normalsize
 
 The results show that the model `PSI-DICE' has the highest importance
@@ -1085,24 +1209,26 @@ values with the worst (i.e., minimum) score among the other models for
 the same task.
 
 \begin{verbatim}
-R> model_importance(forecast_data = forecast_data, 
-                    oracle_output_data = target_data,
-                    ensemble_fun = "simple_ensemble", 
-                    importance_algorithm = "lomo", 
-                    na_action = "worst")
+> model_importance_summary(
+        importance_scores = scores_lomo, 
+        by = "model_id", 
+        na_action = "worst", 
+        fun = mean
+)
 \end{verbatim}
 
 \small
 
 \begin{verbatim}
 # A tibble: 3 x 2
-  model_id          mean_importance
-  <chr>                       <dbl>
-1 Flusight-baseline            28.4
-2 PSI-DICE                    -17.6
-3 MOBS-GLEAM_FLUH             -61.1
+  model_id          importance_score_mean
+  <chr>                             <dbl>
+1 Flusight-baseline                  28.4
+2 PSI-DICE                          -17.6
+3 MOBS-GLEAM_FLUH                   -61.1
 \end{verbatim}
 
+\vspace{0.35cm} 
 \normalsize
 
 The results show that the importance scores of `Flusight-baseline' is
@@ -1134,22 +1260,23 @@ mitigating the influence of the missing data without overly penalizing
 or overlooking them.
 
 \begin{verbatim}
-R> model_importance(forecast_data = forecast_data, 
-                    oracle_output_data = target_data,
-                    ensemble_fun = "simple_ensemble", 
-                    importance_algorithm = "lomo", 
-                    na_action = "average")
+> model_importance_summary(
+        importance_scores = scores_lomo, 
+        by = "model_id", 
+        na_action = "average", 
+        fun = mean
+)
 \end{verbatim}
 
 \small
 
 \begin{verbatim}
 # A tibble: 3 x 2
-  model_id          mean_importance
-  <chr>                       <dbl>
-1 Flusight-baseline            28.4
-2 PSI-DICE                     27.9
-3 MOBS-GLEAM_FLUH             -56.2
+  model_id          importance_score_mean
+  <chr>                             <dbl>
+1 Flusight-baseline                  28.4
+2 PSI-DICE                           27.9
+3 MOBS-GLEAM_FLUH                   -56.2
 \end{verbatim}
 
 \normalsize
@@ -1168,47 +1295,62 @@ The following code and corresponding outputs illustrate the evaluation
 using each weighting scheme.
 
 \begin{verbatim}
-R> model_importance(forecast_data = forecast_data, 
-                    oracle_output_data = target_data,
-                    ensemble_fun = "simple_ensemble", 
-                    importance_algorithm = "lasomo",
-                    subset_wt = "equal", 
-                    na_action = "drop")
+> scores_lasomo_eq <- model_importance(
+        forecast_data = forecast_data,
+        oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble",
+        importance_algorithm = "lasomo",
+        subset_wt = "equal"
+)
+
+> model_importance_summary(
+        importance_scores = scores_lasomo_eq, 
+        by = "model_id", 
+        na_action = "drop", 
+        fun = mean
+)
 \end{verbatim}
 
 \small
 
 \begin{verbatim}
 # A tibble: 3 x 2
-  model_id          mean_importance
-  <chr>                       <dbl>
-1 PSI-DICE                     47.4
-2 Flusight-baseline            24.3
-3 MOBS-GLEAM_FLUH             -79.8
+  model_id          importance_score_mean
+  <chr>                             <dbl>
+1 PSI-DICE                           47.4
+2 Flusight-baseline                  24.3
+3 MOBS-GLEAM_FLUH                   -79.8
 \end{verbatim}
 
-~~
-
+\vspace{0.35cm} 
 \normalsize
 
 \begin{verbatim}
-R> model_importance(forecast_data = forecast_data, 
-                    oracle_output_data = target_data,
-                    ensemble_fun = "simple_ensemble", 
-                    importance_algorithm = "lasomo",
-                    subset_wt = "perm_based", 
-                    na_action = "drop")
+> scores_lasomo_perm <- model_importance(
+        forecast_data = forecast_data,
+        oracle_output_data = target_data,
+        ensemble_fun = "simple_ensemble",
+        importance_algorithm = "lasomo",
+        subset_wt = "perm_based"
+)
+
+> model_importance_summary(
+        importance_scores = scores_lasomo_perm, 
+        by = "model_id", 
+        na_action = "drop", 
+        fun = mean
+)
 \end{verbatim}
 
 \small
 
 \begin{verbatim}
 # A tibble: 3 x 2
-  model_id          mean_importance
-  <chr>                       <dbl>
-1 PSI-DICE                     44.8
-2 Flusight-baseline            25.3
-3 MOBS-GLEAM_FLUH             -78.6
+  model_id          importance_score_mean
+  <chr>                             <dbl>
+1 PSI-DICE                           44.8
+2 Flusight-baseline                  25.3
+3 MOBS-GLEAM_FLUH                   -78.6
 \end{verbatim}
 
 \normalsize
