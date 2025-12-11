@@ -158,7 +158,7 @@ while the weights assigned to the smallest and largest subsets remain
 substantially different as shown in the following figure.
 
 
-```{r plot-lasomo-weights}
+```{r}
 #| echo: false
 #| label: fig-lasomo-weights
 #| fig-cap: "<span style='font-size:0.9em;'>
@@ -248,14 +248,22 @@ data.frame(
 ```
 
 
-## Main function
+## Main functions
 
-In this section, we describe the usage of the function `model_importance()`, 
+In this section, we describe the usage of the two main functions, 
 where multiple options are available to customize the evaluation framework.
+
+### model_importance( )
+
+The `model_importance()` function calculates the importance scores of ensemble 
+component models based on their contributions to improving ensemble prediction 
+accuracy for each prediction task. It returns a single data frame of importance 
+scores combined across all tasks. If a model missed predictions for a specific 
+task, an `NA` value will be assigned for that task.
 
 ```r
 > model_importance(forecast_data, oracle_output_data, ensemble_fun, 
-                    importance_algorithm, subset_wt, na_action, min_log_score, 
+                    importance_algorithm, subset_wt, min_log_score, 
                     ...)
 ```
 
@@ -277,7 +285,6 @@ the `output_type` column specifying the output type of the predictions and an
 As in the forecast data, if the `output_type` is either `"quantile"` or `"pmf"`,
 the `output_type_id` column is often required to provide further identifying 
 information. 
-
 
 The `model_out_tbl` and `oracle_output_data` must have the same task ID columns 
 and `output_type`, including `output_type_id` if necessary, which are used to 
@@ -305,6 +312,35 @@ weight to all subsets and `"perm_based"` assigns weight averaged over all
 possible permutations as in the formula of Shapley values. The default values of
 `importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`, respectively.
 
+The `min_log_score` argument is relevant only for the `output_type` of `"pmf"`, 
+which uses Log Score as a scoring rule. It sets a minimum threshold for log 
+scores to avoid issues with extremely low probabilities assigned to the true 
+outcome, which can lead to undefined or negative infinite log scores. 
+Any probability lower than this threshold will be adjusted to this minimum value
+before calculating the importance metric based on the log score. 
+The default value is set to -10, which is an arbitrary choice. 
+Users may choose a different value based on their practical needs. 
+
+### model_importance_summary( )
+
+The `model_importance_summary()` function summarizes the importance scores 
+produced by `model_importance()` across tasks for each model.
+
+```r
+> model_importance_summary(importance_scores, by = "model_id",
+                           na_action = c("drop", "worst", "average"),
+                           fun = mean, ...)
+```
+
+The `importance_scores` is a data frame containing model importance 
+scores for individual prediction tasks, as produced by the `model_importance()`
+function. 
+
+The `by` argument specifies the grouping variable(s) for summarization. 
+The default is `"model_id"` to summarize importance scores for each model. 
+Users can also specify other columns present in the `importance_scores` data 
+frame as needed.
+
 The `na_action` argument allows for specifying how to handle `NA` values 
 generated during importance score calculation for each task, occurring when a 
 model did not contribute to the ensemble prediction for a given task by missing 
@@ -317,14 +353,11 @@ average of the other models' importance metrics in that task.
 The `"drop"` option removes the `NA` values, which results in the exclusion of 
 the model from the evaluation for that task.
 
-The `min_log_score` argument is relevant only for the `output_type` of `"pmf"`, 
-which uses Log Score as a scoring rule. It sets a minimum threshold for log 
-scores to avoid issues with extremely low probabilities assigned to the true 
-outcome, which can lead to undefined or negative infinite log scores. 
-Any probability lower than this threshold will be adjusted to this minimum value
-before calculating the importance metric based on the log score. 
-The default value is set to -10, which is an arbitrary choice. 
-Users may choose a different value based on their practical needs. 
+The `fun` argument specifies a function used to summarize importance scores. 
+`fun = mean` is a default choice, but other summary functions are also 
+applicable (e.g., `fun = median`).
+Additional arguments can be passed to the summary function `fun` through `...`
+if needed (e.g., `fun = quantile, probs = 0.25` for a quartile summary).
 
 ## Examples
 We illustrate the implementation of the `model_importance()` function, using 
@@ -432,19 +465,30 @@ tend to have higher errors.
 #### Evaluation using LOMO algorithm
 We quantify the contribution of each model within the ensemble using the 
 `model_importance()` function. 
-The following code evaluates the importance of each model in the simple mean 
-ensemble using the LOMO algorithm. The `na_action` argument is set to `"drop"`, 
-which represents that any missing values in the forecasts will be excluded from 
-the evaluation. 
+The following code evaluates the importance of each ensemble member in the 
+simple mean ensemble using the LOMO algorithm. 
 
-```{r lomo-NAdrop}
-model_importance(
+```{r lomo}
+scores_lomo <- model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble",
-  importance_algorithm = "lomo", na_action = "drop"
+  importance_algorithm = "lomo"
 )
+scores_lomo
 ```
 
+For models that missed forecasts for certain tasks, `NA` values are assigned in 
+the importance column for those tasks.
+
+We summarize the importance scores for each model by averaging across all tasks.
+`NA` values are removed during the averaging process by setting the `na_action`
+argument to `"drop"`.
+
+```{r lomo-NAdrop}
+model_importance_summary(
+  scores_lomo, by = "model_id", na_action = "drop", fun = mean
+)
+```
 The results show that the model 'PSI-DICE' has the highest importance score, 
 followed by 'Flusight-baseline' and 'MOBS-GLEAM_FLUH'.
 That is, 'PSI-DICE' contributes the most to improving the ensemble's predictive 
@@ -456,16 +500,13 @@ compared to other models, while its missing forecast for Massachusetts for
 November 26, 2022, was not factored into the evaluation. This single large error
 significantly affected its contribution score.
 
-
-Another approach to handling missing values is to use the `"worst"` option for 
-`na_action`, which replaces missing values with the worst (i.e., minimum) score 
+Another approach to handling `NA` values is to use the `"worst"` option for 
+`na_action`, which replaces `NA` values with the worst (i.e., minimum) score 
 among the other models for the same task.
 
 ```{r lomo-NAworst}
-model_importance(
-  forecast_data = forecast_data, oracle_output_data = target_data,
-  ensemble_fun = "simple_ensemble",
-  importance_algorithm = "lomo", na_action = "worst"
+model_importance_summary(
+  scores_lomo, by = "model_id", na_action = "worst", fun = mean
 )
 ```
 
@@ -498,10 +539,8 @@ This strategy may offer a more balanced trade-off by mitigating the influence of
 the missing data without overly penalizing or overlooking them. 
 
 ```{r lomo-NAaverage}
-model_importance(
-  forecast_data = forecast_data, oracle_output_data = target_data,
-  ensemble_fun = "simple_ensemble",
-  importance_algorithm = "lomo", na_action = "average"
+model_importance_summary(
+  scores_lomo, by = "model_id", na_action = "average", fun = mean
 )
 ```
 
@@ -516,21 +555,29 @@ The following code and corresponding outputs illustrate the evaluation using
 each weighting scheme.
 
 ```{r lasomo-NAdrop-equal}
+#| message: false
 # LASOMO - equal weights
-model_importance(
+scores_lasomo_eq <- model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble",
-  importance_algorithm = "lasomo", subset_wt = "equal", na_action = "drop"
+  importance_algorithm = "lasomo", subset_wt = "equal"
+)
+model_importance_summary(
+  scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean
 )
 ```
 
 ```{r lasomo-NAdrop-perm}
+#| message: false
 # LASOMO - perm based weights
-model_importance(
+scores_lasomo_perm <- model_importance(
   forecast_data = forecast_data,
   oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble",
-  importance_algorithm = "lasomo", subset_wt = "perm_based", na_action = "drop"
+  importance_algorithm = "lasomo", subset_wt = "perm_based"
+)
+model_importance_summary(
+  scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean
 )
 ```
 
