@@ -1,11 +1,35 @@
 Package: modelimportance
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Measuring Contributions of Component Models to Ensemble Forecast Accuracy
 Version: 0.1.0
-Author: Minsu Kim
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Authors@R: c(
+    person(given = "Minsu", 
+           family = "Kim",
+           email = "minsu@umass.edu", 
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0008-4637-3589")),
+    person(given = "Li",
+           family = "Shandross",
+           email = "lshandross@umass.edu",
+           comment = c(ORCID = "0009-0008-1348-1954"),
+           role = c("aut", "ctb")),
+    person(given = "Zhian",
+           family = "Kamvar",
+           email = "zkamvar@umass.edu",
+           comment = c(ORCID = "0000-0003-1458-7108"),
+           role = c("ctb")),
+    person(given = "Nicholas", 
+           family = "Reich",
+           email = "nick@umass.edu", 
+           role = c("aut"),
+           comment = c(ORCID = "0000-0003-3503-9899")),
+    person(given = "Evan", 
+           family = "Ray", 
+           email = "elray1@umass.edu", 
+           role = c("aut"))
+    )
+Description: Provides metrics for quantifying the contribution of individual 
+    component models to the predictive accuracy of ensemble forecasts.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -21,6 +45,7 @@ Imports:
     purrr (>= 1.0.4),
     furrr (>= 0.3.1),
     future (>= 1.49.0),
+    scoringutils (>= 2.1.2.9000),
     checkmate
 Depends: 
     R (>= 2.10)
