@@ -45,7 +45,7 @@ Imports:
     purrr (>= 1.0.4),
     furrr (>= 0.3.1),
     future (>= 1.49.0),
-    scoringutils (>= 2.1.2.9000),
+    scoringutils (>= 2.1.2),
     checkmate
 Depends: 
     R (>= 2.10)
