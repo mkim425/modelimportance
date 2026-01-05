@@ -369,6 +369,7 @@ modeling hubs in the hubverse format.
 
 We load the necessary packages.
 ```{r setup}
+library(hubExamples)
 library(modelimportance)
 library(dplyr)
 library(ggplot2)
