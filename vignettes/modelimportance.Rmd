@@ -1,7 +1,9 @@
 ---
 title: "`modelimportance`: Assessing Model Contribution to Ensemble Accuracy"
+author: "Minsu Kim, Nicholas Reich, Li Shandross"
 output: 
   rmarkdown::html_vignette
+bibliography: vignette-references.bib
 vignette: >
   %\VignetteIndexEntry{Assessing Model Contribution to Ensemble Accuracy}
   %\VignetteEngine{knitr::rmarkdown}
@@ -35,9 +37,11 @@ planning across various fields because they often offer improved accuracy and
 stability compared to individual models. As each model has its own unique 
 characteristics, understanding and measuring the value each constituent model 
 adds to the overall accuracy of the ensemble can support the construction of 
-effective ensembles. The `modelimportance` package provides tools to quantify 
-how each component model contributes to the accuracy of ensemble performance for
-both point and probabilistic forecasts.
+effective ensembles. @kim2024 introduced metrics to quantify how each component 
+model contributes to the accuracy of ensemble performance and demonstrated their
+use in the context of probabilistic forecasting.
+Building on this work, the `modelimportance` package provides tools for extended  
+applications, embracing both point and probabilistic forecasts.
 It supports multiple functionalities; it allows users to specify which ensemble 
 approach to implement and which model importance metric to use. 
 Additionally, the software offers customizable options for handling missing 
@@ -46,9 +50,9 @@ researchers and practitioners. It helps not only in constructing an effective
 ensemble model across a wide range of forecasting tasks, but also in 
 understanding the role of each model within the ensemble and gaining insights 
 into individual models themselves. 
-This package follows the 'hubverse' framework, which is a collection of 
-open-source software and tools developed to promote collaborative modeling hub 
-efforts and simplify their setup and operation. 
+This package follows the 'hubverse' [@hubverse_docs] framework, which is a 
+collection of open-source software and tools developed to promote collaborative 
+modeling hub efforts and simplify their setup and operation. 
 Accordingly, it depends on several packages in the hubverse ecosystem, such as 
 `hubUtils`, `hubEnsembles`, `hubEvals`, and `hubExamples`.
 Doing so enables seamless integration and flexibility with other forecasting
@@ -115,7 +119,7 @@ one assigns equal (uniform) weights to all subsets, and the other assigns
 weights based on their size, similar to the concept of Shapley values in 
 cooperative game theory, which measure a player’s average contribution to all 
 possible coalitions (or, equivalently, over all permutations of players) 
-(*Shapley (1953)*). 
+[@Shapley1953]. 
 The formulas for the weights under each scheme are as follows:
 \begin{align*}
 w^{\text{eq}} &= \frac{1}{2^{n-1}-1}, \\
@@ -589,12 +593,7 @@ However, in general, with a larger number of models, the two weighting schemes
 may yield different importance scores for each model.
 
 An extensive application in more complex scenarios with a larger number of 
-models can be found in *Kim et al. (2025)*.
+models can be found in @kim2024.
 
 ## References
 
-- Shapley, Lloyd S. A value for n-person games. 
-*Contribution to the Theory of Games 2* (1953).
-- Kim, Minsu, Ray, Evan L, and Reich, Nicholas G. Beyond forecast leaderboards: 
-Measuring individual model importance based on contribution to ensemble 
-accuracy. *arXiv preprint arXiv:2412.08916* (2024).
