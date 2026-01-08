@@ -62,3 +62,4 @@ Remotes:
     hubverse-org/hubEvals,
     hubverse-org/hubEnsembles
 VignetteBuilder: knitr
+URL: https://mkim425.github.io/modelimportance/
