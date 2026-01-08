@@ -1,0 +1,50 @@
+# modelimportance
+
+The goal of modelimportance is to …
+
+## Installation
+
+You can install the development version of modelimportance from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("mkim425/modelimportance")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+``` r
+library(modelimportance)
+## basic example code
+```
+
+# Package index
+
+## All functions
+
+- [`compute_importance()`](https://mkim425.github.io/modelimportance/reference/compute_importance.md)
+  : Calculate model importance for a single task
+
+- [`model_importance()`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
+  : Quantifies the contribution of ensemble component models to ensemble
+  prediction accuracy for each prediction task.
+
+- [`model_importance_summary()`](https://mkim425.github.io/modelimportance/reference/model_importance_summary.md)
+  :
+
+  Summarize model importance scores produced by
+  [`model_importance()`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
+  across tasks
+
+- [`split_data_by_task()`](https://mkim425.github.io/modelimportance/reference/split_data_by_task.md)
+  : Split the input data by a single task and make a list of data sets
+
+# Articles
+
+### All vignettes
+
+- [\`modelimportance\`: Assessing Model Contribution to Ensemble
+  Accuracy](https://mkim425.github.io/modelimportance/articles/modelimportance.md):

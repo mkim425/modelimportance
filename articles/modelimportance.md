@@ -1,0 +1,602 @@
+# \`modelimportance\`: Assessing Model Contribution to Ensemble Accuracy
+
+This vignette demonstrates the usage of the `modelimportance` package
+for assessing the contribution of component models to the accuracy of
+ensemble performance.
+
+## Introduction
+
+Ensemble forecasts are commonly used to support decision-making and
+policy planning across various fields because they often offer improved
+accuracy and stability compared to individual models. As each model has
+its own unique characteristics, understanding and measuring the value
+each constituent model adds to the overall accuracy of the ensemble can
+support the construction of effective ensembles. The `modelimportance`
+package provides tools to quantify how each component model contributes
+to the accuracy of ensemble performance for both point and probabilistic
+forecasts. It supports multiple functionalities; it allows users to
+specify which ensemble approach to implement and which model importance
+metric to use. Additionally, the software offers customizable options
+for handling missing values. These features enable the package to serve
+as a versatile tool for researchers and practitioners. It helps not only
+in constructing an effective ensemble model across a wide range of
+forecasting tasks, but also in understanding the role of each model
+within the ensemble and gaining insights into individual models
+themselves. This package follows the ‘hubverse’ framework, which is a
+collection of open-source software and tools developed to promote
+collaborative modeling hub efforts and simplify their setup and
+operation. Accordingly, it depends on several packages in the hubverse
+ecosystem, such as `hubUtils`, `hubEnsembles`, `hubEvals`, and
+`hubExamples`. Doing so enables seamless integration and flexibility
+with other forecasting tools and systems, allowing many analyses to be
+performed on existing and ongoing hubs.
+
+## Model importance metric description
+
+The `modelimportance` package provides two model importance metrics
+based on the algorithms of:
+
+1.  Leave-one-model-out (LOMO)
+
+2.  Leave-all-subsets-of-models-out (LASOMO).
+
+The basic idea of measuring the importance of each component model is to
+evaluate the change in ensemble performance when that model is included
+or excluded in the ensemble construction. More specifically, we compare
+the performance of an ensemble with and without a specific model for a
+specific task, and consider the difference in performance as the
+importance of that model for that task. We apply this idea to many tasks
+and aggregate the importance scores for that model across all tasks
+using averages.
+
+### Leave-one-model-out (LOMO)
+
+LOMO involves creating an ensemble by excluding one component model from
+the entire set of models. Let $A$ be a set of $n$ models and $F^{i}$ be
+a forecast produced by model $i$, where $i = 1,2,\ldots,n.$ Each
+ensemble excludes exactly one model while including all the others.
+$F^{A^{- i}}$ denotes the ensemble forecast constructed using all
+forecasts $F^{A}$*except* $F^{i}$. Its importance score using LOMO is
+calculated as the difference in accuracy, as measured by a specific
+score, between $F^{A^{- i}}$ and $F^{A}$. For example, when evaluating
+model 1 within an ensemble of three models ($n = 3$), LOMO creates an
+ensemble forecast $F^{\{ 2,3\}}$ using only $F^{2}$ and $F^{3}$. The
+performance of this reduced ensemble is then compared to the full
+ensemble forecast $F^{\{ 1,2,3\}}$, which incorporates all three models.
+We note that a model can make an ensemble better or worse, and thus the
+importance score for model 1 can be positive or negative accordingly.
+
+### Leave-all-subsets-of-models-out (LASOMO)
+
+LASOMO involves ensemble constructions from all possible subsets of
+models. For each subset $S$ that does not contain the model $i$,
+$S \cup \{ i\}$ plays a role of $A$ in the LOMO; the score associated
+with the subset $S$ is the difference of measures between $F^{S}$ and
+$F^{S \cup \{ i\}}$. Then, all scores are aggregated across all possible
+subsets that the model $i$ does not belong to. For example, using the
+earlier setup of three forecast models, LASOMO considers three subsets,
+which we denote by $S_{1} = \{ 2\}$, $S_{2} = \{ 3\}$, and
+$S_{3} = \{ 2,3\}$, to calculate the importance score of model 1
+(excluding all subsets that include model 1). The ensemble forecasts
+$F^{\{ 2\}},F^{\{ 3\}}$, and $F^{\{ 2,3\}}$ are then compared to
+$F^{\{ 1,2\}},F^{\{ 1,3\}}$, and $F^{\{ 1,2,3\}}$, respectively. The
+performance differences attributable to model 1’s inclusion are
+aggregated, which results in the importance score for model 1. We note
+that the subsets (e.g., $S_{1},S_{2},$ and $S_{3}$) may have different
+weights during the aggregating process. The `modelimportance` package
+offers two weighting options for subsets: one assigns equal (uniform)
+weights to all subsets, and the other assigns weights based on their
+size, similar to the concept of Shapley values in cooperative game
+theory, which measure a player’s average contribution to all possible
+coalitions (or, equivalently, over all permutations of players)
+(*Shapley (1953)*). The formulas for the weights under each scheme are
+as follows: $$\begin{aligned}
+w^{\text{eq}} & {= \frac{1}{2^{n - 1} - 1},} \\
+w^{\text{perm}} & {= \frac{1}{(n - 1)\left( \frac{n - 1}{k} \right)},}
+\end{aligned}$$ where $k$ is the size of the subset, and the
+superscripts “eq” and “perm” denote the equal and permutation-based
+weighting schemes, respectively.
+
+Users can choose one to evaluate the contribution of each model in a
+manner suited to their preferred framework.
+
+### Comparison of weighting schemes in LASOMO
+
+The maximum weight under the permutation-based scheme occurs when
+$k = n - 1$, which is $1/(n - 1)$. The minimum weight occurs when the
+subset size is around $(n - 1)/2$ (i.e., $k = \lfloor(n - 1)/2\rfloor$),
+which is approximately $\frac{\sqrt{\pi(n - 1)/2}}{(n - 1)2^{n - 1}}$ by
+Stirling’s approximation.
+
+Given a fixed mid-sized subset, as $n$ increases, the weight assigned to
+this subset under the equal weighting scheme decreases at a rate of
+$O\left( 1/2^{n} \right)$, while under the permutation-based scheme, it
+decreases at a much faster rate of
+$O\left( 1/\left( \sqrt{n}\, 2^{n} \right) \right)$. This indicates that
+as the number of models grows, that mid-sized subset becomes
+significantly less influential in determining model importance scores
+when using the permutation-based weighting scheme compared to the equal
+weighting scheme.
+
+On the other hand, for subsets of extreme sizes (e.g., $k = 1$ or
+$k = n - 1$), the weights under permutation-based weighting scheme
+decrease only at $O(1/n)$, much slower under the equal weighting scheme.
+This implies that in scenarios with a large number of models, the
+contributions of these extreme-sized subsets play a relatively larger
+role in the calculation of model importance scores when using
+permutation-based weights compared to the equal weighting approach.
+
+Overall, the difference between the two weighting schemes is likely to
+arise mainly from the the extreme-sized subsets when $n$ is large. This
+is because the weights given to the mid-sized subsets become
+increasingly similar, which are very small values on the order of
+$10^{- 3}$ even when $n = 8$, while the weights assigned to the smallest
+and largest subsets remain substantially different as shown in the
+following figure.
+
+![\<span style='font-size:0.9em;'\> \*\*Figure\*\*: Comparison of
+weights assigned to a subset. The plot shows the weights assigned to a
+subset as the number of models \$n\$ increases from 2 to 10. The red
+line represents the weights under the equal weighting scheme, while the
+blue and green lines represent the minimum and maximum weights,
+respectively, under the permutation-based weighting scheme. The minimum
+weight occurs when the subset size is around \$(n-1)/2\$, and the
+maximum weight occurs when the subset size is \$n-1\$. As the number of
+models increases, the weights assigned by the two schemes become
+increasingly similar for mid-sized subsets whereas substantial
+differences remain for extreme-sized
+subsets.](modelimportance_files/figure-html/fig-lasomo-weights-1.png)
+
+**Figure**: Comparison of weights assigned to a subset. The plot shows
+the weights assigned to a subset as the number of models $n$ increases
+from 2 to 10. The red line represents the weights under the equal
+weighting scheme, while the blue and green lines represent the minimum
+and maximum weights, respectively, under the permutation-based weighting
+scheme. The minimum weight occurs when the subset size is around
+$(n - 1)/2$, and the maximum weight occurs when the subset size is
+$n - 1$. As the number of models increases, the weights assigned by the
+two schemes become increasingly similar for mid-sized subsets whereas
+substantial differences remain for extreme-sized subsets.
+
+### Scoring rules
+
+A model’s prediction performance is evaluated by different scoring rules
+depending to different output types. The following table presents the
+output types and their associated scoring rules supported by the
+`modelimportance` package.
+
+| Output Type | Scoring Rule | Description                                                                             |
+|:------------|:-------------|:----------------------------------------------------------------------------------------|
+| mean        | RSE          | Evaluate using the root squared error (RSE)                                             |
+| median      | AE           | Evaluate using the absolute error (AE)                                                  |
+| quantile    | WIS          | Evaluate using the weighted interval score (WIS)                                        |
+| pmf         | Log Score    | Evaluate using the logarithm of the probability assigned to the true outcome (LogScore) |
+
+## Main functions
+
+In this section, we describe the usage of the two main functions, where
+multiple options are available to customize the evaluation framework.
+
+### model_importance( )
+
+The
+[`model_importance()`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
+function calculates the importance scores of ensemble component models
+based on their contributions to improving ensemble prediction accuracy
+for each prediction task. It returns a single data frame of importance
+scores combined across all tasks. If a model missed predictions for a
+specific task, an `NA` value will be assigned for that task.
+
+``` r
+> model_importance(forecast_data, oracle_output_data, ensemble_fun, 
+                    importance_algorithm, subset_wt, min_log_score, 
+                    ...)
+```
+
+The `forecast_data` is a data frame containing predictions and should be
+or can be coerced to a `model_out_tbl` format, which is the standard S3
+class model output format defined by the hubverse convention. If it
+fails to be coerced to a `model_out_tbl` format, an error message will
+be returned from the `hubUtils` package, which provides the function
+`as_model_out_tbl()` for this purpose. Users may need to manually
+transform their data to meet the hubverse standards.
+
+The `oracle_output_data` is a data frame that contains the ground truth
+values for the variables used to define modeling targets. It is referred
+to as “oracle” because it is formatted as if an oracle made a perfect
+point prediction equal to the truth. This data must follow the oracle
+output format defined in the hubverse standard, which includes
+independent task ID columns (e.g., `location`, `target_date`), the
+`output_type` column specifying the output type of the predictions and
+an `oracle_value` column for the observed values. As in the forecast
+data, if the `output_type` is either `"quantile"` or `"pmf"`, the
+`output_type_id` column is often required to provide further identifying
+information.
+
+The `model_out_tbl` and `oracle_output_data` must have the same task ID
+columns and `output_type`, including `output_type_id` if necessary,
+which are used to match the predictions with the ground truth data.
+
+The `ensemble_fun` argument specifies the ensemble method to be used for
+evaluating model importance, which relies on implementations in the
+`hubEnsembles` package. The currently supported methods are
+`"simple_ensemble"` and `"linear_pool"`. The `"simple_ensemble"` method
+returns the average of the predicted values from all component models
+per prediction task defined by task IDs, `output_type`, and
+`output_type_id` columns. The default aggregation function for this
+method is `"mean"`, but it can be customized by specifying additional
+arguments through `...`, such as `agg_fun="median"`. When
+`"linear_pool"` is specified, ensemble model outputs are created as a
+linear pool of component model outputs. This method supports only an
+`output_type` of `"mean"`, `"quantile"`, or `"pmf"`.
+
+The `importance_algorithm` argument specifies the algorithm for model
+importance calculation, which can be either `"lomo"` (leave one model
+out) and `"lasomo"` (leave all subsets of models out). The `subset_wt`
+argument is employed only for the `"lasomo"` algorithm. This argument
+has two options: `"equal"` assigns equal weight to all subsets and
+`"perm_based"` assigns weight averaged over all possible permutations as
+in the formula of Shapley values. The default values of
+`importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`,
+respectively.
+
+The `min_log_score` argument is relevant only for the `output_type` of
+`"pmf"`, which uses Log Score as a scoring rule. It sets a minimum
+threshold for log scores to avoid issues with extremely low
+probabilities assigned to the true outcome, which can lead to undefined
+or negative infinite log scores. Any probability lower than this
+threshold will be adjusted to this minimum value before calculating the
+importance metric based on the log score. The default value is set to
+-10, which is an arbitrary choice. Users may choose a different value
+based on their practical needs.
+
+### model_importance_summary( )
+
+The
+[`model_importance_summary()`](https://mkim425.github.io/modelimportance/reference/model_importance_summary.md)
+function summarizes the importance scores produced by
+[`model_importance()`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
+across tasks for each model.
+
+``` r
+> model_importance_summary(importance_scores, by = "model_id",
+                           na_action = c("drop", "worst", "average"),
+                           fun = mean, ...)
+```
+
+The `importance_scores` is a data frame containing model importance
+scores for individual prediction tasks, as produced by the
+[`model_importance()`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
+function.
+
+The `by` argument specifies the grouping variable(s) for summarization.
+The default is `"model_id"` to summarize importance scores for each
+model. Users can also specify other columns present in the
+`importance_scores` data frame as needed.
+
+The `na_action` argument allows for specifying how to handle `NA` values
+generated during importance score calculation for each task, occurring
+when a model did not contribute to the ensemble prediction for a given
+task by missing its forecast submission. Three options are available:
+`"worst"`, `"average"`, and `"drop"`. In each specific prediction task,
+if a model has any missing predictions, the `"worst"` option replaces
+the `NA` values with the smallest value among other models’ importance
+metrics, while the `"average"` option replaces them with the average of
+the other models’ importance metrics in that task. The `"drop"` option
+removes the `NA` values, which results in the exclusion of the model
+from the evaluation for that task.
+
+The `fun` argument specifies a function used to summarize importance
+scores. `fun = mean` is a default choice, but other summary functions
+are also applicable (e.g., `fun = median`). Additional arguments can be
+passed to the summary function `fun` through `...` if needed (e.g.,
+`fun = quantile, probs = 0.25` for a quartile summary).
+
+## Examples
+
+We illustrate the implementation of the
+[`model_importance()`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
+function, using various combinations of the arguments. We use some
+example forecast and target data from the `hubExamples` package, which
+provides sample datasets for multiple modeling hubs in the hubverse
+format.
+
+### Setup
+
+We load the necessary packages.
+
+``` r
+library(hubExamples)
+library(modelimportance)
+library(dplyr)
+library(ggplot2)
+```
+
+### Example data
+
+The forecast data used here contains forecasts of weekly incident
+influenza hospitalizations in the US for Massachusetts (FIPS code 25)
+and Texas (FIPS code 48), generated on November 19, 2022. These
+forecasts are for two target end dates, November 26, 2022 (horizon 1),
+and December 10, 2022 (horizon 3), and were produced by three models:
+‘Flusight-baseline’, ‘MOBS-GLEAM_FLUH’, and ‘PSI-DICE’. The output type
+is `median` and the `output_type_id` column has `NA`s as no further
+specification is required for this output type. We have modified the
+example data slightly: some forecasts have been removed to demonstrate
+the handling of missing values. Therefore, MOBS-GLEAM_FLUH’s forecast
+for Massachusetts on November 26, 2022, and PSI-DICE’s forecast for
+Texas on December 10, 2022, are missing.
+
+``` r
+forecast_data <- hubExamples::forecast_outputs |>
+  dplyr::filter(
+    output_type %in% c("median"),
+    target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
+  ) |>
+  filter(
+    !(model_id == "MOBS-GLEAM_FLUH" & location == "25" &
+        target_end_date == as.Date("2022-11-26")),
+    !(model_id == "PSI-DICE" & location == "48" &
+        target_end_date == as.Date("2022-12-10"))
+  )
+
+forecast_data
+#> # A tibble: 10 × 9
+#>    model_id          reference_date target          horizon location target_end_date output_type output_type_id value
+#>    <chr>             <date>         <chr>             <int> <chr>    <date>          <chr>       <chr>          <dbl>
+#>  1 Flusight-baseline 2022-11-19     wk inc flu hosp       1 25       2022-11-26      median      NA                51
+#>  2 Flusight-baseline 2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      NA                51
+#>  3 Flusight-baseline 2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      NA              1052
+#>  4 Flusight-baseline 2022-11-19     wk inc flu hosp       3 48       2022-12-10      median      NA              1052
+#>  5 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      NA                43
+#>  6 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      NA              1072
+#>  7 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 48       2022-12-10      median      NA               688
+#>  8 PSI-DICE          2022-11-19     wk inc flu hosp       1 25       2022-11-26      median      NA                90
+#>  9 PSI-DICE          2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      NA               159
+#> 10 PSI-DICE          2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      NA              1226
+```
+
+The corresponding target data contains the observed hospitalization
+counts for these dates and locations.
+
+``` r
+target_data <- hubExamples::forecast_target_ts |>
+  dplyr::filter(
+    target_end_date %in% unique(forecast_data$target_end_date),
+    location %in% unique(forecast_data$location),
+    target == "wk inc flu hosp"
+  ) |>
+  # Rename columns to match the oracle output format
+  rename(oracle_value = observation)
+
+target_data
+#> # A tibble: 4 × 4
+#>   target_end_date target          location oracle_value
+#>   <date>          <chr>           <chr>           <dbl>
+#> 1 2022-11-26      wk inc flu hosp 25                221
+#> 2 2022-11-26      wk inc flu hosp 48               1929
+#> 3 2022-12-10      wk inc flu hosp 25                578
+#> 4 2022-12-10      wk inc flu hosp 48               1781
+```
+
+We visualize the forecasts and the observed values.
+
+``` r
+forecast_data |>
+  ggplot(aes(x = target_end_date)) +
+  geom_point(aes(y = value, color = model_id), size = 2) +
+  facet_wrap(~location,
+    scales = "free_y",
+    labeller = labeller(location = function(x) paste0("Location: ", x))
+  ) +
+  geom_point(
+    data = target_data,
+    aes(y = oracle_value, group = 1, shape = "Observed"),
+    alpha = 1, size = 2
+  ) +
+  scale_x_date(
+    breaks = target_data$target_end_date,
+    date_labels = "%Y-%m-%d", expand = expansion(add = c(5, 5))
+  ) +
+  scale_color_manual(
+    name = "model_id/Observed",
+    values = c(
+      "Flusight-baseline" = "#619CFF",
+      "MOBS-GLEAM_FLUH" = "#00BA38", "PSI-DICE" = "#F8766D"
+    ),
+    limits = c("Flusight-baseline", "MOBS-GLEAM_FLUH", "PSI-DICE")
+  ) +
+  scale_shape_manual(values = c("Observed" = 1)) +
+  labs(
+    x = "Date", y = "Weekly Hospitalization",
+    title = "Forecasts of incident deaths generated on November 19, 2022"
+  )
+```
+
+![](modelimportance_files/figure-html/fig-example-median-lomo-1.png)
+
+Overall, the forecasts tend to have larger prediction errors for the
+target end date of December 10, 2022, compared to November 26, 2022,
+which is expected due to increased uncertainty at longer horizons.
+Additionally, the forecasts for Massachusetts are relatively more
+accurate compared to those for Texas, which tend to have higher errors.
+
+#### Evaluation using LOMO algorithm
+
+We quantify the contribution of each model within the ensemble using the
+[`model_importance()`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
+function. The following code evaluates the importance of each ensemble
+member in the simple mean ensemble using the LOMO algorithm.
+
+``` r
+scores_lomo <- model_importance(
+  forecast_data = forecast_data, oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble",
+  importance_algorithm = "lomo"
+)
+scores_lomo
+#>             model_id reference_date          target horizon location target_end_date output_type importance
+#> 1  Flusight-baseline     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median  -19.50000
+#> 2    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median         NA
+#> 3           PSI-DICE     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median   19.50000
+#> 4  Flusight-baseline     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median  -32.33333
+#> 5    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median  -22.33333
+#> 6           PSI-DICE     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median   54.66667
+#> 7  Flusight-baseline     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median  -16.66667
+#> 8    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median  -20.66667
+#> 9           PSI-DICE     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median   37.33333
+#> 10 Flusight-baseline     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median  182.00000
+#> 11   MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median -182.00000
+#> 12          PSI-DICE     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median         NA
+```
+
+For models that missed forecasts for certain tasks, `NA` values are
+assigned in the importance column for those tasks.
+
+We summarize the importance scores for each model by averaging across
+all tasks. `NA` values are removed during the averaging process by
+setting the `na_action` argument to `"drop"`.
+
+``` r
+model_importance_summary(
+  scores_lomo, by = "model_id", na_action = "drop", fun = mean
+)
+#> # A tibble: 3 × 2
+#>   model_id          importance_score_mean
+#>   <chr>                             <dbl>
+#> 1 PSI-DICE                           37.2
+#> 2 Flusight-baseline                  28.4
+#> 3 MOBS-GLEAM_FLUH                   -75
+```
+
+The results show that the model ‘PSI-DICE’ has the highest importance
+score, followed by ‘Flusight-baseline’ and ‘MOBS-GLEAM_FLUH’. That is,
+‘PSI-DICE’ contributes the most to improving the ensemble’s predictive
+performance, whereas ‘MOBS-GLEAM_FLUH’, which has a negative score,
+detracts from the ensemble’s performance. The low importance score of
+‘MOBS-GLEAM_FLUH’ is mainly due to a substantially larger prediction
+error for Texas on the target end date of December 10, 2022, compared to
+other models, while its missing forecast for Massachusetts for November
+26, 2022, was not factored into the evaluation. This single large error
+significantly affected its contribution score.
+
+Another approach to handling `NA` values is to use the `"worst"` option
+for `na_action`, which replaces `NA` values with the worst (i.e.,
+minimum) score among the other models for the same task.
+
+``` r
+model_importance_summary(
+  scores_lomo, by = "model_id", na_action = "worst", fun = mean
+)
+#> # A tibble: 3 × 2
+#>   model_id          importance_score_mean
+#>   <chr>                             <dbl>
+#> 1 Flusight-baseline                  28.4
+#> 2 PSI-DICE                          -17.6
+#> 3 MOBS-GLEAM_FLUH                   -61.1
+```
+
+The results show that the importance scores of ‘Flusight-baseline’ is
+unchanged because it has no missing forecast. We observe that the
+importance score of ‘PSI-DICE’, which was previously positive, has now
+decreased to a negative value when compared to the evaluation using the
+`"drop"` option for `na_action`. Moreover, ‘MOBS-GLEAM_FLUH’ still ranks
+the lowest, but the importance score has increased. This change is
+related to the varying forecast accuracy across different tasks. For the
+target end date of November 26, 2022, in Massachusetts, most forecasts
+are relatively accurate. Thus, even if the ‘MOBS-GLEAM_FLUH’ is assigned
+the worst value of importance score for its missing forecast, including
+this value in the averaging is not detrimental to the overall importance
+metric; rather, it is more beneficial than excluding it. In contrast,
+for the target end date of December 10, 2022, in Texas, the forecasts
+have much larger errors across the board, and assigning the worst value
+of importance score to the missing forecast of ‘PSI-DICE’ in this task
+has a detrimental effect on averaging importance scores. This is because
+the scale of the importance scores is influenced by the magnitude of the
+prediction errors: for tasks with small errors, the scores remain
+moderate, while tasks with large errors can yield importance scores of
+much greater magnitude.
+
+It is also possible to impute the missing scores with intermediate
+values by assigning the average importance scores of other models in the
+same task. This strategy may offer a more balanced trade-off by
+mitigating the influence of the missing data without overly penalizing
+or overlooking them.
+
+``` r
+model_importance_summary(
+  scores_lomo, by = "model_id", na_action = "average", fun = mean
+)
+#> # A tibble: 3 × 2
+#>   model_id          importance_score_mean
+#>   <chr>                             <dbl>
+#> 1 Flusight-baseline                  28.4
+#> 2 PSI-DICE                           27.9
+#> 3 MOBS-GLEAM_FLUH                   -56.2
+```
+
+#### Evaluation using LASOMO algorithm
+
+Now we demonstrate the use of the LASOMO algorithm in the evaluation of
+model importance. As we explored the difference of `na_action` options
+in the previous LOMO example, we focus on options for `subset_wt`, which
+specifies how weights are assigned to subsets of models when calculating
+importance scores, with `na_action` fixed to `"drop"`.
+
+The following code and corresponding outputs illustrate the evaluation
+using each weighting scheme.
+
+``` r
+# LASOMO - equal weights
+scores_lasomo_eq <- model_importance(
+  forecast_data = forecast_data, oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble",
+  importance_algorithm = "lasomo", subset_wt = "equal"
+)
+model_importance_summary(
+  scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean
+)
+#> # A tibble: 3 × 2
+#>   model_id          importance_score_mean
+#>   <chr>                             <dbl>
+#> 1 PSI-DICE                           47.4
+#> 2 Flusight-baseline                  24.3
+#> 3 MOBS-GLEAM_FLUH                   -79.8
+```
+
+``` r
+# LASOMO - perm based weights
+scores_lasomo_perm <- model_importance(
+  forecast_data = forecast_data,
+  oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble",
+  importance_algorithm = "lasomo", subset_wt = "perm_based"
+)
+model_importance_summary(
+  scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean
+)
+#> # A tibble: 3 × 2
+#>   model_id          importance_score_mean
+#>   <chr>                             <dbl>
+#> 1 PSI-DICE                           44.8
+#> 2 Flusight-baseline                  25.3
+#> 3 MOBS-GLEAM_FLUH                   -78.6
+```
+
+In this example, there are only three models ($n = 3$), and the weights
+do not differ significantly between the two weighting schemes.
+Therefore, the resulting outputs show little difference. However, in
+general, with a larger number of models, the two weighting schemes may
+yield different importance scores for each model.
+
+An extensive application in more complex scenarios with a larger number
+of models can be found in *Kim et al. (2025)*.
+
+## References
+
+- Shapley, Lloyd S. A value for n-person games. *Contribution to the
+  Theory of Games 2* (1953).
+- Kim, Minsu, Ray, Evan L, and Reich, Nicholas G. Beyond forecast
+  leaderboards: Measuring individual model importance based on
+  contribution to ensemble accuracy. *arXiv preprint arXiv:2412.08916*
+  (2024).
