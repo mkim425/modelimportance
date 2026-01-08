@@ -32,7 +32,6 @@ Description: Provides metrics for quantifying the contribution of individual
     component models to the predictive accuracy of ensemble forecasts.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports:
@@ -45,15 +44,15 @@ Imports:
     purrr (>= 1.0.4),
     furrr (>= 0.3.1),
     future (>= 1.49.0),
-    scoringutils (>= 2.1.2),
     checkmate
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5)
 Suggests: 
     knitr,
     rmarkdown,
     ggplot2,
     kableExtra,
+    scoringutils (>= 2.1.2),
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Remotes:
