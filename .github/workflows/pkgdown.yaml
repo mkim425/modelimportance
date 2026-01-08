@@ -14,12 +14,16 @@ permissions: read-all
 
 jobs:
   pkgdown:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     # Only restrict concurrency for non-PR jobs
     concurrency:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      PAK_NUM_WORKERS: ${{ matrix.os == 'macos-latest' && 1 || '' }}
     permissions:
       contents: write
     steps:
