@@ -134,11 +134,14 @@ forecast_data |>
     reference_date == "2022-12-17",
     horizon != 0
   ) |>
-  head(10) |> 
-        knitr::kable(format = "html",
-                     caption = "Table 1: Example of the model output for incident influenza hospitalizations (top 10 rows) extracted from `forecast_outputs` data in the `hubExamples` package.") |>
+  head(10) |>
+  knitr::kable(
+               format = "html",
+               caption = "Table 1: Example of the model output for incident 
+               influenza hospitalizations (top 10 rows) extracted from 
+               `forecast_outputs` data in the `hubExamples` package.") |>
   kableExtra::kable_styling(
-          font_size = 12,
+    font_size = 12,
     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
     full_width = TRUE
   )
@@ -150,8 +153,14 @@ For each model, the quantile-based forecasts are shown for the target end dates 
 ```{r, fig.pos="t"}
 #| echo: false
 #| label: fig-example-model_output
-#| fig.cap: "Figure 1: Example plot of three distributional forecasts corresponding to the model output for incident influenza hospitalizations shown in Table 1. Solid black dots indicate historically available data as of the forecast generation date, and open black circles indicate the eventually observed values. The blue dots represent predictive medians and the blue shaded area represents the corresponding 90% prediction interval defined by the 0.05 and 0.95 quantiles."
-
+#| fig.cap: >
+#|   Figure 1: Example plot of three distributional forecasts corresponding to
+#|   the model output for incident influenza hospitalizations shown in Table 1.
+#|   Solid black dots indicate historically available data as of the forecast
+#|   generation date, and open black circles indicate the eventually observed
+#|   values. The blue dots represent predictive medians and the blue shaded area
+#|   represents the corresponding 90% prediction interval defined by the 0.05
+#|   and 0.95 quantiles.
 
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
@@ -264,11 +273,12 @@ data.frame(
     "Evaluate using the logarithm of the probability assigned to the true outcome (LogScore)"
   ),
   check.names = FALSE
-) |> 
-        knitr::kable(format = "html",
-                     caption = "Table 2: Pairs of output types and their associated scoring rules for evaluating prediction performance.") |>
-  kableExtra::kable_styling(
-          font_size = 13,
+) |>
+  knitr::kable(format = "html",
+               caption = "Table 2: Pairs of output types and their 
+               associated scoring rules for evaluating prediction 
+               performance.") |>
+  kableExtra::kable_styling(font_size = 13,
     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
     full_width = TRUE
   )
@@ -299,7 +309,7 @@ For example, when evaluating model 1 within an ensemble of three models ($n=3$),
 #| label: algorithm-lomo
 #| out.width: '100%'
 #| fig.cap: "Algorithm 1: Leave one model out (LOMO)"
-knitr::include_graphics("algorithm-lomo.jpg") 
+knitr::include_graphics("algorithm-lomo.jpg")
 ```
 
 On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays a role of ${\mathcal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}).
@@ -311,7 +321,7 @@ For example, using the earlier setup of three forecast models, LASOMO considers 
 #| label: algorithm-lasomo
 #| out.width: '100%'
 #| fig.cap: "Algorithm 2: Leave all subsets of models out (LASOMO)"
-knitr::include_graphics("algorithm-lasomo.jpg") 
+knitr::include_graphics("algorithm-lasomo.jpg")
 ```
 
 The [modelimportance]{.pkg} package offers two weighting options for subsets: one assigns equal (uniform) weights to all subsets, and the other assigns weights based on their size, similar to the concept of Shapley values in cooperative game theory, which measure a player’s average contribution to all possible coalitions (or, equivalently, over all permutations of players) (@Shapley1953). Users can choose one to evaluate the contribution of each model in a manner suited to their preferred framework.
@@ -336,7 +346,17 @@ This is because the weights given to the mid-sized subsets become increasingly s
 ```{r, fig.pos="t"}
 #| echo: false
 #| label: fig-lasomo-weights
-#| fig.cap: "Figure 2:Comparison of weights assigned to a subset. The plot shows the weights assigned to a subset as the number of models $n$ increases from 2 to 10. The red line represents the weights under the equal weighting scheme, while the blue and green lines represent the minimum and maximum weights, respectively, under the permutation-based weighting scheme. The minimum weight occurs when the subset size is around $(n-1)/2$, and the maximum weight occurs when the subset size is $n-1$. As the number of models increases, the weights assigned by the two schemes become increasingly similar for mid-sized subsets whereas substantial differences remain for extreme-sized subsets."
+#| fig.cap: >
+#|   Figure 2:Comparison of weights assigned to a subset. The plot shows the
+#|   weights assigned to a subset as the number of models $n$ increases from 2
+#|   to 10. The red line represents the weights under the equal weighting scheme
+#|   , while the blue and green lines represent the minimum and maximum weights,
+#|   respectively, under the permutation-based weighting scheme. The minimum
+#|   weight occurs when the subset size is around $(n-1)/2$, and the maximum
+#|   weight occurs when the subset size is $n-1$. As the number of models
+#|   increases, the weights assigned by the two schemes become increasingly
+#|   similar for mid-sized subsets whereas substantial differences remain for
+#|   extreme-sized subsets.
 
 data.frame(n = 2:10) |>
   mutate(
@@ -356,11 +376,17 @@ data.frame(n = 2:10) |>
       "perm_max" = "#00BA38"
     ),
     labels = c(
-      eq = expression(w^{eq}),
-      perm_min = expression(w^{perm-min}),
-      perm_max = expression(w^{perm-max})
+      eq = expression(w^{
+        "eq"
+      }),
+      perm_min = expression(w^{
+        "perm-min"
+      }),
+      perm_max = expression(w^{
+        "perm-max"
+      })
     )
-  )+
+  ) +
   scale_x_continuous(breaks = 2:10) +
   labs(
     x = "Number of models (n)",
@@ -391,9 +417,9 @@ task, an `NA` value will be assigned for that task.
 
 ```{r code-model_importance}
 #| eval: false
-> model_importance(forecast_data, oracle_output_data, ensemble_fun, 
-                    importance_algorithm, subset_wt, min_log_score, 
-                    ...)
+model_importance(forecast_data, oracle_output_data, ensemble_fun,
+                 importance_algorithm, subset_wt, min_log_score,
+                 ...)
 ```
 
 
@@ -415,7 +441,9 @@ linear pool of component model outputs. This method supports only an
 ```{r}
 #| echo: false
 #| label: tbl-arguments1
-#| tbl-cap: "Table 3: Description of the arguments for the `model_importance()` function, including their purpose, possible values, and default settings."
+#| tbl-cap: "Table 3: Description of the arguments for the
+#| `model_importance()` function, including their purpose, possible values,
+#| and default settings."
 
 tbl_argument1 <- data.frame(
   "Argument" = c(
@@ -455,14 +483,16 @@ tbl_argument1 <- data.frame(
 )
 
 
-tbl_argument1 |> 
-        knitr::kable(format = "html", escape = FALSE, 
-                     caption = "Table 3: Description of the arguments for the `model_importance()` function, including their purpose, possible values, and default settings.") |>
+tbl_argument1 |>
+  knitr::kable(format = "html", escape = FALSE,
+               caption = "Table 3: Description of the arguments for the
+               `model_importance()` function, including their purpose, possible
+               values, and default settings.") |>
   kableExtra::kable_styling(
-          font_size = 13,
+    font_size = 13,
     bootstrap_options = c("striped", "condensed", "responsive"),
     full_width = FALSE
-  ) 
+  )
 ```
 
 
@@ -489,9 +519,9 @@ produced by `model_importance()` across tasks for each model.
 
 ```{r code-model_importance_summary}
 #| eval: false
-> model_importance_summary(importance_scores, by = "model_id",
-                           na_action = c("drop", "worst", "average"),
-                           fun = mean, ...)
+model_importance_summary(importance_scores, by = "model_id",
+                         na_action = c("drop", "worst", "average"),
+                         fun = mean, ...)
 ```
 
 The `importance_scores` is a data frame containing model importance 
@@ -525,13 +555,14 @@ if needed (e.g., `fun = quantile, probs = 0.25` for a quartile summary).
 ```{r}
 #| echo: false
 #| label: tbl-arguments2
-#| tbl-cap: "Description of the arguments for the `model_importance_summary()` function, including their purpose, possible values, and default settings."
+#| tbl-cap: "Description of the arguments for the `model_importance_summary()`
+#| function, including their purpose, possible values, and default settings."
 
 tbl_argument2 <- data.frame(
   "Argument" = c(
-    "`importance_scores`", 
+    "`importance_scores`",
     "`by`",
-    "`na_action`", 
+    "`na_action`",
     "`fun`", "`...`"
   ),
   "Description" = c(
@@ -559,14 +590,16 @@ tbl_argument2 <- data.frame(
 )
 
 
-tbl_argument2 |> 
-        knitr::kable(format = "html", escape = FALSE, 
-                     caption = "Table 4: Description of the arguments for the `model_importance_summary()` function, including their purpose, possible values, and default settings.") |>
+tbl_argument2 |>
+  knitr::kable(format = "html", escape = FALSE,
+               caption = "Table 4: Description of the arguments for the
+               `model_importance_summary()` function, including their purpose,
+               possible values, and default settings.") |>
   kableExtra::kable_styling(
-          font_size = 13,
+    font_size = 13,
     bootstrap_options = c("striped", "condensed", "responsive"),
     full_width = FALSE
-  ) 
+  )
 ```
 
 ## Implementation and availability {#sec:implementation-and-availability}
@@ -597,7 +630,7 @@ and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 
 ```{r code-forecast_data}
 #| eval: false
-> forecast_data
+forecast_data
 ```
 
 
@@ -621,7 +654,7 @@ these dates and locations.
 
 ```{r code-target_data}
 #| eval: false
-> target_data
+target_data
 ```
 
 ```{r target_data}
@@ -644,7 +677,14 @@ target_data
 ```{r, fig.pos="t"}
 #| echo: false
 #| label: fig-example-median-lomo
-#| fig.cap: "Figure 3: Plot of three point forecasts (median) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing."
+#| fig.cap: >
+#|   Figure 3: Plot of three point forecasts (median) and the eventually
+#|   observed values from the `forecast_data` and `target_data`  for weekly
+#|   incident influenza hospitalizations in Massachusetts (FIPS code 25) and
+#|   Texas (FIPS code 48). Colored dots indicate the forecasts by three models,
+#|   generated on November 19, 2022. Open black circles indicate the eventually
+#|   observed values. MOBS-GLEAM_FLUH's forecast for Massachusetts on November
+#|   26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 
 forecast_data |>
   ggplot(aes(x = target_end_date)) +
@@ -712,11 +752,11 @@ simple mean ensemble using the LOMO algorithm.
 
 ```{r code-model_importance-lomo}
 #| eval: false
-> model_importance(
-        forecast_data = forecast_data,
-        oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble",
-        importance_algorithm = "lomo"
+model_importance(
+  forecast_data = forecast_data,
+  oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble",
+  importance_algorithm = "lomo"
 )
 ```
 
@@ -742,10 +782,10 @@ importance scores for each prediction task, along with task id columns.
 #| label: scores_lomo
 #| echo: false
 scores_lomo <- model_importance(
-        forecast_data = forecast_data,
-        oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble",
-        importance_algorithm = "lomo"
+  forecast_data = forecast_data,
+  oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble",
+  importance_algorithm = "lomo"
 )
 
 scores_lomo
@@ -762,17 +802,17 @@ argument to `"drop"`.
 
 ```{r lomo-NAdrop}
 scores_lomo <- model_importance(
-        forecast_data = forecast_data,
-        oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble",
-        importance_algorithm = "lomo"
+  forecast_data = forecast_data,
+  oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble",
+  importance_algorithm = "lomo"
 )
 
 model_importance_summary(
-        importance_scores = scores_lomo, 
-        by = "model_id", 
-        na_action = "drop", 
-        fun = mean
+  importance_scores = scores_lomo,
+  by = "model_id",
+  na_action = "drop",
+  fun = mean
 )
 ```
 
@@ -793,10 +833,10 @@ among the other models for the same task.
 
 ```{r lomo-NAworst}
 model_importance_summary(
-        importance_scores = scores_lomo, 
-        by = "model_id", 
-        na_action = "worst", 
-        fun = mean
+  importance_scores = scores_lomo,
+  by = "model_id",
+  na_action = "worst",
+  fun = mean
 )
 ```
 
@@ -830,7 +870,7 @@ the missing data without overly penalizing or overlooking them.
 
 ```{r lomo-NAaverage}
 model_importance_summary(
-        scores_lomo, by = "model_id", na_action = "average", fun = mean
+  scores_lomo, by = "model_id", na_action = "average", fun = mean
 )
 ```
 
@@ -849,28 +889,28 @@ each weighting scheme.
 
 ```{r lasomo-NAdrop-equal}
 scores_lasomo_eq <- model_importance(
-        forecast_data = forecast_data,
-        oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble",
-        importance_algorithm = "lasomo",
-        subset_wt = "equal"
+  forecast_data = forecast_data,
+  oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble",
+  importance_algorithm = "lasomo",
+  subset_wt = "equal"
 )
 model_importance_summary(
-        scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean
+  scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean
 )
 ```
 
 
 ```{r lasomo-NAdrop-perm}
 scores_lasomo_perm <- model_importance(
-        forecast_data = forecast_data,
-        oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble",
-        importance_algorithm = "lasomo",
-        subset_wt = "perm_based"
+  forecast_data = forecast_data,
+  oracle_output_data = target_data,
+  ensemble_fun = "simple_ensemble",
+  importance_algorithm = "lasomo",
+  subset_wt = "perm_based"
 )
 model_importance_summary(
-        scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean
+  scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean
 )
 ```
 
