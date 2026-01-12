@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, boxrule=0pt, breakable, interior hidden, frame hidden, borderline west={3pt}{0pt}{shadecolor}, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, sharp corners, frame hidden, interior hidden, boxrule=0pt, enhanced, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -883,8 +883,9 @@ with extremely low probabilities assigned to the true outcome, which can
 lead to undefined or negative infinite log scores. Any probability lower
 than this threshold will be adjusted to this minimum value before
 calculating the importance metric based on the log score. The default
-value is set to -10, which is an arbitrary choice. Users may choose a
-different value based on their practical needs.
+value is set to -10, following the CDC FluSight thresholding convention
+\citep{brooks2018nonmechanistic, reich_accuracy_2019}. Users may choose
+a different value based on their practical needs.
 
 \subsection{model\_importance\_summary(
 )}\label{model_importance_summary}
