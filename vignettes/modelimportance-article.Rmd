@@ -508,7 +508,7 @@ scores to avoid issues with extremely low probabilities assigned to the true
 outcome, which can lead to undefined or negative infinite log scores. 
 Any probability lower than this threshold will be adjusted to this minimum value
 before calculating the importance metric based on the log score. 
-The default value is set to -10, which is an arbitrary choice. 
+The default value is set to -10, following the CDC FluSight thresholding convention [@brooks2018nonmechanistic; @reich_accuracy_2019]. 
 Users may choose a different value based on their practical needs. 
 
 
