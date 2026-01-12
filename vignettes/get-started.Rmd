@@ -1,7 +1,7 @@
 ---
 title: "Simple working examples"
 output: rmarkdown::html_vignette
-bibliography: vignette-references.bib
+bibliography: references.bib
 vignette: >
   %\VignetteIndexEntry{Simple working examples}
   %\VignetteEngine{knitr::rmarkdown}
