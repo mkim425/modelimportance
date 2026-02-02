@@ -77,6 +77,8 @@ regardless of its original name in the input \code{forecast_data}.
 \description{
 We measure each ensemble component model's contribution to the ensemble
 prediction accuracy for each model task.
+(See also \code{\link{model_importance_summary}} for a summary of importance
+scores across multiple tasks.)
 
 This function requires that one column represent the forecast date (or
 a date from which each forecast originates or is made in reference to) and
@@ -157,4 +159,7 @@ model_importance(
   subset_wt = "equal", agg_fun = median
 )
 }
+}
+\seealso{
+\code{\link{model_importance_summary}}
 }

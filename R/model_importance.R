@@ -3,6 +3,8 @@
 #' @description
 #' We measure each ensemble component model's contribution to the ensemble
 #' prediction accuracy for each model task.
+#' (See also \code{\link{model_importance_summary}} for a summary of importance
+#' scores across multiple tasks.)
 #'
 #' This function requires that one column represent the forecast date (or
 #' a date from which each forecast originates or is made in reference to) and
@@ -101,6 +103,7 @@
 #' To enable parallel execution, please set a parallel backend, e.g., via
 #' `future::plan()`.
 #'
+#' @seealso \code{\link{model_importance_summary}}
 #' @examples \dontrun{
 #' library(dplyr)
 #' forecast_data <- hubExamples::forecast_outputs |>

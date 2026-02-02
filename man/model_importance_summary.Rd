@@ -52,8 +52,9 @@ The output is sorted in descending order of the summary importance scores.
 }
 \description{
 \code{model_importance_summary} summarizes model importance scores
-calculated for individual prediction tasks into a summary statistic for
-each model. This function handles \code{NA} values in importance scores generated
+calculated for individual prediction tasks by \code{\link{model_importance}}
+into a summary statistic for each model.
+This function handles \code{NA} values in importance scores generated
 when a model did not contribute to the ensemble prediction for a given task
 by missing its forecast submission.
 }
@@ -84,4 +85,7 @@ importance_scores <- model_importance(
 )
 model_importance_summary(importance_scores, by = "model_id")
 }
+}
+\seealso{
+\code{\link{model_importance}}
 }

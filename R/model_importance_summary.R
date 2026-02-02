@@ -2,8 +2,9 @@
 #' across tasks
 #'
 #' @description `model_importance_summary` summarizes model importance scores
-#' calculated for individual prediction tasks into a summary statistic for
-#' each model. This function handles `NA` values in importance scores generated
+#' calculated for individual prediction tasks by \code{\link{model_importance}}
+#' into a summary statistic for each model.
+#' This function handles `NA` values in importance scores generated
 #' when a model did not contribute to the ensemble prediction for a given task
 #' by missing its forecast submission.
 #'
@@ -37,6 +38,7 @@
 #' The output is sorted in descending order of the summary importance scores.
 #' @export
 #' @importFrom checkmate assert_data_frame assert_subset assert_function
+#' @seealso \code{\link{model_importance}}
 #' @examples \dontrun{
 #' library(dplyr)
 #' forecast_data <- hubExamples::forecast_outputs |>
