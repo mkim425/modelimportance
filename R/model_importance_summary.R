@@ -39,7 +39,6 @@
 #' @importFrom checkmate assert_data_frame assert_subset assert_function
 #' @examples \dontrun{
 #' library(dplyr)
-#' library(hubExamples)
 #' forecast_data <- hubExamples::forecast_outputs |>
 #'   dplyr::filter(
 #'     output_type %in% c("quantile"),

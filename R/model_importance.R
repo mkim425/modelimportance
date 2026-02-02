@@ -69,7 +69,6 @@
 #' Note that `reference_date` is used as the name for the forecast date column,
 #' regardless of its original name in the input `forecast_data`.
 #'
-#' @import hubExamples
 #' @importFrom methods is
 #' @export
 #'
@@ -103,7 +102,6 @@
 #'
 #' @examples \dontrun{
 #' library(dplyr)
-#' library(hubExamples)
 #' forecast_data <- hubExamples::forecast_outputs |>
 #'   dplyr::filter(
 #'     output_type %in% c("quantile"),

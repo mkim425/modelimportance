@@ -60,7 +60,6 @@ by missing its forecast submission.
 \examples{
 \dontrun{
 library(dplyr)
-library(hubExamples)
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
     output_type \%in\% c("quantile"),

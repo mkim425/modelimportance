@@ -127,7 +127,6 @@ To enable parallel execution, please set a parallel backend, e.g., via
 \examples{
 \dontrun{
 library(dplyr)
-library(hubExamples)
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
     output_type \%in\% c("quantile"),
