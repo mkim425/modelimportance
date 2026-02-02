@@ -55,12 +55,13 @@ Ignored if \code{lomo} method is used. Default is \code{"equal"}, if not specifi
 }}
 
 \item{min_log_score}{A numeric value specifying a minimum threshold for log
-scores for the \code{pmf} output to avoid issues with extremely low probabilities
-assigned to the true outcome, which can lead to undefined or negative
-infinite log scores. Any probability lower than this threshold will be
-adjusted to this minimum value. The default value is set to -10, which is an
-arbitrary choice. Users may choose a different value based on their practical
-needs.}
+scores for the \code{pmf} output. This threshold prevents issues with extremely
+low probabilities assigned to the true outcome, which would otherwise lead to
+undefined or negative infinite log scores.
+Any probability lower than this threshold will be adjusted to this minimum
+value. The default value is set to -10, following the CDC FluSight
+thresholding convention. Users may choose a different value based on their
+practical needs.}
 
 \item{...}{Optional arguments passed to \code{ensemble_fun} when it is specified
 as \code{"simple_ensemble"}. See 'Details'.}
