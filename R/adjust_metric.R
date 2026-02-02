@@ -16,7 +16,8 @@ adjust_metric <- function(df, log_min_val = -10) {
       mutate(rse_point = sqrt(.data$se_point)) |>
       select(-"se_point")
   }
-  # if metric is log_score, covert values less than log_min_val to log_min_val
+  # if metric is log_score, convert values less than log_min_val (the minimum
+  # threshold) to the assigned log_min_val (default -10)
   # note: these are negative log values from score_model_out(),
   # so "less than" means "greater than" numerically
   if ("log_score" %in% names(df)) {
