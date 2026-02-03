@@ -29,6 +29,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      R_PKGLOAD_PAK: FALSE
 
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +40,11 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
-          use-public-rspm: true
+          use-public-rspm: ${{ matrix.config.os != 'macos-latest' }}
+
+      - name: Install pkgload and dependencies from source
+        run: |
+          Rscript -e 'install.packages("pkgload", type="source")'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
