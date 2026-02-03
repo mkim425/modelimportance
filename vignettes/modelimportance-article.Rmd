@@ -210,7 +210,6 @@ forecast_data |>
   scale_x_date(breaks = target_data$target_end_date, date_labels = "%Y-%m-%d") +
   labs(
     y = "Weekly Hospitalization",
-    # title = "Forecasts of incident deaths in Massachusetts on November 28, 2021",
     x = "Date"
   ) +
   scale_color_manual(
@@ -719,7 +718,6 @@ forecast_data |>
   scale_shape_manual(values = c("Observed" = 1)) +
   labs(
     y = "Weekly Hospitalization",
-    # title = "Forecasts of incident deaths in Massachusetts (25) on November 28, 2021",
     x = "Date"
   ) +
   theme(
