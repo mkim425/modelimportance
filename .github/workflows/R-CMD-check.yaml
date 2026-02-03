@@ -41,11 +41,19 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: false
 
+      - name: Install system dependencies
+        if: runner.os == 'macOS'
+        run: |
+          # Force install pkgload from source before the main dependency step
+          # This 'pre-installs' it so the next step sees it as already satisfied
+          Rscript -e 'install.packages("pkgload", type = "source", repos = "https://cloud.r-project.org")'
+
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
           needs: check
-          cache-key: ${{ runner.os }}-${{ matrix.config.r }}-v1
+          cache-key: ${{ runner.os }}-${{ matrix.config.r }}-refresh-v1
 
       - uses: r-lib/actions/check-r-package@v2
         with:
