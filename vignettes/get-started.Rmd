@@ -25,13 +25,12 @@ library(kableExtra)
 
 
 This vignette demonstrates the usage of the `modelimportance` package for 
-assessing the contribution of component models to the accuracy of ensemble 
-performance. 
+evaluating how each component model contributes to ensemble accuracy.
 We provide simple working examples to help you get started with the package. 
-Detailed descriptions of the model importance metrics, algorithms, key functions
-, and in-depth interpretations of the examples covered here are available in the
-accompanying article titled '`modelimportance`: Evaluating model importance 
-within a multi-model ensemble in R' under *Articles*.
+Detailed descriptions of the model importance metrics, algorithms, key 
+functions, and in-depth interpretations of the examples covered here are 
+available in the accompanying article titled '`modelimportance`: Evaluating 
+model importance within a multi-model ensemble in R' under *Articles*.
 
 
 ## Setup
@@ -130,10 +129,8 @@ forecast_data |>
   )
 ```
 
-Overall, the forecasts tend to have larger prediction errors for the target end 
-date of December 10, 2022, compared to November 26, 2022, which is expected due 
-to increased uncertainty at  longer horizons. Additionally, the forecasts for 
-Massachusetts are relatively more accurate compared to those for Texas, which 
+As expected, prediction errors increase at longer horizons due to greater uncertainty, with forecasts for December 10, 2022, showing larger deviations from the observed values compared to those for November 26, 2022.
+Additionally, the forecasts for Massachusetts are relatively more accurate compared to those for Texas, which 
 tend to have higher errors.
 
 
