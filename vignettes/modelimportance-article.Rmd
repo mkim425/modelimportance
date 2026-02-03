@@ -37,7 +37,7 @@ model contributes to the accuracy of ensemble performance and demonstrated their
 use in the context of probabilistic forecasting.
 Building on this work, the `modelimportance` package provides tools for extended
 applications, embracing both point and probabilistic forecasts.
-It supports multiple functionalities; it allows users to specify which ensemble 
+It supports multiple functionalities, allowing users to specify which ensemble 
 approach to implement and which model importance metric to use. 
 Additionally, the software offers customizable options for handling missing 
 values. These features enable the package to serve as a versatile tool for 
@@ -735,10 +735,8 @@ forecast_data |>
   )
 ```
 
-Overall, the forecasts tend to have larger prediction errors for the target end 
-date of December 10, 2022, compared to November 26, 2022, which is expected due 
-to increased uncertainty at  longer horizons. Additionally, the forecasts for 
-Massachusetts are relatively more accurate compared to those for Texas, which 
+As expected, prediction errors increase at longer horizons due to greater uncertainty, with forecasts for December 10, 2022, showing larger deviations from the observed values compared to those for November 26, 2022.
+Additionally, the forecasts for Massachusetts are relatively more accurate compared to those for Texas, which 
 tend to have higher errors (@fig-example-median-lomo).
 
 
