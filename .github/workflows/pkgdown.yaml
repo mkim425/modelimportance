@@ -33,6 +33,9 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install pkgload
+        run: Rscript -e 'install.packages("pkgload", repos = "https://cloud.r-project.org")'
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::pkgdown, local::.
