@@ -41,6 +41,11 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      - name: Install pkgload manually
+        run: |
+          install.packages("pak", repos = "https://r-lib.github.io")
+          pak::pkg_install("pkgload")
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
