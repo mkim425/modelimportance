@@ -45,9 +45,9 @@ Default is \code{mean()}}
 See the documentation of the corresponding function for details.}
 }
 \value{
-A data.frame with columns \code{model_id} and \verb{importance_score_<fun>},
-where \verb{<fun>} is the name of the summary function used
-(e.g., \code{importance_score_mean} when \code{fun = mean}).
+A \code{importance_summary} class object with columns \code{model_id} and
+\verb{importance_score_<fun>}, where \verb{<fun>} is the name of the summary function
+used (e.g., \code{importance_score_mean} when \code{fun = mean}).
 The output is sorted in descending order of the summary importance scores.
 }
 \description{
@@ -69,12 +69,11 @@ forecast_data <- hubExamples::forecast_outputs |>
   )
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
-    date \%in\% unique(forecast_data$target_end_date),
+    target_end_date \%in\% unique(forecast_data$target_end_date),
     location == "25"
   ) |>
   # Rename columns to match the oracle output format
   rename(
-    target_end_date = date,
     oracle_value = observation
   )
 # Example with the default arguments.

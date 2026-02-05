@@ -65,10 +65,10 @@
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
 #'
-#' @return A data.frame with columns `model_id`, `reference_date`,
-#' `output_type`, and `importance`, along with any task ID columns (e.g.,
-#' `location`, `horizon`, and `target_end_date`) present in the input
-#' `forecast_data`.
+#' @return A `model_imp_tbl` class object with columns `model_id`,
+#' `reference_date`, `output_type`, and `importance`, along with any task ID
+#' columns (e.g., `location`, `horizon`, and `target_end_date`) present in the
+#' input `forecast_data`.
 #' Note that `reference_date` is used as the name for the forecast date column,
 #' regardless of its original name in the input `forecast_data`.
 #'
@@ -114,12 +114,11 @@
 #'   )
 #' target_data <- hubExamples::forecast_target_ts |>
 #'   dplyr::filter(
-#'     date %in% unique(forecast_data$target_end_date),
+#'     target_end_date %in% unique(forecast_data$target_end_date),
 #'     location == "25"
 #'   ) |>
 #'   # Rename columns to match the oracle output format
 #'   rename(
-#'     target_end_date = date,
 #'     oracle_value = observation
 #'   )
 #' # Example with the default arguments.
@@ -209,7 +208,7 @@ model_importance <- function(forecast_data,
   )
   # Reorder columns to place `model_id` and `reference_date` first,
   # task-related columns in the middle, and `output_type` and `importance` last.
-  score_result |>
+  df_scores <- score_result |>
     dplyr::select(
       "model_id", "reference_date",
       dplyr::everything()
@@ -217,4 +216,6 @@ model_importance <- function(forecast_data,
     dplyr::relocate(c("output_type", "importance"),
       .after = dplyr::last_col()
     )
+  # return result as model_imp_tbl class
+  structure(df_scores, class = c("model_imp_tbl", class(df_scores)))
 }
