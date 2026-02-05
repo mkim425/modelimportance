@@ -86,13 +86,30 @@ pmap(
         # compare expected and actual results
         expect_equal(
           actual_summary_scores_mean, exp_summary_scores_mean,
-          tolerance = 1e-8
+          tolerance = 1e-8, ignore_attr = TRUE
         )
         expect_equal(
           actual_summary_scores_median, exp_summary_scores_median,
-          tolerance = 1e-8
+          tolerance = 1e-8, ignore_attr = TRUE
         )
       }
     )
   }
 )
+
+## Test: importance_summary class and its methods
+test_that("importance_summary class and methods", {
+  data <- raw_imp_scores |>
+    dplyr::filter(calc_args == "mean_output-simple_ensemble-lomo-equal-mean")
+  summary_scores <- model_importance_summary(
+    importance_scores = data,
+    by = "model_id",
+    na_action = "drop",
+    fun = mean
+  )
+  # test for class and its methods
+  expect_s3_class(summary_scores, "importance_summary")
+  expect_error(print(summary_scores), NA)
+  expect_error(summary(summary_scores), NA)
+  expect_error(plot(summary_scores), NA)
+})

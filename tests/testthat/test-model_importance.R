@@ -142,3 +142,28 @@ test_that(
     }
   }
 )
+
+## Test: model_imp_tbl class and its methods
+test_that("model_imp_tbl class and methods", {
+  selected_data <- data_list[["dat_quantile"]]
+  imp_scores <- suppressMessages(model_importance(
+    forecast_data = selected_data,
+    oracle_output_data = target_data,
+    ensemble_fun = "simple_ensemble",
+    importance_algorithm = "lomo",
+    subset_wt = "equal",
+    agg_fun = "mean",
+    min_log_score = -10
+  ))
+  # test for class and print/plot methods
+  expect_s3_class(imp_scores, "model_imp_tbl")
+  expect_error(print(imp_scores), NA)
+  expect_error(plot(imp_scores), NA)
+  # test for summary method
+  s <- summary(imp_scores)
+  expect_s3_class(s, "summary.model_imp_tbl")
+  expect_true(is.data.frame(s$task_winners))
+  expect_true(is.data.frame(s$model_summary))
+  expect_true(is.data.frame(s$all_tasks))
+  expect_equal(length(s$all_models), length(unique(imp_scores$model_id)))
+})
