@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, sharp corners, frame hidden, interior hidden, boxrule=0pt, enhanced, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, sharp corners, boxrule=0pt, enhanced, borderline west={3pt}{0pt}{shadecolor}, interior hidden, breakable]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -222,7 +222,7 @@ accuracy of the ensemble can support the construction of effective
 ensembles. The \proglang{R} package \pkg{modelimportance} provides tools
 to quantify how each component model contributes to the accuracy of
 ensemble performance for both point and probabilistic forecasts. It
-supports multiple functionalities; it allows users to specify which
+supports multiple functionalities, allowing users to specify which
 ensemble approach to implement and which model importance metric to use.
 Additionally, the software offers customizable options for handling
 missing values. These features enable the package to serve as a
@@ -435,6 +435,38 @@ demonstration purposes (see
 
 \subsection{Model output format}\label{subsec:model_output_format}
 
+\begin{table}
+
+\centering{
+
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}{lllrllllr}
+\toprule
+model\_id & reference\_date & target & horizon & location & target\_end\_date & output\_type & output\_type\_id & value\\
+\midrule
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.05 & 496\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.1 & 536\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.25 & 566\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.5 & 582\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.75 & 598\\
+\addlinespace
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.9 & 629\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.95 & 668\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.05 & 454\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.1 & 518\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.25 & 558\\
+\bottomrule
+\end{tabular}}
+
+}
+
+\caption{\label{tbl-example-model_output}Example of the model output for
+incident influenza hospitalizations (top 10 rows) extracted from
+\texttt{forecast\_outputs} data in the \pkg{hubExamples} package.}
+
+\end{table}%
+
 Model outputs are structured in a tabular format designed specifically
 for predictions, which is a formal S3 object called
 \texttt{model\_out\_tbl}. In the hubverse standard, each row represents
@@ -471,39 +503,7 @@ The prediction representation is specified as `quantile' in the
 value corresponding to each quantile is recorded in the \texttt{value}
 column.
 
-\begin{table}
-
-\centering{
-
-\centering
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
-\begin{tabular}{lllrllllr}
-\toprule
-model\_id & reference\_date & target & horizon & location & target\_end\_date & output\_type & output\_type\_id & value\\
-\midrule
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.05 & 496\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.1 & 536\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.25 & 566\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.5 & 582\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.75 & 598\\
-\addlinespace
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.9 & 629\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.95 & 668\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.05 & 454\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.1 & 518\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.25 & 558\\
-\bottomrule
-\end{tabular}}
-
-}
-
-\caption{\label{tbl-example-model_output}Example of the model output for
-incident influenza hospitalizations (top 10 rows) extracted from
-\texttt{forecast\_outputs} data in the \pkg{hubExamples} package.}
-
-\end{table}%
-
-Figure~\ref{fig-example-model_output} visualize the information on the
+Figure~\ref{fig-example-model_output} visualizes the information on the
 prediction task provided by Table~\ref{tbl-example-model_output} for
 three models. For each model, the quantile-based forecasts are shown for
 the target end dates of December 24, 2022 (horizon 1), December 31, 2022
@@ -569,7 +569,10 @@ Different output types correspond to different scoring rules for
 evaluating a model's prediction performance.
 Table~\ref{tbl-pair-output-scoringrule} presents the output types and
 their associated scoring rules supported by the \pkg{modelimportance}
-package.
+package. We note that the scoring rules are listed in the table using
+their conventional names, however, the package uses their negative
+values for evaluation (e.g., \(-\text{RSE}, -\text{WIS}\)) so that
+higher scores indicate better performance.
 
 \begin{table}
 
@@ -613,7 +616,7 @@ the same task ID columns and \texttt{output\_type}, including
 \texttt{output\_type\_id} if necessary, which are used to match the
 predictions with the ground truth data.
 
-\section{Algorithms}\label{sec:algorithms}
+\section{Method description and algorithms}\label{sec:algorithms}
 
 This section provides a brief description of the leave one model out
 (LOMO) and leave all subsets of models out (LASOMO) algorithms, which
@@ -623,9 +626,30 @@ change in ensemble performance when that model is included or excluded
 in the ensemble construction. More specifically, we compare the
 performance of an ensemble with and without a specific model for a
 specific task, and consider the difference in performance as the
-importance of that model for that task. We apply this idea to many tasks
-and aggregate the importance scores for that model across all tasks
-using averages. (Details can be found in \citet{kim2024}.)
+importance of that model for that task (Figure~\ref{fig-concept}). We
+apply this idea to many tasks and aggregate the importance scores for
+that model across all tasks using averages. (Details can be found in
+\citet{kim2024}.)
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{figure-concept.png}
+
+}
+
+\caption{\label{fig-concept}Conceptual illustration of measuring model
+importance in a three-model setting. Each circle represents a
+forecasting model with component model(s) shown inside. Vertical bars
+indicate the performance score measured by a positively oriented scoring
+rule (e.g., \(-\)WIS), with more bars indicating better accuracy. LOMO
+computes a single performance difference by removing the target model A
+from the full ensemble. LASOMO leverages multiple performance
+differences across all subsets containing the model A and aggregates
+them.}
+
+\end{figure}%
 
 LOMO involves creating an ensemble by excluding one component model from
 the entire set of models. Let \({\cal A}\) be a set of \(n\) models and
@@ -634,7 +658,7 @@ the entire set of models. Let \({\cal A}\) be a set of \(n\) models and
 including all the others. \(F^{{\cal A}^{-i}}\) denotes the ensemble
 forecast constructed using all forecasts \(F^{\cal A}\) except \(F^i\).
 Model \(i\)'s importance score using LOMO is calculated as the
-difference in accuracy, as measured by a specific score, between
+difference in accuracy, as measured by a specific scoring rule, between
 \(F^{{\cal A}^{-i}}\) and \(F^{\cal A}\)
 (\hyperref[alg:lomo]{Algorithm~\ref{alg:lomo}}). For example, when
 evaluating model 1 within an ensemble of three models (\(n=3\)), LOMO
@@ -654,14 +678,14 @@ accordingly.
     \Statex $\bullet$ Set of $n$ individual models, ${\cal A}=\{1,2,\dots, n\},$ and their forecasts $\{F^1,F^2,...,F^n\}$
     \Statex $\bullet$ Truth value, $y$
     \Statex $\bullet$ Function $g$ to build an ensemble
-    \Statex $\bullet$ Scoring rule $\psi$ to evaluate forecast skills}
+    \Statex $\bullet$ A positively oriented scoring rule $\psi$ to evaluate forecast skills}
    \ENSURE importance metric of model $i$, $\phi^{i,\text{lomo}}$
     \STATE{Create an ensemble forecast $F^{\cal A}$ using $g$: $F^{\cal A} \gets g(\{F^1,F^2,...,F^n\})$}
     \STATE{Evaluate $F^{\cal A}$ using $\psi$: $\psi(F^{\cal A},y).$}
     \FOR{each $i, (i = 1,2,..., n)$}
       \STATE {$F^{{\cal A}^{-i}} \gets g(\{F^j|\, j\ne i, j\in {\cal A}\})$}
       \STATE{Compute $\psi(F^{{\cal A}^{-i}},y).$}
-      \STATE $\phi^{i,\text{lomo}} \gets   \psi(F^{{\cal A}^{-i}},y) - \psi(F^{\cal A},y)$
+      \STATE $\phi^{i,\text{lomo}} \gets \psi(F^{\cal A},y) - \psi(F^{{\cal A}^{-i}},y)$
     \ENDFOR
   \end{algorithmic}
  \end{spacing}
@@ -694,7 +718,7 @@ have different weights during the aggregating process.
     \Statex $\bullet$ Set of $n$ individual models, ${\cal A}=\{1,2,\dots, n\},$ and their forecasts $\{F^1,F^2,...,F^n\}$
     \Statex $\bullet$ Truth value, $y$
     \Statex $\bullet$ Function $g$ to build an ensemble
-    \Statex $\bullet$ Scoring rule $\psi$ to evaluate forecast skills}
+    \Statex $\bullet$ A positively oriented scoring rule $\psi$ to evaluate forecast skills}
    \ENSURE Importance metric of model $i$, $\phi^{i,\text{lasomo}}$
    \FOR{$i = 1 \text{ to } n$}
      \STATE $\phi^{i,\text{lasomo}} \gets 0$
@@ -710,7 +734,7 @@ have different weights during the aggregating process.
        \STATE{$F^{{S_j}\cup \{i\}}\gets g(\{F^i, F^j|\, j\in S_j\})$}
        \STATE{Compute $\psi(F^{S_j},y)$ and
        $\psi(F^{{S_j}\cup\{i\}},y)$}
-       \STATE {$\phi^{i,\text{lasomo}} \gets \phi^{i,\text{lasomo}} + \gamma_{S_j}\times\Big[ \psi(F^{S_j},y) - \psi(F^{{S_j}\cup\{i\}},y) \Big]$}
+       \STATE {$\phi^{i,\text{lasomo}} \gets \phi^{i,\text{lasomo}} + \gamma_{S_j}\times\Big[ \psi(F^{{S_j}\cup\{i\}},y) -\psi(F^{S_j},y) \Big]$}
      \ENDFOR
    \ENDFOR
   \end{algorithmic}
@@ -1077,12 +1101,12 @@ December 10, 2022, are missing.}
 
 \vspace{0.35cm}
 
-Overall, the forecasts tend to have larger prediction errors for the
-target end date of December 10, 2022, compared to November 26, 2022,
-which is expected due to increased uncertainty at longer horizons.
-Additionally, the forecasts for Massachusetts are relatively more
-accurate compared to those for Texas, which tend to have higher errors
-(Figure~\ref{fig-example-median-lomo}).
+As expected, prediction errors increase at longer horizons due to
+greater uncertainty, with forecasts for December 10, 2022, showing
+larger deviations from the observed values compared to those for
+November 26, 2022. Additionally, the forecasts for Massachusetts are
+relatively more accurate compared to those for Texas, which tend to have
+higher errors (Figure~\ref{fig-example-median-lomo}).
 
 \subsection{Evaluation using LOMO algorithm}\label{sec:example-lomo}
 
