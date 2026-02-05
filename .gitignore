@@ -4,6 +4,6 @@
 .Ruserdata
 *.DS_Store
 inst/doc
-
+inst/local/
 # added from pkgdown
 docs
