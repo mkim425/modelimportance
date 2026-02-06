@@ -67,7 +67,7 @@ practical needs.}
 as \code{"simple_ensemble"}. See 'Details'.}
 }
 \value{
-A \code{model_imp_tbl} class object with columns \code{model_id},
+A \code{model_imp_tbl} S3 class object with columns \code{model_id},
 \code{reference_date}, \code{output_type}, and \code{importance}, along with any task ID
 columns (e.g., \code{location}, \code{horizon}, and \code{target_end_date}) present in the
 input \code{forecast_data}.

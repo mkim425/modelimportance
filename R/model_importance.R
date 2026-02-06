@@ -65,7 +65,7 @@
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
 #'
-#' @return A `model_imp_tbl` class object with columns `model_id`,
+#' @return A `model_imp_tbl` S3 class object with columns `model_id`,
 #' `reference_date`, `output_type`, and `importance`, along with any task ID
 #' columns (e.g., `location`, `horizon`, and `target_end_date`) present in the
 #' input `forecast_data`.
@@ -194,10 +194,14 @@ model_importance <- function(forecast_data,
 
   # Group by single task
   df_list_by_task <- split_data_by_task(valid_tbl)
+  # Check if each task has at least 2 distinct models, and filter out tasks that
+  valid_df_list_by_task <- filter_valid_tasks(
+    df_list_by_task, min_models = 2
+  )
 
   # Call the function to calculate importance scores
   score_result <- furrr::future_map_dfr(
-    df_list_by_task,
+    valid_df_list_by_task,
     function(single_task_data) {
       compute_importance(
         single_task_data, oracle_output_data, model_id_list,
