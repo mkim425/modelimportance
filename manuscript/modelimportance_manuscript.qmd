@@ -436,34 +436,6 @@ In this section, we describe the usage of the function `model_importance()`, whe
 
 ### model_importance( )
 
-The `model_importance()` function calculates the importance scores of ensemble 
-component models based on their contributions to improving ensemble prediction 
-accuracy for each prediction task. It returns a single data frame of importance 
-scores combined across all tasks. If a model missed predictions for a specific 
-task, an `NA` value will be assigned for that task.
-
-```{r code-model_importance}
-#| eval: false
-> model_importance(forecast_data, oracle_output_data, ensemble_fun, 
-                    importance_algorithm, subset_wt, min_log_score, 
-                    ...)
-```
-
-
-The `forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
-
-The `oracle_output_data` is a data frame containing the actual observed values of the variables used to specify modeling targets. Details are provided in \hyperref[subsec:oracle_output_data]{Section~\ref{subsec:oracle_output_data}}.
-
-The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance, which relies on implementations in the \pkg{hubEnsembles} package (@Rpackage-hubEnsembles).
-The currently supported methods are `"simple_ensemble"` and `"linear_pool"`. 
-The `"simple_ensemble"` method returns the average of the predicted values from 
-all component models per prediction task defined by task IDs, `output_type`, and `output_type_id` columns. 
-The default aggregation function for this method is `"mean"`, but it can be 
-customized by specifying additional arguments through `...`, such as 
-`agg_fun="median"`.
-When `"linear_pool"` is specified, ensemble model outputs are created as a 
-linear pool of component model outputs. This method supports only an 
-`output_type` of `"mean"`, `"quantile"`, or `"pmf"`.
 
 ```{r}
 #| echo: false
@@ -515,6 +487,35 @@ tbl_argument1 |>
 ```
 
 
+The `model_importance()` function calculates the importance scores of ensemble 
+component models based on their contributions to improving ensemble prediction 
+accuracy for each prediction task. It returns a single data frame of importance 
+scores combined across all tasks. If a model missed predictions for a specific 
+task, an `NA` value will be assigned for that task.
+
+```{r code-model_importance}
+#| eval: false
+> model_importance(forecast_data, oracle_output_data, ensemble_fun, 
+                    importance_algorithm, subset_wt, min_log_score, 
+                    ...)
+```
+
+
+The `forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
+
+The `oracle_output_data` is a data frame containing the actual observed values of the variables used to specify modeling targets. Details are provided in \hyperref[subsec:oracle_output_data]{Section~\ref{subsec:oracle_output_data}}.
+
+The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance, which relies on implementations in the \pkg{hubEnsembles} package (@Rpackage-hubEnsembles).
+The currently supported methods are `"simple_ensemble"` and `"linear_pool"`. 
+The `"simple_ensemble"` method returns the average of the predicted values from 
+all component models per prediction task defined by task IDs, `output_type`, and `output_type_id` columns. 
+The default aggregation function for this method is `"mean"`, but it can be 
+customized by specifying additional arguments through `...`, such as 
+`agg_fun="median"`.
+When `"linear_pool"` is specified, ensemble model outputs are created as a 
+linear pool of component model outputs. This method supports only an 
+`output_type` of `"mean"`, `"quantile"`, or `"pmf"`.
+
 The `importance_algorithm` argument specifies the algorithm for model importance calculation, which can be either `"lomo"` (leave one model out) and `"lasomo"` 
 (leave all subsets of models out). The `subset_wt` argument is employed only for
 the `"lasomo"` algorithm. This argument has two options: `"equal"` assigns equal
@@ -530,50 +531,12 @@ before calculating the importance metric based on the log score.
 The default value is set to -10, following the CDC FluSight thresholding convention [@brooks2018nonmechanistic; @reich_accuracy_2019].
 Users may choose a different value based on their practical needs. 
 
-`model_importance()` function returns a data frame of class `model_imp_tbl`, with columns ...
-
-
-
+`model_importance()` function returns an object of S3 class `model_imp_tbl`, with columns 
+`model_id`, `reference_date`, `output_type`, and `importance`, along with any task ID columns (e.g., `location`, `horizon`, and `target_end_date`) present in the input `forecast_data`. 
+Regardless of the original column name for the forecast generation date in the `forecast_data`, it is standardized to `reference_date` in the output. The `importance` column contains the calculated importance scores for each model and specific task, which are derived from the specified algorithm and ensemble method. 
 
 
 ### model_importance_summary( )
-
-The `model_importance_summary()` function summarizes the importance scores 
-produced by `model_importance()` across tasks for each model.
-
-```{r code-model_importance_summary}
-#| eval: false
-> model_importance_summary(importance_scores, by = "model_id",
-                           na_action = c("drop", "worst", "average"),
-                           fun = mean, ...)
-```
-
-The `importance_scores` is a data frame containing model importance 
-scores for individual prediction tasks, as produced by the `model_importance()`
-function. 
-
-The `by` argument specifies the grouping variable(s) for summarization. 
-The default is `"model_id"` to summarize importance scores for each model. 
-Users can also specify other columns present in the `importance_scores` data 
-frame as needed.
-
-The `na_action` argument allows for specifying how to handle `NA` values 
-generated during importance score calculation for each task, occurring when a 
-model did not contribute to the ensemble prediction for a given task by missing 
-its forecast submission.
-Three options are available: `"worst"`, `"average"`, and `"drop"`. 
-In each specific prediction task, if a model has any missing predictions, the 
-`"worst"` option replaces the `NA` values with the smallest value among other 
-models' importance metrics, while the `"average"` option replaces them with the 
-average of the other models' importance metrics in that task. 
-The `"drop"` option removes the `NA` values, which results in the exclusion of 
-the model from the evaluation for that task.
-
-The `fun` argument specifies a function used to summarize importance scores. 
-`fun = mean` is a default choice, but other summary functions are also 
-applicable (e.g., `fun = median`).
-Additional arguments can be passed to the summary function `fun` through `...`
-if needed (e.g., `fun = quantile, probs = 0.25` for a quartile summary).
 
 
 ```{r}
@@ -618,6 +581,49 @@ tbl_argument2 |>
   column_spec(c(2, 3, 4), width = c("4cm", "3.7cm", "2cm")) |>
   kable_styling(latex_options = c("striped", "t"), font_size = 10.5)
 ```
+
+
+
+The `model_importance_summary()` function summarizes the importance scores 
+produced by `model_importance()` across tasks for each model.
+
+```{r code-model_importance_summary}
+#| eval: false
+> model_importance_summary(importance_scores, by = "model_id",
+                           na_action = c("drop", "worst", "average"),
+                           fun = mean, ...)
+```
+
+The `importance_scores` is a data frame containing model importance 
+scores for individual prediction tasks, as produced by the `model_importance()`
+function. 
+
+The `by` argument specifies the grouping variable(s) for summarization. 
+The default is `"model_id"` to summarize importance scores for each model. 
+Users can also specify other columns present in the `importance_scores` data 
+frame as needed.
+
+The `na_action` argument allows for specifying how to handle `NA` values 
+generated during importance score calculation for each task, occurring when a 
+model did not contribute to the ensemble prediction for a given task by missing 
+its forecast submission.
+Three options are available: `"worst"`, `"average"`, and `"drop"`. 
+In each specific prediction task, if a model has any missing predictions, the 
+`"worst"` option replaces the `NA` values with the smallest value among other 
+models' importance metrics, while the `"average"` option replaces them with the 
+average of the other models' importance metrics in that task. 
+The `"drop"` option removes the `NA` values, which results in the exclusion of 
+the model from the evaluation for that task.
+
+The `fun` argument specifies a function used to summarize importance scores. 
+`fun = mean` is a default choice, but other summary functions are also 
+applicable (e.g., `fun = median`).
+Additional arguments can be passed to the summary function `fun` through `...`
+if needed (e.g., `fun = quantile, probs = 0.25` for a quartile summary).
+
+
+`model_importance_summary()` function returns an object of S3 class `importance_summary`, with columns 
+`model_id` and `importance_score_<fun>`, where `<fun>` is the name of the summary function used (e.g., `importance_score_mean` when `fun = mean`). The output is sorted in descending order of the summarized importance scores, `importance_score_<fun>`.
 
 
 ## Implementation and availability {#sec:implementation-and-availability}

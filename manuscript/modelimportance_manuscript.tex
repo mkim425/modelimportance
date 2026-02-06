@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, sharp corners, boxrule=0pt, enhanced, borderline west={3pt}{0pt}{shadecolor}, interior hidden, breakable]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, borderline west={3pt}{0pt}{shadecolor}, sharp corners, enhanced, boxrule=0pt, frame hidden, interior hidden]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -816,6 +816,36 @@ Table~\ref{tbl-arguments2}).
 
 \subsection{model\_importance( )}\label{model_importance}
 
+\begin{table}
+
+\centering{
+
+\centering\begingroup\fontsize{10.5}{12.5}\selectfont
+
+\begin{tabular}{l>{\raggedright\arraybackslash}p{3.8cm}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.8cm}}
+\toprule
+Argument & Description & Possible Values & Default\\
+\midrule
+\cellcolor{gray!10}{\texttt{forecast\_data}} & \cellcolor{gray!10}{Forecasts} & \cellcolor{gray!10}{Must be the model output format} & \cellcolor{gray!10}{N/A}\\
+\texttt{oracle\_output\_data} & Ground truth data & Must be the oracle output format & N/A\\
+\cellcolor{gray!10}{\texttt{ensemble\_fun}} & \cellcolor{gray!10}{Ensemble method} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}, \texttt{"linear\_pool"}} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}}\\
+\texttt{importance\_algorithm} & Algorithm to calculate importance & \texttt{"lomo", "lasomo"} & \texttt{"lomo"}\\
+\cellcolor{gray!10}{\texttt{subset\_wt}} & \cellcolor{gray!10}{Method for assigning weight to subsets when using LASOMO algorithm} & \cellcolor{gray!10}{\texttt{"equal", "perm\_based"}} & \cellcolor{gray!10}{\texttt{"equal"}}\\
+\addlinespace
+\texttt{min\_log\_score} & Minimum value to replace for log score & Non-positive numeric & -10\\
+\cellcolor{gray!10}{\texttt{...}} & \cellcolor{gray!10}{Optional arguments for \texttt{"simple\_ensemble"}} & \cellcolor{gray!10}{Varies} & \cellcolor{gray!10}{\texttt{agg\_fun="mean"}}\\
+\bottomrule
+\end{tabular}
+\endgroup{}
+
+}
+
+\caption{\label{tbl-arguments1}Description of the arguments for the
+\texttt{model\_importance()} function, including their purpose, possible
+values, and default settings.}
+
+\end{table}%
+
 The \texttt{model\_importance()} function calculates the importance
 scores of ensemble component models based on their contributions to
 improving ensemble prediction accuracy for each prediction task. It
@@ -858,36 +888,6 @@ ensemble model outputs are created as a linear pool of component model
 outputs. This method supports only an \texttt{output\_type} of
 \texttt{"mean"}, \texttt{"quantile"}, or \texttt{"pmf"}.
 
-\begin{table}
-
-\centering{
-
-\centering\begingroup\fontsize{10.5}{12.5}\selectfont
-
-\begin{tabular}{l>{\raggedright\arraybackslash}p{3.8cm}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.8cm}}
-\toprule
-Argument & Description & Possible Values & Default\\
-\midrule
-\cellcolor{gray!10}{\texttt{forecast\_data}} & \cellcolor{gray!10}{Forecasts} & \cellcolor{gray!10}{Must be the model output format} & \cellcolor{gray!10}{N/A}\\
-\texttt{oracle\_output\_data} & Ground truth data & Must be the oracle output format & N/A\\
-\cellcolor{gray!10}{\texttt{ensemble\_fun}} & \cellcolor{gray!10}{Ensemble method} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}, \texttt{"linear\_pool"}} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}}\\
-\texttt{importance\_algorithm} & Algorithm to calculate importance & \texttt{"lomo", "lasomo"} & \texttt{"lomo"}\\
-\cellcolor{gray!10}{\texttt{subset\_wt}} & \cellcolor{gray!10}{Method for assigning weight to subsets when using LASOMO algorithm} & \cellcolor{gray!10}{\texttt{"equal", "perm\_based"}} & \cellcolor{gray!10}{\texttt{"equal"}}\\
-\addlinespace
-\texttt{min\_log\_score} & Minimum value to replace for log score & Non-positive numeric & -10\\
-\cellcolor{gray!10}{\texttt{...}} & \cellcolor{gray!10}{Optional arguments for \texttt{"simple\_ensemble"}} & \cellcolor{gray!10}{Varies} & \cellcolor{gray!10}{\texttt{agg\_fun="mean"}}\\
-\bottomrule
-\end{tabular}
-\endgroup{}
-
-}
-
-\caption{\label{tbl-arguments1}Description of the arguments for the
-\texttt{model\_importance()} function, including their purpose, possible
-values, and default settings.}
-
-\end{table}%
-
 The \texttt{importance\_algorithm} argument specifies the algorithm for
 model importance calculation, which can be either \texttt{"lomo"} (leave
 one model out) and \texttt{"lasomo"} (leave all subsets of models out).
@@ -911,8 +911,47 @@ value is set to -10, following the CDC FluSight thresholding convention
 \citep{brooks2018nonmechanistic, reich_accuracy_2019}. Users may choose
 a different value based on their practical needs.
 
+\texttt{model\_importance()} function returns an object of S3 class
+\texttt{model\_imp\_tbl}, with columns \texttt{model\_id},
+\texttt{reference\_date}, \texttt{output\_type}, and
+\texttt{importance}, along with any task ID columns (e.g.,
+\texttt{location}, \texttt{horizon}, and \texttt{target\_end\_date})
+present in the input \texttt{forecast\_data}. Regardless of the original
+column name for the forecast generation date in the
+\texttt{forecast\_data}, it is standardized to \texttt{reference\_date}
+in the output. The \texttt{importance} column contains the calculated
+importance scores for each model and specific task, which are derived
+from the specified algorithm and ensemble method.
+
 \subsection{model\_importance\_summary(
 )}\label{model_importance_summary}
+
+\begin{table}
+
+\centering{
+
+\centering\begingroup\fontsize{10.5}{12.5}\selectfont
+
+\begin{tabular}{l>{\raggedright\arraybackslash}p{4cm}>{\raggedright\arraybackslash}p{3.7cm}>{\raggedright\arraybackslash}p{2cm}}
+\toprule
+Argument & Description & Possible Values & Default\\
+\midrule
+\cellcolor{gray!10}{\texttt{importance\_scores}} & \cellcolor{gray!10}{Model importance scores produced by \texttt{model\_importance()}} & \cellcolor{gray!10}{data frame} & \cellcolor{gray!10}{N/A}\\
+\texttt{by} & Grouping variable(s) for summarization & grouping variable(s) & \texttt{"model\_id"}\\
+\cellcolor{gray!10}{\texttt{na\_action}} & \cellcolor{gray!10}{Method to handle \texttt{NA} values} & \cellcolor{gray!10}{\texttt{"drop", "worst", "average"}} & \cellcolor{gray!10}{\texttt{"drop"}}\\
+\texttt{fun} & Function to summarize importance scores & summary function & \texttt{mean}\\
+\cellcolor{gray!10}{\texttt{...}} & \cellcolor{gray!10}{Optional arguments for \texttt{"fun"}} & \cellcolor{gray!10}{depends on \texttt{fun}} & \cellcolor{gray!10}{N/A}\\
+\bottomrule
+\end{tabular}
+\endgroup{}
+
+}
+
+\caption{\label{tbl-arguments2}Description of the arguments for the
+\texttt{model\_importance\_summary()} function, including their purpose,
+possible values, and default settings.}
+
+\end{table}%
 
 The \texttt{model\_importance\_summary()} function summarizes the
 importance scores produced by \texttt{model\_importance()} across tasks
@@ -953,32 +992,14 @@ Additional arguments can be passed to the summary function \texttt{fun}
 through \texttt{...} if needed (e.g.,
 \texttt{fun\ =\ quantile,\ probs\ =\ 0.25} for a quartile summary).
 
-\begin{table}
-
-\centering{
-
-\centering\begingroup\fontsize{10.5}{12.5}\selectfont
-
-\begin{tabular}{l>{\raggedright\arraybackslash}p{4cm}>{\raggedright\arraybackslash}p{3.7cm}>{\raggedright\arraybackslash}p{2cm}}
-\toprule
-Argument & Description & Possible Values & Default\\
-\midrule
-\cellcolor{gray!10}{\texttt{importance\_scores}} & \cellcolor{gray!10}{Model importance scores produced by \texttt{model\_importance()}} & \cellcolor{gray!10}{data frame} & \cellcolor{gray!10}{N/A}\\
-\texttt{by} & Grouping variable(s) for summarization & grouping variable(s) & \texttt{"model\_id"}\\
-\cellcolor{gray!10}{\texttt{na\_action}} & \cellcolor{gray!10}{Method to handle \texttt{NA} values} & \cellcolor{gray!10}{\texttt{"drop", "worst", "average"}} & \cellcolor{gray!10}{\texttt{"drop"}}\\
-\texttt{fun} & Function to summarize importance scores & summary function & \texttt{mean}\\
-\cellcolor{gray!10}{\texttt{...}} & \cellcolor{gray!10}{Optional arguments for \texttt{"fun"}} & \cellcolor{gray!10}{depends on \texttt{fun}} & \cellcolor{gray!10}{N/A}\\
-\bottomrule
-\end{tabular}
-\endgroup{}
-
-}
-
-\caption{\label{tbl-arguments2}Description of the arguments for the
-\texttt{model\_importance\_summary()} function, including their purpose,
-possible values, and default settings.}
-
-\end{table}%
+\texttt{model\_importance\_summary()} function returns an object of S3
+class \texttt{importance\_summary}, with columns \texttt{model\_id} and
+\texttt{importance\_score\_\textless{}fun\textgreater{}}, where
+\texttt{\textless{}fun\textgreater{}} is the name of the summary
+function used (e.g., \texttt{importance\_score\_mean} when
+\texttt{fun\ =\ mean}). The output is sorted in descending order of the
+summarized importance scores,
+\texttt{importance\_score\_\textless{}fun\textgreater{}}.
 
 \section{Implementation and
 availability}\label{sec:implementation-and-availability}
@@ -1392,6 +1413,17 @@ In this section, we explored each component model's contribution to the
 ensemble accuracy with only three models. An extensive application in
 more complex scenarios with a larger number of models can be found in
 \citet{kim2024}.
+
+\section{Classes and S3 methods}\label{sec:s3-infrastructure}
+
+We have defined S3 classes and methods to facilitate the use of the main
+functions in the package. In this section, we describe the S3
+infrastructure underlying our package, including \texttt{print},
+\texttt{summary}, and \texttt{plot} methods for the output of the main
+functions.
+
+\subsection{model\_importance\_tbl
+class}\label{model_importance_tbl-class}
 
 \section{Summary and discussion}\label{sec:discussion}
 
