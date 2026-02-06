@@ -32,7 +32,7 @@
 #' @param ... Additional arguments passed to the summary function `fun`.
 #' See the documentation of the corresponding function for details.
 #'
-#' @returns A `importance_summary` class object with columns `model_id` and
+#' @returns A `importance_summary` S3 class object with columns `model_id` and
 #' `importance_score_<fun>`, where `<fun>` is the name of the summary function
 #' used (e.g., `importance_score_mean` when `fun = mean`).
 #' The output is sorted in descending order of the summary importance scores.
@@ -105,10 +105,14 @@ model_importance_summary <- function(importance_scores, by = "model_id",
   }
   # summarize importance scores by the specified grouping variable(s)
   summary_df <- imputed_scores |>
-    dplyr::group_by(!!sym(by)) |>
+    # use unquote symbols: !!!syms(by) to handles column(s) specified in `by`
+    dplyr::group_by(!!!syms(by)) |>
+    # dynamically created a column named by summary function and additional
+    # arguments passed through `fun_args`
     dplyr::summarise(!!colname := {
       do.call(fun, list(x = .data$importance, !!!fun_args))
     }, .groups = "drop") |>
+    # unquote symbol !!sym(colname) handles the dynamically created column name
     dplyr::arrange(desc(!!sym(colname)))
 
   # return result as model_imp_tbl class
