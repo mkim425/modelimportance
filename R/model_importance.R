@@ -3,6 +3,8 @@
 #' @description
 #' We measure each ensemble component model's contribution to the ensemble
 #' prediction accuracy for each model task.
+#' (See also \code{\link{model_importance_summary}} for a summary of importance
+#' scores across multiple tasks.)
 #'
 #' This function requires that one column represent the forecast date (or
 #' a date from which each forecast originates or is made in reference to) and
@@ -53,12 +55,13 @@
 #' a linear pool of component model outputs. This method supports only
 #' an `output_type` of `mean`, `quantile`, or `pmf`.
 #' @param min_log_score A numeric value specifying a minimum threshold for log
-#' scores for the `pmf` output to avoid issues with extremely low probabilities
-#' assigned to the true outcome, which can lead to undefined or negative
-#' infinite log scores. Any probability lower than this threshold will be
-#' adjusted to this minimum value. The default value is set to -10, which is an
-#' arbitrary choice. Users may choose a different value based on their practical
-#' needs.
+#' scores for the `pmf` output. This threshold prevents issues with extremely
+#' low probabilities assigned to the true outcome, which would otherwise lead to
+#' undefined or negative infinite log scores.
+#' Any probability lower than this threshold will be adjusted to this minimum
+#' value. The default value is set to -10, following the CDC FluSight
+#' thresholding convention. Users may choose a different value based on their
+#' practical needs.
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
 #'
@@ -69,7 +72,6 @@
 #' Note that `reference_date` is used as the name for the forecast date column,
 #' regardless of its original name in the input `forecast_data`.
 #'
-#' @import hubExamples
 #' @importFrom methods is
 #' @export
 #'
@@ -101,9 +103,9 @@
 #' To enable parallel execution, please set a parallel backend, e.g., via
 #' `future::plan()`.
 #'
+#' @seealso \code{\link{model_importance_summary}}
 #' @examples \dontrun{
 #' library(dplyr)
-#' library(hubExamples)
 #' forecast_data <- hubExamples::forecast_outputs |>
 #'   dplyr::filter(
 #'     output_type %in% c("quantile"),

@@ -28,7 +28,7 @@
 #' @importFrom utils getFromNamespace
 #' @importFrom utils combn
 #' @inherit model_importance details
-
+#' @noRd
 compute_importance <- function(single_task_data, oracle_output_data,
                                model_id_list, ensemble_fun,
                                importance_algorithm, subset_wt,
