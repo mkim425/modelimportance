@@ -1,10 +1,12 @@
 # Summarize model importance scores produced by `model_importance()` across tasks
 
 `model_importance_summary` summarizes model importance scores calculated
-for individual prediction tasks into a summary statistic for each model.
-This function handles `NA` values in importance scores generated when a
-model did not contribute to the ensemble prediction for a given task by
-missing its forecast submission.
+for individual prediction tasks by
+[`model_importance`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
+into a summary statistic for each model. This function handles `NA`
+values in importance scores generated when a model did not contribute to
+the ensemble prediction for a given task by missing its forecast
+submission.
 
 ## Usage
 
@@ -69,12 +71,15 @@ A data.frame with columns `model_id` and `importance_score_<fun>`, where
 `importance_score_mean` when `fun = mean`). The output is sorted in
 descending order of the summary importance scores.
 
+## See also
+
+[`model_importance`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
+
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
 library(dplyr)
-library(hubExamples)
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
     output_type %in% c("quantile"),

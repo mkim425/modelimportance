@@ -1,0 +1,23 @@
+table {
+  margin-top: 1.5em;
+  margin-bottom: 2em;
+}
+
+table caption {
+  caption-side: bottom;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #444;
+  text-align: left;
+  margin-top: 0.5em;
+  margin-bottom: 1.5em;
+}
+
+p.caption {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #444;
+  text-align: left;
+  margin-top: 0.5em;
+  margin-bottom: 1.5em;
+}

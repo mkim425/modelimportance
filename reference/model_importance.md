@@ -1,7 +1,9 @@
 # Quantifies the contribution of ensemble component models to ensemble prediction accuracy for each prediction task.
 
 We measure each ensemble component model's contribution to the ensemble
-prediction accuracy for each model task.
+prediction accuracy for each model task. (See also
+[`model_importance_summary`](https://mkim425.github.io/modelimportance/reference/model_importance_summary.md)
+for a summary of importance scores across multiple tasks.)
 
 This function requires that one column represent the forecast date (or a
 date from which each forecast originates or is made in reference to) and
@@ -86,11 +88,12 @@ model_importance(
 - min_log_score:
 
   A numeric value specifying a minimum threshold for log scores for the
-  `pmf` output to avoid issues with extremely low probabilities assigned
-  to the true outcome, which can lead to undefined or negative infinite
-  log scores. Any probability lower than this threshold will be adjusted
-  to this minimum value. The default value is set to -10, which is an
-  arbitrary choice. Users may choose a different value based on their
+  `pmf` output. This threshold prevents issues with extremely low
+  probabilities assigned to the true outcome, which would otherwise lead
+  to undefined or negative infinite log scores. Any probability lower
+  than this threshold will be adjusted to this minimum value. The
+  default value is set to -10, following the CDC FluSight thresholding
+  convention. Users may choose a different value based on their
   practical needs.
 
 - ...:
@@ -136,12 +139,15 @@ This function uses the `furrr` and `future` for parallelization. To
 enable parallel execution, please set a parallel backend, e.g., via
 [`future::plan()`](https://future.futureverse.org/reference/plan.html).
 
+## See also
+
+[`model_importance_summary`](https://mkim425.github.io/modelimportance/reference/model_importance_summary.md)
+
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
 library(dplyr)
-library(hubExamples)
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
     output_type %in% c("quantile"),
