@@ -29,7 +29,7 @@ evaluating how each component model contributes to ensemble accuracy.
 We provide simple working examples to help you get started with the package. 
 Detailed descriptions of the model importance metrics, algorithms, key 
 functions, and in-depth interpretations of the examples covered here are 
-available in the accompanying article titled '`modelimportance`: Evaluating 
+available in the [accompanying article](https://mkim425.github.io/modelimportance/articles/modelimportance-article.html) titled '`modelimportance`: Evaluating 
 model importance within a multi-model ensemble in R' under *Articles*.
 
 
@@ -71,12 +71,20 @@ forecast_data <- hubExamples::forecast_outputs |>
   ) |>
   filter(
     !(model_id == "MOBS-GLEAM_FLUH" & location == "25" &
-        target_end_date == as.Date("2022-11-26")),
+      target_end_date == as.Date("2022-11-26")),
     !(model_id == "PSI-DICE" & location == "48" &
-        target_end_date == as.Date("2022-12-10"))
+      target_end_date == as.Date("2022-12-10"))
   )
 
-forecast_data
+forecast_data |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    font_size = 12,
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
 
 The corresponding target data contains the observed hospitalization counts for 
@@ -92,7 +100,14 @@ target_data <- hubExamples::forecast_target_ts |>
   # Rename columns to match the oracle output format
   rename(oracle_value = observation)
 
-target_data
+target_data |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
 
 We visualize the forecasts and the observed values.
@@ -147,7 +162,16 @@ scores_lomo <- model_importance(
   ensemble_fun = "simple_ensemble",
   importance_algorithm = "lomo"
 )
-scores_lomo
+
+scores_lomo |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    font_size = 12,
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
 
 For models that missed forecasts for certain tasks, `NA` values are assigned in 
@@ -158,9 +182,19 @@ We summarize the importance scores for each model by averaging across all tasks.
 argument to `"drop"`.
 
 ```{r lomo-NAdrop}
-model_importance_summary(
-  scores_lomo, by = "model_id", na_action = "drop", fun = mean
+summary.lomo.drop <- model_importance_summary(
+  scores_lomo,
+  by = "model_id", na_action = "drop", fun = mean
 )
+
+summary.lomo.drop |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
 The results show that the model 'PSI-DICE' has the highest importance score, 
 followed by 'Flusight-baseline' and 'MOBS-GLEAM_FLUH'.
@@ -173,9 +207,19 @@ Another approach to handling `NA` values is to use the `"worst"` option for
 among the other models for the same task.
 
 ```{r lomo-NAworst}
-model_importance_summary(
-  scores_lomo, by = "model_id", na_action = "worst", fun = mean
+summary.lomo.worst <- model_importance_summary(
+  scores_lomo,
+  by = "model_id", na_action = "worst", fun = mean
 )
+
+summary.lomo.worst |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
 
 
@@ -193,9 +237,19 @@ This strategy may offer a more balanced trade-off by mitigating the influence of
 the missing data without overly penalizing or overlooking them. 
 
 ```{r lomo-NAaverage}
-model_importance_summary(
-  scores_lomo, by = "model_id", na_action = "average", fun = mean
+summary.lomo.avg <- model_importance_summary(
+  scores_lomo,
+  by = "model_id", na_action = "average", fun = mean
 )
+
+summary.lomo.avg |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
 
 ## Evaluation using LASOMO algorithm
@@ -217,9 +271,20 @@ scores_lasomo_eq <- model_importance(
   ensemble_fun = "simple_ensemble",
   importance_algorithm = "lasomo", subset_wt = "equal"
 )
-model_importance_summary(
-  scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean
+
+summary.lasomo_eq <- model_importance_summary(
+  scores_lasomo_eq,
+  by = "model_id", na_action = "drop", fun = mean
 )
+
+summary.lasomo_eq |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
 
 ```{r lasomo-NAdrop-perm}
@@ -231,9 +296,20 @@ scores_lasomo_perm <- model_importance(
   ensemble_fun = "simple_ensemble",
   importance_algorithm = "lasomo", subset_wt = "perm_based"
 )
-model_importance_summary(
-  scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean
+
+summary.lasomo_perm <- model_importance_summary(
+  scores_lasomo_perm,
+  by = "model_id", na_action = "drop", fun = mean
 )
+
+summary.lasomo_perm |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
 
 In this example, there are only three models ($n = 3$), and the weights do not 
@@ -242,8 +318,12 @@ Therefore, the resulting outputs show little difference.
 However, in general, with a larger number of models, the two weighting schemes 
 may yield different importance scores for each model.
 
+Note that the computational time here is about 0.3 seconds for both LOMO and LASOMO algorithms.
+However, this time can be increased substantially with a large number of models and tasks. 
+See detailed discussions on execution time and computational feasibility in the 
+[Computational complexity](../articles/modelimportance-article.html#sec:computational-complexity) section of the accompanying article.
+
 An extensive application in more complex scenarios with a larger number of 
 models can be found in @kim2024.
 
 ## References
-
