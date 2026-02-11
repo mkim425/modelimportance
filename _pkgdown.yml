@@ -2,6 +2,7 @@ url: https://mkim425.github.io/modelimportance/
 template:
   bootstrap: 5
   extra_css: pkgdown/extra.css
+remove_empty_sections: false
 
 navbar:
   structure:
