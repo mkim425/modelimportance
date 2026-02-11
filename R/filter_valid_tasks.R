@@ -27,8 +27,7 @@ filter_valid_tasks <- function(df_list_by_task, min_models = 2) {
   invalid_tasks_idx <- which(task_model_count < min_models)
   if (length(invalid_tasks_idx) > 0) {
     invalid_tasks <- purrr::map_dfr(invalid_tasks_idx, function(idx) {
-      single_task_data <- df_list_by_task[[idx]]
-      current_task <- single_task_data |>
+      df_list_by_task[[idx]] |>
         select(all_of(task_id_cols)) |>
         distinct() |>
         as.data.frame()

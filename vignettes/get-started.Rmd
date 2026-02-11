@@ -70,10 +70,16 @@ forecast_data <- hubExamples::forecast_outputs |>
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
   ) |>
   filter(
-    !(model_id == "MOBS-GLEAM_FLUH" & location == "25" &
-      target_end_date == as.Date("2022-11-26")),
-    !(model_id == "PSI-DICE" & location == "48" &
-      target_end_date == as.Date("2022-12-10"))
+    !(
+      model_id == "MOBS-GLEAM_FLUH" &
+        location == "25" &
+        target_end_date == as.Date("2022-11-26")
+    ),
+    !(
+      model_id == "PSI-DICE" &
+        location == "48" &
+        target_end_date == as.Date("2022-12-10")
+    )
   )
 
 forecast_data |>

@@ -36,21 +36,26 @@ summary.model_imp_tbl <- function(object, ...) {
   task_winners <- object |>
     dplyr::group_by(across(all_of(task_id_cols))) |>
     dplyr::slice_max(importance, n = 1, with_ties = FALSE) |>
-    dplyr::select(all_of(task_id_cols), top_model = model_id, max_score = importance) |>
+    dplyr::select(all_of(task_id_cols),
+      top_model = model_id,
+      max_score = importance
+    ) |>
     dplyr::ungroup() |>
     as.data.frame()
 
   # create summary list
   summary_list <- list(
     all_models = unique(object$model_id),
-    all_tasks = object |> dplyr::select(dplyr::all_of(task_id_cols)) |>
-      dplyr::distinct() |> as.data.frame(),
+    all_tasks = object |>
+      dplyr::select(dplyr::all_of(task_id_cols)) |>
+      dplyr::distinct() |>
+      as.data.frame(),
     model_summary = model_stats,
     task_winners = task_winners
   )
   # set class
   class(summary_list) <- "summary.model_imp_tbl"
-  return(summary_list)
+  summary_list
 }
 
 #' Print method for summary of model importance score table

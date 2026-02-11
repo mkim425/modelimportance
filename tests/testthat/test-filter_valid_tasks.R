@@ -42,10 +42,14 @@ test_that("filter_valid_tasks() works as expected", {
   # Create a modified df_list_by_task with all tasks having only one model
   modified_tbl_all_invalid <- valid_tbl |>
     filter(model_id != "PSI-DICE") |>
-    filter(!(model_id == "MOBS-GLEAM_FLUH" &
-      target_end_date == "2022-12-24")) |>
-    filter(!(model_id == "Flusight-baseline" &
-      target_end_date == "2022-11-26"))
+    filter(!(
+      model_id == "MOBS-GLEAM_FLUH" &
+        target_end_date == "2022-12-24"
+    )) |>
+    filter(!(
+      model_id == "Flusight-baseline" &
+        target_end_date == "2022-11-26"
+    ))
 
   modified_df_list_all_invalid <- split_data_by_task(modified_tbl_all_invalid)
   expect_error(
