@@ -69,5 +69,5 @@ filter_valid_tasks <- function(df_list_by_task, min_models = 2) {
     )
   }
 
-  return(valid_df_list_by_task)
+  valid_df_list_by_task
 }
