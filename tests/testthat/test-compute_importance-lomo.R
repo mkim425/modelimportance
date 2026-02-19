@@ -122,7 +122,7 @@ pmap(
       # test: compare the calculated importance with the expected importance,
       # ignoring their attributes
       expect_equal(calculated, expected_value,
-        tolerance = 1e-1, ignore_attr = TRUE
+        tolerance = 1e-3, ignore_attr = TRUE
       )
     })
   }
@@ -178,7 +178,7 @@ pmap(reduced_params, function(output_type, metric) {
     # test: compare the calculated importance with the expected importance,
     # ignoring their attributes
     expect_equal(calculated, expected_value,
-      tolerance = 1e-1, ignore_attr = TRUE
+      tolerance = 1e-3, ignore_attr = TRUE
     )
   })
 })

@@ -921,6 +921,9 @@ In this section, we explored each component model's contribution to the ensemble
 accuracy with only three models. An extensive application in more complex 
 scenarios with a larger number of models can be found in @kim2024.
 
+## Computational complexity {#sec:computational-complexity}
+
+Content coming soon. This section will describe computational complexity of LOMO and LASOMO algorithms implemented in the package, depending the numbers of models and tasks.
 
 ## Summary and discussion {#sec:discussion}
 

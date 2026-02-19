@@ -104,7 +104,7 @@ pmap(
       # test: compare the calculated importance with the expected importance,
       # ignoring their attributes
       expect_equal(calculated, expected_df,
-        tolerance = 1e-1, ignore_attr = TRUE
+        tolerance = 1e-3, ignore_attr = TRUE
       )
     })
   }
@@ -137,8 +137,111 @@ test_that(
       ))
       # test: compare the two importance scores
       expect_equal(imp_simple_ens, imp_linear_pool,
-        tolerance = 1e-1, ignore_attr = TRUE
+        tolerance = 1e-3, ignore_attr = TRUE
       )
     }
   }
 )
+
+## Test: model_imp_tbl class and its methods
+test_that("model_imp_tbl class and methods are valid", {
+  selected_data <- data_list[["dat_quantile"]]
+  imp_scores <- suppressMessages(model_importance(
+    forecast_data = selected_data,
+    oracle_output_data = target_data,
+    ensemble_fun = "simple_ensemble",
+    importance_algorithm = "lomo",
+    subset_wt = "equal",
+    agg_fun = "mean",
+    min_log_score = -10
+  ))
+  # test for class and print/plot methods
+  expect_s3_class(imp_scores, "model_imp_tbl")
+  expect_error(print(imp_scores), NA)
+  expect_error(plot(imp_scores), NA)
+  # test for summary method
+  s <- summary(imp_scores)
+  expect_s3_class(s, "summary.model_imp_tbl")
+  expect_true(is.data.frame(s$task_winners))
+  expect_true(is.data.frame(s$model_summary))
+  expect_true(is.data.frame(s$all_tasks))
+  expect_equal(length(s$all_models), length(unique(imp_scores$model_id)))
+})
+
+# Test: LOMO algorithm runs within a reasonable time with a larger number of
+# models and tasks
+test_that("lomo runs with a large number of models and tasks", {
+  testthat::skip_on_cran()
+
+  # Create a larger dataset with more models and tasks
+  n_models <- 50
+  n_tasks <- 1000
+  fake_models <- paste0("model_", seq_len(n_models))
+  fake_fdat <- data_list[[1]] |>
+    slice(1) |>
+    select(-model_id, -value) |>
+    slice(rep(seq_len(n()), each = n_tasks)) |>
+    mutate(target_end_date = as.Date("2022-11-26") + (row_number() - 1)) |>
+    slice(rep(seq_len(n()), each = n_models)) |>
+    mutate(
+      model_id = rep(fake_models, times = n() / n_models),
+      value = rnorm(n(), mean = 500, sd = 100)
+    )
+  fake_target_data <- target_data |>
+    filter(location == "25", output_type == "mean") |>
+    slice(1) |>
+    slice(rep(seq_len(n()), each = n_tasks)) |>
+    mutate(
+      target_end_date = as.Date("2022-11-26") + (row_number() - 1),
+      oracle_value = oracle_value + rnorm(n(), mean = 100, sd = 50)
+    )
+  # test that the function runs without error
+  expect_error(suppressMessages(model_importance(
+    forecast_data = fake_fdat,
+    oracle_output_data = fake_target_data,
+    ensemble_fun = "simple_ensemble",
+    importance_algorithm = "lomo",
+    subset_wt = "equal",
+    agg_fun = "mean",
+    min_log_score = -10
+  )), regexp = NA)
+})
+
+# Test: LASOMO algorithm runs within a reasonable time with a larger number of
+# models
+test_that("lasomo runs with a large number of models and tasks", {
+  testthat::skip_on_cran()
+
+  # Create a larger dataset with more models and tasks
+  n_models <- 10
+  n_tasks <- 10
+  fake_models <- paste0("model_", seq_len(n_models))
+  fake_fdat <- data_list[[1]] |>
+    slice(1) |>
+    select(-model_id, -value) |>
+    slice(rep(seq_len(n()), each = n_tasks)) |>
+    mutate(target_end_date = as.Date("2022-11-26") + (row_number() - 1)) |>
+    slice(rep(seq_len(n()), each = n_models)) |>
+    mutate(
+      model_id = rep(fake_models, times = n() / n_models),
+      value = rnorm(n(), mean = 500, sd = 100)
+    )
+  fake_target_data <- target_data |>
+    filter(location == "25", output_type == "mean") |>
+    slice(1) |>
+    slice(rep(seq_len(n()), each = n_tasks)) |>
+    mutate(
+      target_end_date = as.Date("2022-11-26") + (row_number() - 1),
+      oracle_value = oracle_value + rnorm(n(), mean = 100, sd = 50)
+    )
+  # test: the function runs without error
+  expect_error(suppressMessages(model_importance(
+    forecast_data = fake_fdat,
+    oracle_output_data = fake_target_data,
+    ensemble_fun = "simple_ensemble",
+    importance_algorithm = "lasomo",
+    subset_wt = "equal",
+    agg_fun = "mean",
+    min_log_score = -10
+  )), regexp = NA)
+})

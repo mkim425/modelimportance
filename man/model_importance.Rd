@@ -67,10 +67,10 @@ practical needs.}
 as \code{"simple_ensemble"}. See 'Details'.}
 }
 \value{
-A data.frame with columns \code{model_id}, \code{reference_date},
-\code{output_type}, and \code{importance}, along with any task ID columns (e.g.,
-\code{location}, \code{horizon}, and \code{target_end_date}) present in the input
-\code{forecast_data}.
+A \code{model_imp_tbl} S3 class object with columns \code{model_id},
+\code{reference_date}, \code{output_type}, and \code{importance}, along with any task ID
+columns (e.g., \code{location}, \code{horizon}, and \code{target_end_date}) present in the
+input \code{forecast_data}.
 Note that \code{reference_date} is used as the name for the forecast date column,
 regardless of its original name in the input \code{forecast_data}.
 }
@@ -138,12 +138,11 @@ forecast_data <- hubExamples::forecast_outputs |>
   )
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
-    date \%in\% unique(forecast_data$target_end_date),
+    target_end_date \%in\% unique(forecast_data$target_end_date),
     location == "25"
   ) |>
   # Rename columns to match the oracle output format
   rename(
-    target_end_date = date,
     oracle_value = observation
   )
 # Example with the default arguments.

@@ -32,9 +32,9 @@
 #' @param ... Additional arguments passed to the summary function `fun`.
 #' See the documentation of the corresponding function for details.
 #'
-#' @returns A data.frame with columns `model_id` and `importance_score_<fun>`,
-#' where `<fun>` is the name of the summary function used
-#' (e.g., `importance_score_mean` when `fun = mean`).
+#' @returns An `importance_summary` S3 class object with columns `model_id` and
+#' `importance_score_<fun>`, where `<fun>` is the name of the summary function
+#' used (e.g., `importance_score_mean` when `fun = mean`).
 #' The output is sorted in descending order of the summary importance scores.
 #' @export
 #' @importFrom checkmate assert_data_frame assert_subset assert_function
@@ -49,12 +49,11 @@
 #'   )
 #' target_data <- hubExamples::forecast_target_ts |>
 #'   dplyr::filter(
-#'     date %in% unique(forecast_data$target_end_date),
+#'     target_end_date %in% unique(forecast_data$target_end_date),
 #'     location == "25"
 #'   ) |>
 #'   # Rename columns to match the oracle output format
 #'   rename(
-#'     target_end_date = date,
 #'     oracle_value = observation
 #'   )
 #' # Example with the default arguments.
@@ -105,10 +104,17 @@ model_importance_summary <- function(importance_scores, by = "model_id",
       ungroup()
   }
   # summarize importance scores by the specified grouping variable(s)
-  imputed_scores |>
-    dplyr::group_by(!!sym(by)) |>
+  summary_df <- imputed_scores |>
+    # use unquote symbols: !!!syms(by) to handles column(s) specified in `by`
+    dplyr::group_by(!!!syms(by)) |>
+    # dynamically created a column named by summary function and additional
+    # arguments passed through `fun_args`
     dplyr::summarise(!!colname := {
       do.call(fun, list(x = .data$importance, !!!fun_args))
     }, .groups = "drop") |>
+    # unquote symbol !!sym(colname) handles the dynamically created column name
     dplyr::arrange(desc(!!sym(colname)))
+
+  # return result as model_imp_tbl class
+  structure(summary_df, class = c("importance_summary", class(summary_df)))
 }
