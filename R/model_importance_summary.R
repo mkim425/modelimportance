@@ -32,7 +32,7 @@
 #' @param ... Additional arguments passed to the summary function `fun`.
 #' See the documentation of the corresponding function for details.
 #'
-#' @returns A `importance_summary` S3 class object with columns `model_id` and
+#' @returns An `importance_summary` S3 class object with columns `model_id` and
 #' `importance_score_<fun>`, where `<fun>` is the name of the summary function
 #' used (e.g., `importance_score_mean` when `fun = mean`).
 #' The output is sorted in descending order of the summary importance scores.
