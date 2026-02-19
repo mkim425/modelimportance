@@ -98,7 +98,7 @@ pmap(
 )
 
 ## Test: importance_summary class and its methods
-test_that("importance_summary class and methods", {
+test_that("importance_summary class and methods are valid", {
   data <- raw_imp_scores |>
     dplyr::filter(calc_args == "mean_output-simple_ensemble-lomo-equal-mean")
   summary_scores <- model_importance_summary(

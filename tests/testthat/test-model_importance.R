@@ -144,7 +144,7 @@ test_that(
 )
 
 ## Test: model_imp_tbl class and its methods
-test_that("model_imp_tbl class and methods", {
+test_that("model_imp_tbl class and methods are valid", {
   selected_data <- data_list[["dat_quantile"]]
   imp_scores <- suppressMessages(model_importance(
     forecast_data = selected_data,
