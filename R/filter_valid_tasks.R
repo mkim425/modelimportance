@@ -26,12 +26,14 @@ filter_valid_tasks <- function(df_list_by_task, min_models = 2) {
   # Identify tasks that do not meet the minimum model requirement
   invalid_tasks_idx <- which(task_model_count < min_models)
   if (length(invalid_tasks_idx) > 0) {
-    invalid_tasks <- purrr::map_dfr(invalid_tasks_idx, function(idx) {
-      df_list_by_task[[idx]] |>
-        select(all_of(task_id_cols)) |>
-        distinct() |>
-        as.data.frame()
-    })
+    invalid_tasks <- invalid_tasks_idx |>
+      purrr::map(function(idx) {
+        df_list_by_task[[idx]] |>
+          select(all_of(task_id_cols)) |>
+          distinct() |>
+          as.data.frame()
+      }) |>
+      purrr::list_rbind()
     # Print a message listing the invalid tasks
     message(
       paste0(
