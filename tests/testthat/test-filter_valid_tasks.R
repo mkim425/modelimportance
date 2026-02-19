@@ -23,6 +23,10 @@ test_that("filter_valid_tasks() works as expected", {
   df_list_by_task <- split_data_by_task(valid_tbl)
   result_all_valid <- filter_valid_tasks(df_list_by_task, min_models = 2)
   expect_equal(length(result_all_valid), length(df_list_by_task))
+  expect_message(
+    filter_valid_tasks(df_list_by_task, min_models = 2),
+    "All tasks meet the minimum model requirement of 2 models."
+  )
 
   # Case 2: Some tasks invalid
   # Create a modified df_list_by_task with one task having only one model
@@ -33,9 +37,9 @@ test_that("filter_valid_tasks() works as expected", {
   result_some_invalid <- filter_valid_tasks(modified_df_list_some_invalid,
     min_models = 2
   )
-  expect_true(
-    0 < length(result_some_invalid),
-    length(result_some_invalid) < length(modified_df_list)
+  expect_equal(
+    length(result_some_invalid),
+    length(modified_df_list_some_invalid) - 1
   )
 
   # Case 3: All tasks invalid
