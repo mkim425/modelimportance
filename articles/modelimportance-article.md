@@ -706,6 +706,8 @@ The function output is a data frame containing model ids and their
 corresponding importance scores for each prediction task, along with
 task id columns.
 
+    #> Model importance result by task
+    #> ---------------------------------
     #>             model_id reference_date          target horizon location target_end_date output_type importance
     #> 1  Flusight-baseline     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median  -19.50000
     #> 2    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median         NA
@@ -741,12 +743,12 @@ model_importance_summary(
   na_action = "drop",
   fun = mean
 )
-#> # A tibble: 3 × 2
-#>   model_id          importance_score_mean
-#>   <chr>                             <dbl>
-#> 1 PSI-DICE                           37.2
-#> 2 Flusight-baseline                  28.4
-#> 3 MOBS-GLEAM_FLUH                   -75
+#> Overall model importance across tasks
+#> ---------------------------------------- 
+#>            model_id importance_score_mean
+#> 1          PSI-DICE              37.16667
+#> 2 Flusight-baseline              28.37500
+#> 3   MOBS-GLEAM_FLUH             -75.00000
 ```
 
 The results show that the model ‘PSI-DICE’ has the highest importance
@@ -771,12 +773,12 @@ model_importance_summary(
   na_action = "worst",
   fun = mean
 )
-#> # A tibble: 3 × 2
-#>   model_id          importance_score_mean
-#>   <chr>                             <dbl>
-#> 1 Flusight-baseline                  28.4
-#> 2 PSI-DICE                          -17.6
-#> 3 MOBS-GLEAM_FLUH                   -61.1
+#> Overall model importance across tasks
+#> ---------------------------------------- 
+#>            model_id importance_score_mean
+#> 1 Flusight-baseline                28.375
+#> 2          PSI-DICE               -17.625
+#> 3   MOBS-GLEAM_FLUH               -61.125
 ```
 
 The results show that the importance scores of ‘Flusight-baseline’ is
@@ -810,12 +812,12 @@ or overlooking them.
 model_importance_summary(
   scores_lomo, by = "model_id", na_action = "average", fun = mean
 )
-#> # A tibble: 3 × 2
-#>   model_id          importance_score_mean
-#>   <chr>                             <dbl>
-#> 1 Flusight-baseline                  28.4
-#> 2 PSI-DICE                           27.9
-#> 3 MOBS-GLEAM_FLUH                   -56.2
+#> Overall model importance across tasks
+#> ---------------------------------------- 
+#>            model_id importance_score_mean
+#> 1 Flusight-baseline                28.375
+#> 2          PSI-DICE                27.875
+#> 3   MOBS-GLEAM_FLUH               -56.250
 ```
 
 ### Evaluation using LASOMO algorithm
@@ -840,12 +842,12 @@ scores_lasomo_eq <- model_importance(
 model_importance_summary(
   scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean
 )
-#> # A tibble: 3 × 2
-#>   model_id          importance_score_mean
-#>   <chr>                             <dbl>
-#> 1 PSI-DICE                           47.4
-#> 2 Flusight-baseline                  24.3
-#> 3 MOBS-GLEAM_FLUH                   -79.8
+#> Overall model importance across tasks
+#> ---------------------------------------- 
+#>            model_id importance_score_mean
+#> 1          PSI-DICE              47.38889
+#> 2 Flusight-baseline              24.29167
+#> 3   MOBS-GLEAM_FLUH             -79.77778
 ```
 
 ``` r
@@ -859,12 +861,12 @@ scores_lasomo_perm <- model_importance(
 model_importance_summary(
   scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean
 )
-#> # A tibble: 3 × 2
-#>   model_id          importance_score_mean
-#>   <chr>                             <dbl>
-#> 1 PSI-DICE                           44.8
-#> 2 Flusight-baseline                  25.3
-#> 3 MOBS-GLEAM_FLUH                   -78.6
+#> Overall model importance across tasks
+#> ---------------------------------------- 
+#>            model_id importance_score_mean
+#> 1          PSI-DICE              44.83333
+#> 2 Flusight-baseline              25.31250
+#> 3   MOBS-GLEAM_FLUH             -78.58333
 ```
 
 In this example, there are only three models ($n = 3$), and the weights
@@ -877,6 +879,12 @@ In this section, we explored each component model’s contribution to the
 ensemble accuracy with only three models. An extensive application in
 more complex scenarios with a larger number of models can be found in
 Kim, Ray, and Reich (2024).
+
+## Computational complexity
+
+Content coming soon. This section will describe computational complexity
+of LOMO and LASOMO algorithms implemented in the package, depending the
+numbers of models and tasks.
 
 ## Summary and discussion
 

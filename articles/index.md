@@ -6,7 +6,7 @@
   ensemble in
   R](https://mkim425.github.io/modelimportance/articles/modelimportance-article.md):
 
-### Vignette
+### Get started
 
 - [Simple working
   examples](https://mkim425.github.io/modelimportance/articles/get-started.md):

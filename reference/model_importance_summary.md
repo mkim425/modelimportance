@@ -66,10 +66,10 @@ model_importance_summary(
 
 ## Value
 
-A data.frame with columns `model_id` and `importance_score_<fun>`, where
-`<fun>` is the name of the summary function used (e.g.,
-`importance_score_mean` when `fun = mean`). The output is sorted in
-descending order of the summary importance scores.
+A `importance_summary` S3 class object with columns `model_id` and
+`importance_score_<fun>`, where `<fun>` is the name of the summary
+function used (e.g., `importance_score_mean` when `fun = mean`). The
+output is sorted in descending order of the summary importance scores.
 
 ## See also
 
@@ -88,12 +88,11 @@ forecast_data <- hubExamples::forecast_outputs |>
   )
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
-    date %in% unique(forecast_data$target_end_date),
+    target_end_date %in% unique(forecast_data$target_end_date),
     location == "25"
   ) |>
   # Rename columns to match the oracle output format
   rename(
-    target_end_date = date,
     oracle_value = observation
   )
 # Example with the default arguments.

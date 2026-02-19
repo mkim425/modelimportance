@@ -5,9 +5,10 @@ for evaluating how each component model contributes to ensemble
 accuracy. We provide simple working examples to help you get started
 with the package. Detailed descriptions of the model importance metrics,
 algorithms, key functions, and in-depth interpretations of the examples
-covered here are available in the accompanying article titled
-‘`modelimportance`: Evaluating model importance within a multi-model
-ensemble in R’ under *Articles*.
+covered here are available in the [accompanying
+article](https://mkim425.github.io/modelimportance/articles/modelimportance-article.html)
+titled ‘`modelimportance`: Evaluating model importance within a
+multi-model ensemble in R’ under *Articles*.
 
 ## Setup
 
@@ -46,27 +47,41 @@ forecast_data <- hubExamples::forecast_outputs |>
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
   ) |>
   filter(
-    !(model_id == "MOBS-GLEAM_FLUH" & location == "25" &
-        target_end_date == as.Date("2022-11-26")),
-    !(model_id == "PSI-DICE" & location == "48" &
-        target_end_date == as.Date("2022-12-10"))
+    !(
+      model_id == "MOBS-GLEAM_FLUH" &
+        location == "25" &
+        target_end_date == as.Date("2022-11-26")
+    ),
+    !(
+      model_id == "PSI-DICE" &
+        location == "48" &
+        target_end_date == as.Date("2022-12-10")
+    )
   )
 
-forecast_data
-#> # A tibble: 10 × 9
-#>    model_id          reference_date target          horizon location target_end_date output_type output_type_id value
-#>    <chr>             <date>         <chr>             <int> <chr>    <date>          <chr>       <chr>          <dbl>
-#>  1 Flusight-baseline 2022-11-19     wk inc flu hosp       1 25       2022-11-26      median      NA                51
-#>  2 Flusight-baseline 2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      NA                51
-#>  3 Flusight-baseline 2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      NA              1052
-#>  4 Flusight-baseline 2022-11-19     wk inc flu hosp       3 48       2022-12-10      median      NA              1052
-#>  5 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      NA                43
-#>  6 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      NA              1072
-#>  7 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 48       2022-12-10      median      NA               688
-#>  8 PSI-DICE          2022-11-19     wk inc flu hosp       1 25       2022-11-26      median      NA                90
-#>  9 PSI-DICE          2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      NA               159
-#> 10 PSI-DICE          2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      NA              1226
+forecast_data |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    font_size = 12,
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
+
+| model_id          | reference_date | target          | horizon | location | target_end_date | output_type | output_type_id | value |
+|:------------------|:---------------|:----------------|--------:|:---------|:----------------|:------------|:---------------|------:|
+| Flusight-baseline | 2022-11-19     | wk inc flu hosp |       1 | 25       | 2022-11-26      | median      | NA             |    51 |
+| Flusight-baseline | 2022-11-19     | wk inc flu hosp |       3 | 25       | 2022-12-10      | median      | NA             |    51 |
+| Flusight-baseline | 2022-11-19     | wk inc flu hosp |       1 | 48       | 2022-11-26      | median      | NA             |  1052 |
+| Flusight-baseline | 2022-11-19     | wk inc flu hosp |       3 | 48       | 2022-12-10      | median      | NA             |  1052 |
+| MOBS-GLEAM_FLUH   | 2022-11-19     | wk inc flu hosp |       3 | 25       | 2022-12-10      | median      | NA             |    43 |
+| MOBS-GLEAM_FLUH   | 2022-11-19     | wk inc flu hosp |       1 | 48       | 2022-11-26      | median      | NA             |  1072 |
+| MOBS-GLEAM_FLUH   | 2022-11-19     | wk inc flu hosp |       3 | 48       | 2022-12-10      | median      | NA             |   688 |
+| PSI-DICE          | 2022-11-19     | wk inc flu hosp |       1 | 25       | 2022-11-26      | median      | NA             |    90 |
+| PSI-DICE          | 2022-11-19     | wk inc flu hosp |       3 | 25       | 2022-12-10      | median      | NA             |   159 |
+| PSI-DICE          | 2022-11-19     | wk inc flu hosp |       1 | 48       | 2022-11-26      | median      | NA             |  1226 |
 
 The corresponding target data contains the observed hospitalization
 counts for these dates and locations.
@@ -81,15 +96,22 @@ target_data <- hubExamples::forecast_target_ts |>
   # Rename columns to match the oracle output format
   rename(oracle_value = observation)
 
-target_data
-#> # A tibble: 4 × 4
-#>   target_end_date target          location oracle_value
-#>   <date>          <chr>           <chr>           <dbl>
-#> 1 2022-11-26      wk inc flu hosp 25                221
-#> 2 2022-11-26      wk inc flu hosp 48               1929
-#> 3 2022-12-10      wk inc flu hosp 25                578
-#> 4 2022-12-10      wk inc flu hosp 48               1781
+target_data |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
+
+| target_end_date | target          | location | oracle_value |
+|:----------------|:----------------|:---------|-------------:|
+| 2022-11-26      | wk inc flu hosp | 25       |          221 |
+| 2022-11-26      | wk inc flu hosp | 48       |         1929 |
+| 2022-12-10      | wk inc flu hosp | 25       |          578 |
+| 2022-12-10      | wk inc flu hosp | 48       |         1781 |
 
 We visualize the forecasts and the observed values.
 
@@ -147,21 +169,32 @@ scores_lomo <- model_importance(
   ensemble_fun = "simple_ensemble",
   importance_algorithm = "lomo"
 )
-scores_lomo
-#>             model_id reference_date          target horizon location target_end_date output_type importance
-#> 1  Flusight-baseline     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median  -19.50000
-#> 2    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median         NA
-#> 3           PSI-DICE     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median   19.50000
-#> 4  Flusight-baseline     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median  -32.33333
-#> 5    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median  -22.33333
-#> 6           PSI-DICE     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median   54.66667
-#> 7  Flusight-baseline     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median  -16.66667
-#> 8    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median  -20.66667
-#> 9           PSI-DICE     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median   37.33333
-#> 10 Flusight-baseline     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median  182.00000
-#> 11   MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median -182.00000
-#> 12          PSI-DICE     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median         NA
+
+scores_lomo |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    font_size = 12,
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
+
+| model_id          | reference_date | target          | horizon | location | target_end_date | output_type | importance |
+|:------------------|:---------------|:----------------|--------:|:---------|:----------------|:------------|-----------:|
+| Flusight-baseline | 2022-11-19     | wk inc flu hosp |       1 | 25       | 2022-11-26      | median      |  -19.50000 |
+| MOBS-GLEAM_FLUH   | 2022-11-19     | wk inc flu hosp |       1 | 25       | 2022-11-26      | median      |         NA |
+| PSI-DICE          | 2022-11-19     | wk inc flu hosp |       1 | 25       | 2022-11-26      | median      |   19.50000 |
+| Flusight-baseline | 2022-11-19     | wk inc flu hosp |       1 | 48       | 2022-11-26      | median      |  -32.33333 |
+| MOBS-GLEAM_FLUH   | 2022-11-19     | wk inc flu hosp |       1 | 48       | 2022-11-26      | median      |  -22.33333 |
+| PSI-DICE          | 2022-11-19     | wk inc flu hosp |       1 | 48       | 2022-11-26      | median      |   54.66667 |
+| Flusight-baseline | 2022-11-19     | wk inc flu hosp |       3 | 25       | 2022-12-10      | median      |  -16.66667 |
+| MOBS-GLEAM_FLUH   | 2022-11-19     | wk inc flu hosp |       3 | 25       | 2022-12-10      | median      |  -20.66667 |
+| PSI-DICE          | 2022-11-19     | wk inc flu hosp |       3 | 25       | 2022-12-10      | median      |   37.33333 |
+| Flusight-baseline | 2022-11-19     | wk inc flu hosp |       3 | 48       | 2022-12-10      | median      |  182.00000 |
+| MOBS-GLEAM_FLUH   | 2022-11-19     | wk inc flu hosp |       3 | 48       | 2022-12-10      | median      | -182.00000 |
+| PSI-DICE          | 2022-11-19     | wk inc flu hosp |       3 | 48       | 2022-12-10      | median      |         NA |
 
 For models that missed forecasts for certain tasks, `NA` values are
 assigned in the importance column for those tasks.
@@ -171,16 +204,26 @@ all tasks. `NA` values are removed during the averaging process by
 setting the `na_action` argument to `"drop"`.
 
 ``` r
-model_importance_summary(
-  scores_lomo, by = "model_id", na_action = "drop", fun = mean
+summary.lomo.drop <- model_importance_summary(
+  scores_lomo,
+  by = "model_id", na_action = "drop", fun = mean
 )
-#> # A tibble: 3 × 2
-#>   model_id          importance_score_mean
-#>   <chr>                             <dbl>
-#> 1 PSI-DICE                           37.2
-#> 2 Flusight-baseline                  28.4
-#> 3 MOBS-GLEAM_FLUH                   -75
+
+summary.lomo.drop |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
+
+| model_id          | importance_score_mean |
+|:------------------|----------------------:|
+| PSI-DICE          |              37.16667 |
+| Flusight-baseline |              28.37500 |
+| MOBS-GLEAM_FLUH   |             -75.00000 |
 
 The results show that the model ‘PSI-DICE’ has the highest importance
 score, followed by ‘Flusight-baseline’ and ‘MOBS-GLEAM_FLUH’. That is,
@@ -193,16 +236,26 @@ for `na_action`, which replaces `NA` values with the worst (i.e.,
 minimum) score among the other models for the same task.
 
 ``` r
-model_importance_summary(
-  scores_lomo, by = "model_id", na_action = "worst", fun = mean
+summary.lomo.worst <- model_importance_summary(
+  scores_lomo,
+  by = "model_id", na_action = "worst", fun = mean
 )
-#> # A tibble: 3 × 2
-#>   model_id          importance_score_mean
-#>   <chr>                             <dbl>
-#> 1 Flusight-baseline                  28.4
-#> 2 PSI-DICE                          -17.6
-#> 3 MOBS-GLEAM_FLUH                   -61.1
+
+summary.lomo.worst |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
+
+| model_id          | importance_score_mean |
+|:------------------|----------------------:|
+| Flusight-baseline |                28.375 |
+| PSI-DICE          |               -17.625 |
+| MOBS-GLEAM_FLUH   |               -61.125 |
 
 The results show that the importance scores of ‘Flusight-baseline’ is
 unchanged because it has no missing forecast. We observe that the
@@ -218,16 +271,26 @@ mitigating the influence of the missing data without overly penalizing
 or overlooking them.
 
 ``` r
-model_importance_summary(
-  scores_lomo, by = "model_id", na_action = "average", fun = mean
+summary.lomo.avg <- model_importance_summary(
+  scores_lomo,
+  by = "model_id", na_action = "average", fun = mean
 )
-#> # A tibble: 3 × 2
-#>   model_id          importance_score_mean
-#>   <chr>                             <dbl>
-#> 1 Flusight-baseline                  28.4
-#> 2 PSI-DICE                           27.9
-#> 3 MOBS-GLEAM_FLUH                   -56.2
+
+summary.lomo.avg |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
+
+| model_id          | importance_score_mean |
+|:------------------|----------------------:|
+| Flusight-baseline |                28.375 |
+| PSI-DICE          |                27.875 |
+| MOBS-GLEAM_FLUH   |               -56.250 |
 
 ## Evaluation using LASOMO algorithm
 
@@ -247,16 +310,27 @@ scores_lasomo_eq <- model_importance(
   ensemble_fun = "simple_ensemble",
   importance_algorithm = "lasomo", subset_wt = "equal"
 )
-model_importance_summary(
-  scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean
+
+summary.lasomo_eq <- model_importance_summary(
+  scores_lasomo_eq,
+  by = "model_id", na_action = "drop", fun = mean
 )
-#> # A tibble: 3 × 2
-#>   model_id          importance_score_mean
-#>   <chr>                             <dbl>
-#> 1 PSI-DICE                           47.4
-#> 2 Flusight-baseline                  24.3
-#> 3 MOBS-GLEAM_FLUH                   -79.8
+
+summary.lasomo_eq |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
+
+| model_id          | importance_score_mean |
+|:------------------|----------------------:|
+| PSI-DICE          |              47.38889 |
+| Flusight-baseline |              24.29167 |
+| MOBS-GLEAM_FLUH   |             -79.77778 |
 
 ``` r
 # LASOMO - perm based weights
@@ -266,22 +340,40 @@ scores_lasomo_perm <- model_importance(
   ensemble_fun = "simple_ensemble",
   importance_algorithm = "lasomo", subset_wt = "perm_based"
 )
-model_importance_summary(
-  scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean
+
+summary.lasomo_perm <- model_importance_summary(
+  scores_lasomo_perm,
+  by = "model_id", na_action = "drop", fun = mean
 )
-#> # A tibble: 3 × 2
-#>   model_id          importance_score_mean
-#>   <chr>                             <dbl>
-#> 1 PSI-DICE                           44.8
-#> 2 Flusight-baseline                  25.3
-#> 3 MOBS-GLEAM_FLUH                   -78.6
+
+summary.lasomo_perm |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
 ```
+
+| model_id          | importance_score_mean |
+|:------------------|----------------------:|
+| PSI-DICE          |              44.83333 |
+| Flusight-baseline |              25.31250 |
+| MOBS-GLEAM_FLUH   |             -78.58333 |
 
 In this example, there are only three models ($n = 3$), and the weights
 do not differ significantly between the two weighting schemes.
 Therefore, the resulting outputs show little difference. However, in
 general, with a larger number of models, the two weighting schemes may
 yield different importance scores for each model.
+
+Note that the computational time here is about 0.3 seconds for both LOMO
+and LASOMO algorithms. However, this time can be increased substantially
+with a large number of models and tasks. See detailed discussions on
+execution time and computational feasibility in the [Computational
+complexity](https://mkim425.github.io/modelimportance/articles/modelimportance-article.html#sec:computational-complexity)
+section of the accompanying article.
 
 An extensive application in more complex scenarios with a larger number
 of models can be found in Kim, Ray, and Reich (2024).

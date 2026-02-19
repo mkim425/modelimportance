@@ -103,11 +103,12 @@ model_importance(
 
 ## Value
 
-A data.frame with columns `model_id`, `reference_date`, `output_type`,
-and `importance`, along with any task ID columns (e.g., `location`,
-`horizon`, and `target_end_date`) present in the input `forecast_data`.
-Note that `reference_date` is used as the name for the forecast date
-column, regardless of its original name in the input `forecast_data`.
+A `model_imp_tbl` S3 class object with columns `model_id`,
+`reference_date`, `output_type`, and `importance`, along with any task
+ID columns (e.g., `location`, `horizon`, and `target_end_date`) present
+in the input `forecast_data`. Note that `reference_date` is used as the
+name for the forecast date column, regardless of its original name in
+the input `forecast_data`.
 
 ## Details
 
@@ -156,12 +157,11 @@ forecast_data <- hubExamples::forecast_outputs |>
   )
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
-    date %in% unique(forecast_data$target_end_date),
+    target_end_date %in% unique(forecast_data$target_end_date),
     location == "25"
   ) |>
   # Rename columns to match the oracle output format
   rename(
-    target_end_date = date,
     oracle_value = observation
   )
 # Example with the default arguments.

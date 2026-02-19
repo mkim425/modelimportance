@@ -35,3 +35,10 @@ modelimportance provides two main functions:
 - [`model_importance_summary()`](https://mkim425.github.io/modelimportance/reference/model_importance_summary.md)
   summarizes these importance scores across multiple tasks to provide an
   overall importance score for each model.
+
+## Learn more
+
+Learn more about this package and how to use it in the
+[vignette](https://mkim425.github.io/modelimportance/articles/get-started.html).
+The vignette provides detailed examples and theoretical background on
+the algorithms implemented in the package.

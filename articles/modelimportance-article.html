@@ -1354,7 +1354,9 @@ follows.</p>
 <p>The function output is a data frame containing model ids and their
 corresponding importance scores for each prediction task, along with
 task id columns.</p>
-<pre><code><span><span class="co">#&gt;             model_id reference_date          target horizon location target_end_date output_type importance</span></span>
+<pre><code><span><span class="co">#&gt; Model importance result by task</span></span>
+<span><span class="co">#&gt; ---------------------------------</span></span>
+<span><span class="co">#&gt;             model_id reference_date          target horizon location target_end_date output_type importance</span></span>
 <span><span class="co">#&gt; 1  Flusight-baseline     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median  -19.50000</span></span>
 <span><span class="co">#&gt; 2    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median         NA</span></span>
 <span><span class="co">#&gt; 3           PSI-DICE     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median   19.50000</span></span>
@@ -1387,12 +1389,12 @@ process by setting the <code>na_action</code> argument to
 <span>  na_action <span class="op">=</span> <span class="st">"drop"</span>,</span>
 <span>  fun <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
-<span><span class="co">#&gt;   model_id          importance_score_mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> PSI-DICE                           37.2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Flusight-baseline                  28.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MOBS-GLEAM_FLUH                   -<span style="color: #BB0000;">75</span></span></span></code></pre></div>
+<span><span class="co">#&gt; Overall model importance across tasks</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;            model_id importance_score_mean</span></span>
+<span><span class="co">#&gt; 1          PSI-DICE              37.16667</span></span>
+<span><span class="co">#&gt; 2 Flusight-baseline              28.37500</span></span>
+<span><span class="co">#&gt; 3   MOBS-GLEAM_FLUH             -75.00000</span></span></code></pre></div>
 <p>The results show that the model ‘PSI-DICE’ has the highest importance
 score, followed by ‘Flusight-baseline’ and ‘MOBS-GLEAM_FLUH’. That is,
 ‘PSI-DICE’ contributes the most to improving the ensemble’s predictive
@@ -1414,12 +1416,12 @@ models for the same task.</p>
 <span>  na_action <span class="op">=</span> <span class="st">"worst"</span>,</span>
 <span>  fun <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
-<span><span class="co">#&gt;   model_id          importance_score_mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Flusight-baseline                  28.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> PSI-DICE                          -<span style="color: #BB0000;">17.6</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MOBS-GLEAM_FLUH                   -<span style="color: #BB0000;">61.1</span></span></span></code></pre></div>
+<span><span class="co">#&gt; Overall model importance across tasks</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;            model_id importance_score_mean</span></span>
+<span><span class="co">#&gt; 1 Flusight-baseline                28.375</span></span>
+<span><span class="co">#&gt; 2          PSI-DICE               -17.625</span></span>
+<span><span class="co">#&gt; 3   MOBS-GLEAM_FLUH               -61.125</span></span></code></pre></div>
 <p>The results show that the importance scores of ‘Flusight-baseline’ is
 unchanged because it has no missing forecast. We observe that the
 importance score of ‘PSI-DICE’, which was previously positive, has now
@@ -1450,12 +1452,12 @@ or overlooking them.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
 <span>  <span class="va">scores_lomo</span>, by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"average"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
-<span><span class="co">#&gt;   model_id          importance_score_mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Flusight-baseline                  28.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> PSI-DICE                           27.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MOBS-GLEAM_FLUH                   -<span style="color: #BB0000;">56.2</span></span></span></code></pre></div>
+<span><span class="co">#&gt; Overall model importance across tasks</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;            model_id importance_score_mean</span></span>
+<span><span class="co">#&gt; 1 Flusight-baseline                28.375</span></span>
+<span><span class="co">#&gt; 2          PSI-DICE                27.875</span></span>
+<span><span class="co">#&gt; 3   MOBS-GLEAM_FLUH               -56.250</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="sec:example-lasomo">Evaluation using LASOMO algorithm<a class="anchor" aria-label="anchor" href="#sec:example-lasomo"></a>
@@ -1479,12 +1481,12 @@ evaluation using each weighting scheme.</p>
 <span><span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
 <span>  <span class="va">scores_lasomo_eq</span>, by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"drop"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
-<span><span class="co">#&gt;   model_id          importance_score_mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> PSI-DICE                           47.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Flusight-baseline                  24.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MOBS-GLEAM_FLUH                   -<span style="color: #BB0000;">79.8</span></span></span></code></pre></div>
+<span><span class="co">#&gt; Overall model importance across tasks</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;            model_id importance_score_mean</span></span>
+<span><span class="co">#&gt; 1          PSI-DICE              47.38889</span></span>
+<span><span class="co">#&gt; 2 Flusight-baseline              24.29167</span></span>
+<span><span class="co">#&gt; 3   MOBS-GLEAM_FLUH             -79.77778</span></span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scores_lasomo_perm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model_importance.html">model_importance</a></span><span class="op">(</span></span>
 <span>  forecast_data <span class="op">=</span> <span class="va">forecast_data</span>,</span>
@@ -1496,12 +1498,12 @@ evaluation using each weighting scheme.</p>
 <span><span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
 <span>  <span class="va">scores_lasomo_perm</span>, by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"drop"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
-<span><span class="co">#&gt;   model_id          importance_score_mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> PSI-DICE                           44.8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Flusight-baseline                  25.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MOBS-GLEAM_FLUH                   -<span style="color: #BB0000;">78.6</span></span></span></code></pre></div>
+<span><span class="co">#&gt; Overall model importance across tasks</span></span>
+<span><span class="co">#&gt; ---------------------------------------- </span></span>
+<span><span class="co">#&gt;            model_id importance_score_mean</span></span>
+<span><span class="co">#&gt; 1          PSI-DICE              44.83333</span></span>
+<span><span class="co">#&gt; 2 Flusight-baseline              25.31250</span></span>
+<span><span class="co">#&gt; 3   MOBS-GLEAM_FLUH             -78.58333</span></span></code></pre></div>
 <p>In this example, there are only three models
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">n = 3</annotation></semantics></math>),
 and the weights do not differ significantly between the two weighting
@@ -1513,6 +1515,13 @@ the ensemble accuracy with only three models. An extensive application
 in more complex scenarios with a larger number of models can be found in
 <span class="citation">Kim, Ray, and Reich (2024)</span>.</p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="sec:computational-complexity">Computational complexity<a class="anchor" aria-label="anchor" href="#sec:computational-complexity"></a>
+</h2>
+<p>Content coming soon. This section will describe computational
+complexity of LOMO and LASOMO algorithms implemented in the package,
+depending the numbers of models and tasks.</p>
 </div>
 <div class="section level2">
 <h2 id="sec:discussion">Summary and discussion<a class="anchor" aria-label="anchor" href="#sec:discussion"></a>

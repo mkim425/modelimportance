@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   get-started: get-started.html
   modelimportance-article: modelimportance-article.html
-last_built: 2026-02-10T18:29Z
+last_built: 2026-02-19T21:56Z
 urls:
   reference: https://mkim425.github.io/modelimportance/reference
   article: https://mkim425.github.io/modelimportance/articles

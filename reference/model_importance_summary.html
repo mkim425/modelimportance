@@ -107,9 +107,9 @@ See the documentation of the corresponding function for details.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data.frame with columns <code>model_id</code> and <code>importance_score_&lt;fun&gt;</code>,
-where <code>&lt;fun&gt;</code> is the name of the summary function used
-(e.g., <code>importance_score_mean</code> when <code>fun = mean</code>).
+    <p>A <code>importance_summary</code> S3 class object with columns <code>model_id</code> and
+<code>importance_score_&lt;fun&gt;</code>, where <code>&lt;fun&gt;</code> is the name of the summary function
+used (e.g., <code>importance_score_mean</code> when <code>fun = mean</code>).
 The output is sorted in descending order of the summary importance scores.</p>
     </div>
     <div class="section level2">
@@ -129,12 +129,11 @@ The output is sorted in descending order of the summary importance scores.</p>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">target_data</span> <span class="op">&lt;-</span> <span class="fu">hubExamples</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/hubExamples/man/forecast_data.html" class="external-link">forecast_target_ts</a></span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">forecast_data</span><span class="op">$</span><span class="va">target_end_date</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="va">target_end_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">forecast_data</span><span class="op">$</span><span class="va">target_end_date</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    <span class="va">location</span> <span class="op">==</span> <span class="st">"25"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="co"># Rename columns to match the oracle output format</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    target_end_date <span class="op">=</span> <span class="va">date</span>,</span></span>
 <span class="r-in"><span>    oracle_value <span class="op">=</span> <span class="va">observation</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Example with the default arguments.</span></span></span>

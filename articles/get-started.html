@@ -47,7 +47,7 @@
 
 
 
-
+<script src="get-started_files/kePrint-0.0.1/kePrint.js"></script><link href="get-started_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
@@ -65,9 +65,9 @@
 model contributes to ensemble accuracy. We provide simple working
 examples to help you get started with the package. Detailed descriptions
 of the model importance metrics, algorithms, key functions, and in-depth
-interpretations of the examples covered here are available in the
-accompanying article titled ‘<code>modelimportance</code>: Evaluating
-model importance within a multi-model ensemble in R’ under
+interpretations of the examples covered here are available in the <a href="https://mkim425.github.io/modelimportance/articles/modelimportance-article.html">accompanying
+article</a> titled ‘<code>modelimportance</code>: Evaluating model
+importance within a multi-model ensemble in R’ under
 <em>Articles</em>.</p>
 <div class="section level2">
 <h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
@@ -104,26 +104,350 @@ PSI-DICE’s forecast for Texas on December 10, 2022, are missing.</p>
 <span>    <span class="va">target_end_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2022-11-26"</span>, <span class="st">"2022-12-10"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
-<span>    <span class="op">!</span><span class="op">(</span><span class="va">model_id</span> <span class="op">==</span> <span class="st">"MOBS-GLEAM_FLUH"</span> <span class="op">&amp;</span> <span class="va">location</span> <span class="op">==</span> <span class="st">"25"</span> <span class="op">&amp;</span></span>
-<span>        <span class="va">target_end_date</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2022-11-26"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    <span class="op">!</span><span class="op">(</span><span class="va">model_id</span> <span class="op">==</span> <span class="st">"PSI-DICE"</span> <span class="op">&amp;</span> <span class="va">location</span> <span class="op">==</span> <span class="st">"48"</span> <span class="op">&amp;</span></span>
-<span>        <span class="va">target_end_date</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2022-12-10"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">!</span><span class="op">(</span></span>
+<span>      <span class="va">model_id</span> <span class="op">==</span> <span class="st">"MOBS-GLEAM_FLUH"</span> <span class="op">&amp;</span></span>
+<span>        <span class="va">location</span> <span class="op">==</span> <span class="st">"25"</span> <span class="op">&amp;</span></span>
+<span>        <span class="va">target_end_date</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2022-11-26"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="op">!</span><span class="op">(</span></span>
+<span>      <span class="va">model_id</span> <span class="op">==</span> <span class="st">"PSI-DICE"</span> <span class="op">&amp;</span></span>
+<span>        <span class="va">location</span> <span class="op">==</span> <span class="st">"48"</span> <span class="op">&amp;</span></span>
+<span>        <span class="va">target_end_date</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2022-12-10"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="va">forecast_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 9</span></span></span>
-<span><span class="co">#&gt;    model_id          reference_date target          horizon location target_end_date output_type output_type_id value</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Flusight-baseline 2022-11-19     wk inc flu hosp       1 25       2022-11-26      median      <span style="color: #BB0000;">NA</span>                51</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Flusight-baseline 2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      <span style="color: #BB0000;">NA</span>                51</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Flusight-baseline 2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      <span style="color: #BB0000;">NA</span>              <span style="text-decoration: underline;">1</span>052</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Flusight-baseline 2022-11-19     wk inc flu hosp       3 48       2022-12-10      median      <span style="color: #BB0000;">NA</span>              <span style="text-decoration: underline;">1</span>052</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      <span style="color: #BB0000;">NA</span>                43</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      <span style="color: #BB0000;">NA</span>              <span style="text-decoration: underline;">1</span>072</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 48       2022-12-10      median      <span style="color: #BB0000;">NA</span>               688</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> PSI-DICE          2022-11-19     wk inc flu hosp       1 25       2022-11-26      median      <span style="color: #BB0000;">NA</span>                90</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> PSI-DICE          2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      <span style="color: #BB0000;">NA</span>               159</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> PSI-DICE          2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      <span style="color: #BB0000;">NA</span>              <span style="text-decoration: underline;">1</span>226</span></span></code></pre></div>
+<span><span class="va">forecast_data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
+<span>    format <span class="op">=</span> <span class="st">"html"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span></span>
+<span>    font_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>    bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span>,</span>
+<span>    full_width <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<table class="table table table-striped table-hover table-condensed table-responsive" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+model_id
+</th>
+<th style="text-align:left;">
+reference_date
+</th>
+<th style="text-align:left;">
+target
+</th>
+<th style="text-align:right;">
+horizon
+</th>
+<th style="text-align:left;">
+location
+</th>
+<th style="text-align:left;">
+target_end_date
+</th>
+<th style="text-align:left;">
+output_type
+</th>
+<th style="text-align:left;">
+output_type_id
+</th>
+<th style="text-align:right;">
+value
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+51
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+51
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+1052
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+1052
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+43
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+1072
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+688
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+90
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+159
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+1226
+</td>
+</tr>
+</tbody>
+</table>
 <p>The corresponding target data contains the observed hospitalization
 counts for these dates and locations.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -136,14 +460,88 @@ counts for these dates and locations.</p>
 <span>  <span class="co"># Rename columns to match the oracle output format</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>oracle_value <span class="op">=</span> <span class="va">observation</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">target_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 4</span></span></span>
-<span><span class="co">#&gt;   target_end_date target          location oracle_value</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2022-11-26      wk inc flu hosp 25                221</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2022-11-26      wk inc flu hosp 48               <span style="text-decoration: underline;">1</span>929</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2022-12-10      wk inc flu hosp 25                578</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2022-12-10      wk inc flu hosp 48               <span style="text-decoration: underline;">1</span>781</span></span></code></pre></div>
+<span><span class="va">target_data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
+<span>    format <span class="op">=</span> <span class="st">"html"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span></span>
+<span>    bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span>,</span>
+<span>    full_width <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+target_end_date
+</th>
+<th style="text-align:left;">
+target
+</th>
+<th style="text-align:left;">
+location
+</th>
+<th style="text-align:right;">
+oracle_value
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:right;">
+221
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:right;">
+1929
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:right;">
+578
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:right;">
+1781
+</td>
+</tr>
+</tbody>
+</table>
 <p>We visualize the forecasts and the observed values.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">forecast_data</span> <span class="op">|&gt;</span></span>
@@ -196,20 +594,358 @@ ensemble using the LOMO algorithm.</p>
 <span>  ensemble_fun <span class="op">=</span> <span class="st">"simple_ensemble"</span>,</span>
 <span>  importance_algorithm <span class="op">=</span> <span class="st">"lomo"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">scores_lomo</span></span>
-<span><span class="co">#&gt;             model_id reference_date          target horizon location target_end_date output_type importance</span></span>
-<span><span class="co">#&gt; 1  Flusight-baseline     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median  -19.50000</span></span>
-<span><span class="co">#&gt; 2    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median         NA</span></span>
-<span><span class="co">#&gt; 3           PSI-DICE     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median   19.50000</span></span>
-<span><span class="co">#&gt; 4  Flusight-baseline     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median  -32.33333</span></span>
-<span><span class="co">#&gt; 5    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median  -22.33333</span></span>
-<span><span class="co">#&gt; 6           PSI-DICE     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median   54.66667</span></span>
-<span><span class="co">#&gt; 7  Flusight-baseline     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median  -16.66667</span></span>
-<span><span class="co">#&gt; 8    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median  -20.66667</span></span>
-<span><span class="co">#&gt; 9           PSI-DICE     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median   37.33333</span></span>
-<span><span class="co">#&gt; 10 Flusight-baseline     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median  182.00000</span></span>
-<span><span class="co">#&gt; 11   MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median -182.00000</span></span>
-<span><span class="co">#&gt; 12          PSI-DICE     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median         NA</span></span></code></pre></div>
+<span></span>
+<span><span class="va">scores_lomo</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
+<span>    format <span class="op">=</span> <span class="st">"html"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span></span>
+<span>    font_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>    bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span>,</span>
+<span>    full_width <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<table class="table table table-striped table-hover table-condensed table-responsive" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+model_id
+</th>
+<th style="text-align:left;">
+reference_date
+</th>
+<th style="text-align:left;">
+target
+</th>
+<th style="text-align:right;">
+horizon
+</th>
+<th style="text-align:left;">
+location
+</th>
+<th style="text-align:left;">
+target_end_date
+</th>
+<th style="text-align:left;">
+output_type
+</th>
+<th style="text-align:right;">
+importance
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+-19.50000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+19.50000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+-32.33333
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+-22.33333
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-11-26
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+54.66667
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+-16.66667
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+-20.66667
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+37.33333
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+182.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+-182.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:left;">
+2022-11-19
+</td>
+<td style="text-align:left;">
+wk inc flu hosp
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+48
+</td>
+<td style="text-align:left;">
+2022-12-10
+</td>
+<td style="text-align:left;">
+median
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+</tbody>
+</table>
 <p>For models that missed forecasts for certain tasks, <code>NA</code>
 values are assigned in the importance column for those tasks.</p>
 <p>We summarize the importance scores for each model by averaging across
@@ -217,15 +953,55 @@ all tasks. <code>NA</code> values are removed during the averaging
 process by setting the <code>na_action</code> argument to
 <code>"drop"</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
-<span>  <span class="va">scores_lomo</span>, by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"drop"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
+<code class="sourceCode R"><span><span class="va">summary.lomo.drop</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">scores_lomo</span>,</span>
+<span>  by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"drop"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
-<span><span class="co">#&gt;   model_id          importance_score_mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> PSI-DICE                           37.2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Flusight-baseline                  28.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MOBS-GLEAM_FLUH                   -<span style="color: #BB0000;">75</span></span></span></code></pre></div>
+<span></span>
+<span><span class="va">summary.lomo.drop</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
+<span>    format <span class="op">=</span> <span class="st">"html"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span></span>
+<span>    bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span>,</span>
+<span>    full_width <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+model_id
+</th>
+<th style="text-align:right;">
+importance_score_mean
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:right;">
+37.16667
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:right;">
+28.37500
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:right;">
+-75.00000
+</td>
+</tr>
+</tbody>
+</table>
 <p>The results show that the model ‘PSI-DICE’ has the highest importance
 score, followed by ‘Flusight-baseline’ and ‘MOBS-GLEAM_FLUH’. That is,
 ‘PSI-DICE’ contributes the most to improving the ensemble’s predictive
@@ -236,15 +1012,55 @@ detracts from the ensemble’s performance.</p>
 <code>NA</code> values with the worst (i.e., minimum) score among the
 other models for the same task.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
-<span>  <span class="va">scores_lomo</span>, by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"worst"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
+<code class="sourceCode R"><span><span class="va">summary.lomo.worst</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">scores_lomo</span>,</span>
+<span>  by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"worst"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
-<span><span class="co">#&gt;   model_id          importance_score_mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Flusight-baseline                  28.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> PSI-DICE                          -<span style="color: #BB0000;">17.6</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MOBS-GLEAM_FLUH                   -<span style="color: #BB0000;">61.1</span></span></span></code></pre></div>
+<span></span>
+<span><span class="va">summary.lomo.worst</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
+<span>    format <span class="op">=</span> <span class="st">"html"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span></span>
+<span>    bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span>,</span>
+<span>    full_width <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+model_id
+</th>
+<th style="text-align:right;">
+importance_score_mean
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:right;">
+28.375
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:right;">
+-17.625
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:right;">
+-61.125
+</td>
+</tr>
+</tbody>
+</table>
 <p>The results show that the importance scores of ‘Flusight-baseline’ is
 unchanged because it has no missing forecast. We observe that the
 importance score of ‘PSI-DICE’, which was previously positive, has now
@@ -258,15 +1074,55 @@ same task. This strategy may offer a more balanced trade-off by
 mitigating the influence of the missing data without overly penalizing
 or overlooking them.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
-<span>  <span class="va">scores_lomo</span>, by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"average"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
+<code class="sourceCode R"><span><span class="va">summary.lomo.avg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">scores_lomo</span>,</span>
+<span>  by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"average"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
-<span><span class="co">#&gt;   model_id          importance_score_mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Flusight-baseline                  28.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> PSI-DICE                           27.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MOBS-GLEAM_FLUH                   -<span style="color: #BB0000;">56.2</span></span></span></code></pre></div>
+<span></span>
+<span><span class="va">summary.lomo.avg</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
+<span>    format <span class="op">=</span> <span class="st">"html"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span></span>
+<span>    bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span>,</span>
+<span>    full_width <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+model_id
+</th>
+<th style="text-align:right;">
+importance_score_mean
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:right;">
+28.375
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:right;">
+27.875
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:right;">
+-56.250
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
 <h2 id="evaluation-using-lasomo-algorithm">Evaluation using LASOMO algorithm<a class="anchor" aria-label="anchor" href="#evaluation-using-lasomo-algorithm"></a>
@@ -286,15 +1142,56 @@ evaluation using each weighting scheme.</p>
 <span>  ensemble_fun <span class="op">=</span> <span class="st">"simple_ensemble"</span>,</span>
 <span>  importance_algorithm <span class="op">=</span> <span class="st">"lasomo"</span>, subset_wt <span class="op">=</span> <span class="st">"equal"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
-<span>  <span class="va">scores_lasomo_eq</span>, by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"drop"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
+<span></span>
+<span><span class="va">summary.lasomo_eq</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">scores_lasomo_eq</span>,</span>
+<span>  by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"drop"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
-<span><span class="co">#&gt;   model_id          importance_score_mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> PSI-DICE                           47.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Flusight-baseline                  24.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MOBS-GLEAM_FLUH                   -<span style="color: #BB0000;">79.8</span></span></span></code></pre></div>
+<span></span>
+<span><span class="va">summary.lasomo_eq</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
+<span>    format <span class="op">=</span> <span class="st">"html"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span></span>
+<span>    bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span>,</span>
+<span>    full_width <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+model_id
+</th>
+<th style="text-align:right;">
+importance_score_mean
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:right;">
+47.38889
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:right;">
+24.29167
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:right;">
+-79.77778
+</td>
+</tr>
+</tbody>
+</table>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># LASOMO - perm based weights</span></span>
 <span><span class="va">scores_lasomo_perm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model_importance.html">model_importance</a></span><span class="op">(</span></span>
@@ -303,21 +1200,67 @@ evaluation using each weighting scheme.</p>
 <span>  ensemble_fun <span class="op">=</span> <span class="st">"simple_ensemble"</span>,</span>
 <span>  importance_algorithm <span class="op">=</span> <span class="st">"lasomo"</span>, subset_wt <span class="op">=</span> <span class="st">"perm_based"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
-<span>  <span class="va">scores_lasomo_perm</span>, by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"drop"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
+<span></span>
+<span><span class="va">summary.lasomo_perm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model_importance_summary.html">model_importance_summary</a></span><span class="op">(</span></span>
+<span>  <span class="va">scores_lasomo_perm</span>,</span>
+<span>  by <span class="op">=</span> <span class="st">"model_id"</span>, na_action <span class="op">=</span> <span class="st">"drop"</span>, fun <span class="op">=</span> <span class="va">mean</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
-<span><span class="co">#&gt;   model_id          importance_score_mean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> PSI-DICE                           44.8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Flusight-baseline                  25.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MOBS-GLEAM_FLUH                   -<span style="color: #BB0000;">78.6</span></span></span></code></pre></div>
+<span></span>
+<span><span class="va">summary.lasomo_perm</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
+<span>    format <span class="op">=</span> <span class="st">"html"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html" class="external-link">kable_styling</a></span><span class="op">(</span></span>
+<span>    bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span><span class="op">)</span>,</span>
+<span>    full_width <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<table class="table table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead><tr>
+<th style="text-align:left;">
+model_id
+</th>
+<th style="text-align:right;">
+importance_score_mean
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+PSI-DICE
+</td>
+<td style="text-align:right;">
+44.83333
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Flusight-baseline
+</td>
+<td style="text-align:right;">
+25.31250
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MOBS-GLEAM_FLUH
+</td>
+<td style="text-align:right;">
+-78.58333
+</td>
+</tr>
+</tbody>
+</table>
 <p>In this example, there are only three models
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">n = 3</annotation></semantics></math>),
 and the weights do not differ significantly between the two weighting
 schemes. Therefore, the resulting outputs show little difference.
 However, in general, with a larger number of models, the two weighting
 schemes may yield different importance scores for each model.</p>
+<p>Note that the computational time here is about 0.3 seconds for both
+LOMO and LASOMO algorithms. However, this time can be increased
+substantially with a large number of models and tasks. See detailed
+discussions on execution time and computational feasibility in the <a href="../articles/modelimportance-article.html#sec:computational-complexity">Computational
+complexity</a> section of the accompanying article.</p>
 <p>An extensive application in more complex scenarios with a larger
 number of models can be found in <span class="citation">Kim, Ray, and
 Reich (2024)</span>.</p>
