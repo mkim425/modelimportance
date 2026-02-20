@@ -34,7 +34,8 @@ test_that("filter_valid_tasks() works as expected", {
     filter(model_id != "PSI-DICE") |>
     filter(!(model_id == "MOBS-GLEAM_FLUH" & target_end_date == "2022-12-24"))
   modified_df_list_some_invalid <- split_data_by_task(modified_tbl_some_invalid)
-  result_some_invalid <- filter_valid_tasks(modified_df_list_some_invalid,
+  result_some_invalid <- filter_valid_tasks(
+    modified_df_list_some_invalid,
     min_models = 2
   )
   expect_equal(
@@ -44,16 +45,13 @@ test_that("filter_valid_tasks() works as expected", {
 
   # Case 3: All tasks invalid
   # Create a modified df_list_by_task with all tasks having only one model
+  forecast_to_remove <- tibble(
+    model_id = c("MOBS-GLEAM_FLUH", "Flusight-baseline"),
+    target_end_date = as.Date(c("2022-12-24", "2022-11-26"))
+  )
   modified_tbl_all_invalid <- valid_tbl |>
     filter(model_id != "PSI-DICE") |>
-    filter(!(
-      model_id == "MOBS-GLEAM_FLUH" &
-        target_end_date == "2022-12-24"
-    )) |>
-    filter(!(
-      model_id == "Flusight-baseline" &
-        target_end_date == "2022-11-26"
-    ))
+    anti_join(forecast_to_remove, by = c("model_id", "target_end_date"))
 
   modified_df_list_all_invalid <- split_data_by_task(modified_tbl_all_invalid)
   expect_error(

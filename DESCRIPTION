@@ -55,7 +55,8 @@ Suggests:
     kableExtra (>= 1.4.0),
     hubExamples (>= 1.0.0),
     scoringutils (>= 2.1.2),
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    progressr (>= 0.15.1)
 Config/testthat/edition: 3
 Remotes:
     hubverse-org/hubUtils,

@@ -45,7 +45,7 @@ Default is \code{mean()}}
 See the documentation of the corresponding function for details.}
 }
 \value{
-A \code{importance_summary} S3 class object with columns \code{model_id} and
+An \code{importance_summary} S3 class object with columns \code{model_id} and
 \verb{importance_score_<fun>}, where \verb{<fun>} is the name of the summary function
 used (e.g., \code{importance_score_mean} when \code{fun = mean}).
 The output is sorted in descending order of the summary importance scores.

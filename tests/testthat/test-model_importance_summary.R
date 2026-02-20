@@ -50,8 +50,10 @@ pmap(
   function(args, handle_na) {
     test_that(
       paste0(
-        "model_importance_summary() works with calc_args: ", args,
-        " /na_action = ", handle_na
+        "model_importance_summary() works with calc_args: ",
+        args,
+        " /na_action = ",
+        handle_na
       ),
       {
         # filter the raw and imputed importance scores for the given args
@@ -77,20 +79,28 @@ pmap(
         # compute actual summary importance scores
         actual_summary_scores_mean <- raw_scores_subset |>
           model_importance_summary(
-            by = "model_id", na_action = handle_na, fun = mean
+            by = "model_id",
+            na_action = handle_na,
+            fun = mean
           )
         actual_summary_scores_median <- raw_scores_subset |>
           model_importance_summary(
-            by = "model_id", na_action = handle_na, fun = median
+            by = "model_id",
+            na_action = handle_na,
+            fun = median
           )
         # compare expected and actual results
         expect_equal(
-          actual_summary_scores_mean, exp_summary_scores_mean,
-          tolerance = 1e-8, ignore_attr = TRUE
+          actual_summary_scores_mean,
+          exp_summary_scores_mean,
+          tolerance = 1e-8,
+          ignore_attr = TRUE
         )
         expect_equal(
-          actual_summary_scores_median, exp_summary_scores_median,
-          tolerance = 1e-8, ignore_attr = TRUE
+          actual_summary_scores_median,
+          exp_summary_scores_median,
+          tolerance = 1e-8,
+          ignore_attr = TRUE
         )
       }
     )
@@ -112,4 +122,26 @@ test_that("importance_summary class and methods are valid", {
   expect_error(print(summary_scores), NA)
   expect_error(summary(summary_scores), NA)
   expect_error(plot(summary_scores), NA)
+})
+
+## Test: model_importance_summary() handles invalid inputs properly
+test_that("model_importance_summary() handles invalid inputs", {
+  data <- raw_imp_scores |>
+    dplyr::filter(calc_args == "mean_output-simple_ensemble-lomo-equal-mean")
+  # missing required columns
+  expect_error(
+    model_importance_summary(data |> select(-importance))
+  )
+  # invalid 'by' column
+  expect_error(
+    model_importance_summary(data, by = "nonexistent_column")
+  )
+  # non-function summary function
+  expect_error(
+    model_importance_summary(data, fun = "not_a_function")
+  )
+  # invalid 'na_action' value
+  expect_error(
+    model_importance_summary(data, na_action = "invalid_option")
+  )
 })

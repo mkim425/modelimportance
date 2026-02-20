@@ -32,7 +32,8 @@ lp_ens_untrained_lasomo <- function(models, subset, subsets, n, d) {
   data_subset <- d |>
     dplyr::filter(.data$model_id %in% get_modelsubset)
   # build an ensemble forecast using the models in the subset S
-  ensemble_forecast <- hubEnsembles::linear_pool(data_subset,
+  ensemble_forecast <- hubEnsembles::linear_pool(
+    data_subset,
     model_id = paste0("ensemble_", i)
   )
   # add index and weight to the ensemble forecast
@@ -71,7 +72,8 @@ simple_ens_untrained_lasomo <- function(models, subset, subsets, n, d, aggfun) {
   data_subset <- d |>
     dplyr::filter(.data$model_id %in% get_modelsubset)
   # build an ensemble forecast using the models in the subset S
-  ensemble_forecast <- hubEnsembles::simple_ensemble(data_subset,
+  ensemble_forecast <- hubEnsembles::simple_ensemble(
+    data_subset,
     model_id = paste0("ensemble_", i),
     agg_fun = aggfun
   )
@@ -165,7 +167,9 @@ df_score <- function(cols, j, models, score) {
     # importance score for the jth model depending on the subset_wt option
     dplyr::mutate(
       subset_wt = sub("^subset_wt_", "", .data$subset_wt),
-      importance = ifelse(.data$subset_wt == "perm", .data$importance,
+      importance = ifelse(
+        .data$subset_wt == "perm",
+        .data$importance,
         .data$importance / (2^(n - 1) - 1)
       )
     )

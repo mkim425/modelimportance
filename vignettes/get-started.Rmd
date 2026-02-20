@@ -64,24 +64,25 @@ Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022,
 and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 
 ```{r forecast_data}
-forecast_data <- hubExamples::forecast_outputs |>
+# Load the forecast data from hubExamples
+forecast_data_raw <- hubExamples::forecast_outputs |>
   dplyr::filter(
     output_type %in% c("median"),
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
-  ) |>
-  filter(
-    !(
-      model_id == "MOBS-GLEAM_FLUH" &
-        location == "25" &
-        target_end_date == as.Date("2022-11-26")
-    ),
-    !(
-      model_id == "PSI-DICE" &
-        location == "48" &
-        target_end_date == as.Date("2022-12-10")
-    )
   )
 
+# Specify forecasts to remove
+forecast_to_remove <- tibble(
+  model_id = c("MOBS-GLEAM_FLUH", "PSI-DICE"),
+  location = c("25", "48"),
+  target_end_date = as.Date(c("2022-11-26", "2022-12-10"))
+)
+
+# Filter out the specified forecasts from the original data
+forecast_data <- forecast_data_raw |>
+  anti_join(forecast_to_remove, by = c("model_id", "location", "target_end_date"))
+
+# Display the forecast data
 forecast_data |>
   knitr::kable(
     format = "html"
