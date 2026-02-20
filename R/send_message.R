@@ -32,6 +32,13 @@ send_message <- function(status, ...) {
       "Note: This function uses 'furrr' and 'future' for parallelization.",
       "To enable parallel execution, please set future::plan(multisession).",
       sep = "\n"
+    ),
+    lasomo_computational_time_warning = paste(
+      "\033[31mWarning: The LASOMO algorithm can be computationally intensive,",
+      "especially with a large number of models (> 12).",
+      "\nConsider using the LOMO algorithm or reducing the number of models.",
+      "\033[39m\n",
+      sep = " "
     )
   )
 
