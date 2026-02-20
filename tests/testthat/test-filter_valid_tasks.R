@@ -49,7 +49,7 @@ test_that("filter_valid_tasks() works as expected", {
     model_id = c("MOBS-GLEAM_FLUH", "Flusight-baseline"),
     target_end_date = as.Date(c("2022-12-24", "2022-11-26"))
   )
-  modified_tbl_all_invalid2 <- valid_tbl |>
+  modified_tbl_all_invalid <- valid_tbl |>
     filter(model_id != "PSI-DICE") |>
     anti_join(forecast_to_remove, by = c("model_id", "target_end_date"))
 
