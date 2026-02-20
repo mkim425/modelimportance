@@ -6,6 +6,7 @@
 #'
 #' @import hubUtils
 #' @import dplyr
+#' @importFrom methods as
 #' @noRd
 
 validate_input_data <- function(forecast_data, oracle_output_data) {
