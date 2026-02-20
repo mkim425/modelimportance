@@ -103,6 +103,15 @@
 #' To enable parallel execution, please set a parallel backend, e.g., via
 #' `future::plan()`.
 #'
+#' @section Progress reporting:
+#' Optional progress bars are displayed via the `progressr` package when it is
+#' installed and the session is interactive.
+#' If `progressr` is not installed, the function will run without progress bars.
+#' To enable progress bars,
+#' \preformatted{
+#' progressr::handlers(global = TRUE)
+#' }
+#'
 #' @seealso \code{\link{model_importance_summary}}
 #' @examples \dontrun{
 #' library(dplyr)
@@ -173,7 +182,10 @@ model_importance <- function(forecast_data,
   model_id_list <- unique(valid_tbl$model_id)
   # Message for the user to check the model IDs
   send_message("model_list", model_id_list)
-
+  # Warning message about LASOMO computational time when there are many models
+  if (length(model_id_list) > 12 && importance_algorithm == "lasomo") {
+    send_message("lasomo_computational_time_warning")
+  }
   # Corresponding metric to the output type
   metric <- case_when(
     unique(valid_tbl$output_type) == "median" ~ "ae_point",
@@ -196,20 +208,39 @@ model_importance <- function(forecast_data,
   df_list_by_task <- split_data_by_task(valid_tbl)
   # Check if each task has at least 2 distinct models, and filter out tasks that
   valid_df_list_by_task <- filter_valid_tasks(
-    df_list_by_task, min_models = 2
+    df_list_by_task,
+    min_models = 2
   )
 
   # Call the function to calculate importance scores
-  score_result <- furrr::future_map_dfr(
-    valid_df_list_by_task,
-    function(single_task_data) {
-      compute_importance(
-        single_task_data, oracle_output_data, model_id_list,
-        ensemble_fun, importance_algorithm, subset_wt,
-        metric, min_log_score, ...
+  if (interactive() && requireNamespace("progressr", quietly = TRUE)) {
+    progressr::with_progress({
+      p <- progressr::progressor(steps = length(valid_df_list_by_task))
+
+      score_result <- furrr::future_map_dfr(
+        valid_df_list_by_task,
+        function(single_task_data) {
+          p()
+          compute_importance(
+            single_task_data, oracle_output_data, model_id_list,
+            ensemble_fun, importance_algorithm, subset_wt,
+            metric, min_log_score, ...
+          )
+        }
       )
-    }
-  )
+    })
+  } else {
+    score_result <- furrr::future_map_dfr(
+      valid_df_list_by_task,
+      function(single_task_data) {
+        compute_importance(
+          single_task_data, oracle_output_data, model_id_list,
+          ensemble_fun, importance_algorithm, subset_wt,
+          metric, min_log_score, ...
+        )
+      }
+    )
+  }
   # Reorder columns to place `model_id` and `reference_date` first,
   # task-related columns in the middle, and `output_type` and `importance` last.
   df_scores <- score_result |>

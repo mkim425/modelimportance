@@ -127,6 +127,17 @@ This function uses the \code{furrr} and \code{future} for parallelization.
 To enable parallel execution, please set a parallel backend, e.g., via
 \code{future::plan()}.
 }
+\section{Progress reporting}{
+
+Optional progress bars are displayed via the \code{progressr} package when it is
+installed and the session is interactive.
+If \code{progressr} is not installed, the function will run without progress bars.
+To enable progress bars,
+\preformatted{
+progressr::handlers(global = TRUE)
+}
+}
+
 \examples{
 \dontrun{
 library(dplyr)
