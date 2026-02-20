@@ -47,6 +47,11 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
     )
   }
 
+  # Check if the oracle_output_data contains the required columns
+  assert_subset(c("output_type", "oracle_value", "target_end_date"),
+    names(oracle_output_data),
+    empty.ok = FALSE
+  )
   # Ensure that target_end_date is 'Date' class.
   oracle_output_data$target_end_date <- as.Date(
     oracle_output_data$target_end_date

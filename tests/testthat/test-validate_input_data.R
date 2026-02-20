@@ -93,3 +93,9 @@ test_that("No missing value in target_end_date of target_data", {
          present in the 'target_end_date' column of the target data."
   )
 })
+
+testxt_that("validate_input_data() handles invalid oracle_output_data", {
+  expect_error(
+    validate_input_data(forecast_means, target_data |> select(-oracle_value))
+  )
+})
