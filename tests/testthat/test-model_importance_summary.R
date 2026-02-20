@@ -113,3 +113,25 @@ test_that("importance_summary class and methods are valid", {
   expect_error(summary(summary_scores), NA)
   expect_error(plot(summary_scores), NA)
 })
+
+## Test: model_importance_summary() handles invalid inputs properly
+test_that("model_importance_summary() handles invalid inputs", {
+  data <- raw_imp_scores |>
+    dplyr::filter(calc_args == "mean_output-simple_ensemble-lomo-equal-mean")
+  # missing required columns
+  expect_error(
+    model_importance_summary(data |> select(-importance))
+  )
+  # invalid 'by' column
+  expect_error(
+    model_importance_summary(data, by = "nonexistent_column")
+  )
+  # non-function summary function
+  expect_error(
+    model_importance_summary(data, fun = "not_a_function")
+  )
+  # invalid 'na_action' value
+  expect_error(
+    model_importance_summary(data, na_action = "invalid_option")
+  )
+})
