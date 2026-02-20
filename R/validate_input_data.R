@@ -79,9 +79,10 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
     distinct()
   if (nrow(setdiff(unique_tasks_forecast, unique_tasks_observation)) != 0) {
     stop(
-    paste("All the different tasks on the 'forecast_data' must present",
-           "in the 'oracle_output_data' column of the target data.",
-          sep = " ")
+      paste("All the different tasks on the 'forecast_data' must present",
+        "in the 'oracle_output_data' column of the target data.",
+        sep = " "
+      )
     )
   }
 
