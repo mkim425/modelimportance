@@ -47,20 +47,42 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
     )
   }
 
-  # Check if the oracle_output_data contains the required columns
-  assert_subset(c("output_type", "oracle_value", "target_end_date"),
-    names(oracle_output_data),
-    empty.ok = FALSE
+  # Check if forecast_data and oracle_output_data have common task id columns
+  task_id_cols <- get_task_id_cols(valid_tbl)
+  core_task_id_cols <- intersect(task_id_cols, colnames(oracle_output_data))
+  if (length(core_task_id_cols) == 0) {
+    stop(
+      "'forecast_data' and 'oracle_output_data' have no common task id column."
+    )
+  }
+  # Match the class of the common task id columns in the oracle_output_data
+  # to the class of those in the forecast_data.
+  oracle_output_data[core_task_id_cols] <- Map(
+    function(x, ref_col) {
+      if (inherits(ref_col, "Date")) {
+        as.Date(x)
+      } else {
+        as(x, class(ref_col)[1])
+      }
+    },
+    oracle_output_data[core_task_id_cols],
+    valid_tbl[core_task_id_cols]
   )
-  # Ensure that target_end_date is 'Date' class.
-  oracle_output_data$target_end_date <- as.Date(
-    oracle_output_data$target_end_date
-  )
-  # Check if all values in the target_end_date column of the forecast data are
-  # present in the oracle_output_data
-  if (!all(valid_tbl$target_end_date %in% oracle_output_data$target_end_date)) {
-    stop("All values in the 'target_end_date' column of the forecast data must
-         present in the 'target_end_date' column of the target data.")
+
+  # Check if all the different tasks on the forecast data are present in the
+  # oracle_output_data.
+  unique_tasks_forecast <- forecast_data |>
+    select(all_of(core_task_id_cols)) |>
+    distinct()
+  unique_tasks_observation <- oracle_output_data |>
+    select(all_of(core_task_id_cols)) |>
+    distinct()
+  if (nrow(setdiff(unique_tasks_forecast, unique_tasks_observation)) != 0) {
+    stop(
+    paste("All the different tasks on the 'forecast_data' must present",
+           "in the 'oracle_output_data' column of the target data.",
+          sep = " ")
+    )
   }
 
   valid_tbl

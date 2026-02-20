@@ -82,20 +82,27 @@ test_that("validate_input_data() requires exactly one forecast date column", {
   )
 })
 
-test_that("No missing value in target_end_date of target_data", {
-  reduced_target_data <- target_data |>
-    filter(target_end_date != min(forecast_means$target_end_date))
+test_that("At least one common task id column should be in both input data", {
+  task_ids <- get_task_id_cols(forecast_means)
+  forecast_means2 <- forecast_means |>
+    select(-all_of(task_ids)) |>
+    mutate(target_id = "target1")
 
   # test
   expect_error(
-    validate_input_data(forecast_means, reduced_target_data),
-    "All values in the 'target_end_date' column of the forecast data must
-         present in the 'target_end_date' column of the target data."
+    validate_input_data(forecast_means2, target_data),
+    "'forecast_data' and 'oracle_output_data' have no common task id column."
   )
 })
 
-testxt_that("validate_input_data() handles invalid oracle_output_data", {
+test_that("Unique tasks on forecast_data should be all in the target data", {
+  forecast_means[1, "target_end_date"] <- as.Date("2024-12-24")
+
   expect_error(
-    validate_input_data(forecast_means, target_data |> select(-oracle_value))
+    validate_input_data(forecast_means, target_data),
+    paste("All the different tasks on the 'forecast_data' must present",
+      "in the 'oracle_output_data' column of the target data.",
+      sep = " "
+    )
   )
 })
