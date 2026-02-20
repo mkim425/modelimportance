@@ -43,7 +43,8 @@ test_that("split_data_by_task() groups data correctly", {
   # Each data set has unique task_id
   expect_true(all(
     sapply(
-      result, function(x) {
+      result,
+      function(x) {
         split_cols <- c("horizon", "location", "target_end_date")
         a <- x |>
           dplyr::select(all_of(split_cols)) |>

@@ -64,9 +64,13 @@
 #' )
 #' model_importance_summary(importance_scores, by = "model_id")
 #' }
-model_importance_summary <- function(importance_scores, by = "model_id",
-                                     na_action = c("drop", "worst", "average"),
-                                     fun = mean, ...) {
+model_importance_summary <- function(
+  importance_scores,
+  by = "model_id",
+  na_action = c("drop", "worst", "average"),
+  fun = mean,
+  ...
+) {
   # check inputs
   assert_data_frame(importance_scores)
   required_cols <- c("model_id", "reference_date", "output_type", "importance")
@@ -109,9 +113,12 @@ model_importance_summary <- function(importance_scores, by = "model_id",
     dplyr::group_by(!!!syms(by)) |>
     # dynamically created a column named by summary function and additional
     # arguments passed through `fun_args`
-    dplyr::summarise(!!colname := {
-      do.call(fun, list(x = .data$importance, !!!fun_args))
-    }, .groups = "drop") |>
+    dplyr::summarise(
+      !!colname := {
+        do.call(fun, list(x = .data$importance, !!!fun_args))
+      },
+      .groups = "drop"
+    ) |>
     # unquote symbol !!sym(colname) handles the dynamically created column name
     dplyr::arrange(desc(!!sym(colname)))
 

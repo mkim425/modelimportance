@@ -100,7 +100,8 @@ test_that("Unique tasks on forecast_data should be all in the target data", {
 
   expect_error(
     validate_input_data(forecast_means, target_data),
-    paste("All the different tasks on the 'forecast_data' must present",
+    paste(
+      "All the different tasks on the 'forecast_data' must present",
       "in the 'oracle_output_data' column of the target data.",
       sep = " "
     )

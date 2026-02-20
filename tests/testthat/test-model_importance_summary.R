@@ -50,8 +50,10 @@ pmap(
   function(args, handle_na) {
     test_that(
       paste0(
-        "model_importance_summary() works with calc_args: ", args,
-        " /na_action = ", handle_na
+        "model_importance_summary() works with calc_args: ",
+        args,
+        " /na_action = ",
+        handle_na
       ),
       {
         # filter the raw and imputed importance scores for the given args
@@ -77,20 +79,28 @@ pmap(
         # compute actual summary importance scores
         actual_summary_scores_mean <- raw_scores_subset |>
           model_importance_summary(
-            by = "model_id", na_action = handle_na, fun = mean
+            by = "model_id",
+            na_action = handle_na,
+            fun = mean
           )
         actual_summary_scores_median <- raw_scores_subset |>
           model_importance_summary(
-            by = "model_id", na_action = handle_na, fun = median
+            by = "model_id",
+            na_action = handle_na,
+            fun = median
           )
         # compare expected and actual results
         expect_equal(
-          actual_summary_scores_mean, exp_summary_scores_mean,
-          tolerance = 1e-8, ignore_attr = TRUE
+          actual_summary_scores_mean,
+          exp_summary_scores_mean,
+          tolerance = 1e-8,
+          ignore_attr = TRUE
         )
         expect_equal(
-          actual_summary_scores_median, exp_summary_scores_median,
-          tolerance = 1e-8, ignore_attr = TRUE
+          actual_summary_scores_median,
+          exp_summary_scores_median,
+          tolerance = 1e-8,
+          ignore_attr = TRUE
         )
       }
     )

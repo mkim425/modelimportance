@@ -29,8 +29,13 @@ subsets <- lapply(1:n, function(x) combn(n, x, simplify = FALSE)) |>
 dat_all_ens <- purrr::map_dfr(
   subsets,
   function(subset) {
-    simple_ens_untrained_lasomo(models, subset, subsets, n,
-      d = dat_pmf, aggfun = "median"
+    simple_ens_untrained_lasomo(
+      models,
+      subset,
+      subsets,
+      n,
+      d = dat_pmf,
+      aggfun = "median"
     )
   }
 )
@@ -41,10 +46,13 @@ score_ens_all <- score_model_out(
   target_data_pmf,
   metrics = "log_score"
 ) |>
-  mutate(log_score = ifelse(.data$log_score > -min_log_score,
-    -min_log_score,
-    .data$log_score
-  )) |>
+  mutate(
+    log_score = ifelse(
+      .data$log_score > -min_log_score,
+      -min_log_score,
+      .data$log_score
+    )
+  ) |>
   left_join(
     dat_all_ens |>
       select(c("model_id", "subset_wt_perm", "subset_wt_eq")) |>

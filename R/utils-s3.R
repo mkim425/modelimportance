@@ -35,7 +35,8 @@ summary.model_imp_tbl <- function(object, ...) {
   task_winners <- object |>
     dplyr::group_by(across(all_of(task_id_cols))) |>
     dplyr::slice_max(importance, n = 1, with_ties = FALSE) |>
-    dplyr::select(all_of(task_id_cols),
+    dplyr::select(
+      all_of(task_id_cols),
       top_model = model_id,
       max_score = importance
     ) |>
@@ -97,7 +98,8 @@ plot.model_imp_tbl <- function(x, ...) {
     x,
     aes(
       x = model_id,
-      y = importance, fill = model_id
+      y = importance,
+      fill = model_id
     )
   ) +
     # create bar plot
@@ -157,7 +159,8 @@ plot.importance_summary <- function(x, ...) {
     x,
     aes(
       x = model_id,
-      y = !!sym(y_col), fill = model_id
+      y = !!sym(y_col),
+      fill = model_id
     )
   ) +
     # create bar plot

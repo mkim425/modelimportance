@@ -9,12 +9,12 @@ devtools::load_all()
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10")),
-    !(
-      model_id == "MOBS-GLEAM_FLUH" & location == "25" &
-        target_end_date == as.Date("2022-11-26")),
-    !(
-      model_id == "PSI-DICE" & location == "48" &
-        target_end_date == as.Date("2022-12-10"))
+    !(model_id == "MOBS-GLEAM_FLUH" &
+      location == "25" &
+      target_end_date == as.Date("2022-11-26")),
+    !(model_id == "PSI-DICE" &
+      location == "48" &
+      target_end_date == as.Date("2022-12-10"))
   )
 
 # target data with matching locations and target end dates
@@ -25,12 +25,14 @@ target_data <- hubExamples::forecast_oracle_output |>
   )
 
 # save the data
-saveRDS(forecast_data,
+saveRDS(
+  forecast_data,
   file = testthat::test_path(
     "testdata/for-model_importance/forecast_data_all_outputs.rds"
   )
 )
-saveRDS(target_data,
+saveRDS(
+  target_data,
   file = testthat::test_path(
     "testdata/for-model_importance/target_data_all_outputs.rds"
   )

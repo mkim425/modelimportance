@@ -22,13 +22,12 @@ df_ensembles <- linear_pool(dat_qntl, model_id = "ens_all")
 model_names <- unique(dat_qntl$model_id)
 for (i in seq_along(model_names)) {
   sub_data <- dat_qntl |> filter(model_id != model_names[i])
-  sub_ens <- linear_pool(sub_data,
-    model_id = paste0("ens_wo_", model_names[i])
-  )
+  sub_ens <- linear_pool(sub_data, model_id = paste0("ens_wo_", model_names[i]))
   df_ensembles <- bind_rows(df_ensembles, sub_ens)
 }
 # evaluate each ensemble
-ensemble_scores <- score_model_out(df_ensembles,
+ensemble_scores <- score_model_out(
+  df_ensembles,
   target_data_qntl,
   metrics = "wis"
 ) |>
@@ -53,20 +52,23 @@ exp_imp_qntl1 <- model_imp_scores |>
 # create an ensemble using all models and store it in 'df_ensembles_simple'
 df_ensembles_simple <- simple_ensemble(
   dat_qntl,
-  model_id = "ens_all", agg_fun = "mean"
+  model_id = "ens_all",
+  agg_fun = "mean"
 )
 # create ensembles without each model and add them in the 'df_ensembles_simple'
 model_names <- unique(dat_qntl$model_id)
 for (i in seq_along(model_names)) {
   sub_data <- dat_qntl |> filter(model_id != model_names[i])
-  sub_ens <- simple_ensemble(sub_data,
+  sub_ens <- simple_ensemble(
+    sub_data,
     model_id = paste0("ens_wo_", model_names[i]),
     agg_fun = "mean"
   )
   df_ensembles_simple <- bind_rows(df_ensembles_simple, sub_ens)
 }
 # evaluate each ensemble
-ensemble_scores <- score_model_out(df_ensembles_simple,
+ensemble_scores <- score_model_out(
+  df_ensembles_simple,
   target_data_qntl,
   metrics = "wis"
 ) |>
@@ -91,20 +93,23 @@ exp_imp_qntl2 <- model_imp_scores |>
 # create an ensemble using all models and store it in 'df_ensembles_simple'
 df_ensembles_simple <- simple_ensemble(
   dat_qntl,
-  model_id = "ens_all", agg_fun = "median"
+  model_id = "ens_all",
+  agg_fun = "median"
 )
 # create ensembles without each model and add them in the 'df_ensembles_simple'
 model_names <- unique(dat_qntl$model_id)
 for (i in seq_along(model_names)) {
   sub_data <- dat_qntl |> filter(model_id != model_names[i])
-  sub_ens <- simple_ensemble(sub_data,
+  sub_ens <- simple_ensemble(
+    sub_data,
     model_id = paste0("ens_wo_", model_names[i]),
     agg_fun = "median"
   )
   df_ensembles_simple <- bind_rows(df_ensembles_simple, sub_ens)
 }
 # evaluate each ensemble
-ensemble_scores <- score_model_out(df_ensembles_simple,
+ensemble_scores <- score_model_out(
+  df_ensembles_simple,
   target_data_qntl,
   metrics = "wis"
 ) |>
@@ -134,13 +139,15 @@ df_ensembles <- simple_ensemble(sub_dat_qntl, model_id = "ens_all")
 model_names <- unique(sub_dat_qntl$model_id)
 for (i in seq_along(model_names)) {
   sub_data <- sub_dat_qntl |> filter(model_id != model_names[i])
-  sub_ens <- simple_ensemble(sub_data,
+  sub_ens <- simple_ensemble(
+    sub_data,
     model_id = paste0("ens_wo_", model_names[i])
   )
   df_ensembles <- bind_rows(df_ensembles, sub_ens)
 }
 # evaluate each ensemble
-ensemble_scores <- score_model_out(df_ensembles,
+ensemble_scores <- score_model_out(
+  df_ensembles,
   target_data_qntl,
   metrics = "wis"
 ) |>
@@ -164,11 +171,16 @@ exp_imp_qntl4 <- data.frame(model_id = model_id_list) |>
 
 # combine the expected importance scores
 exp_imp_qntl <- rbind(
-  exp_imp_qntl1, exp_imp_qntl2, exp_imp_qntl3, exp_imp_qntl4
-) |> as_tibble()
+  exp_imp_qntl1,
+  exp_imp_qntl2,
+  exp_imp_qntl3,
+  exp_imp_qntl4
+) |>
+  as_tibble()
 
 # save data
-saveRDS(exp_imp_qntl,
+saveRDS(
+  exp_imp_qntl,
   file = paste0(
     "tests/testthat/testdata/for-compute_importance/",
     "exp_imp_qntl_lomo.rds"

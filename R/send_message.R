@@ -11,7 +11,9 @@ send_message <- function(status, ...) {
           "Evaluating forecasts from %s to %s ",
           "(a total of %d forecast date(s)).\n"
         ),
-        first_date, last_date, n_dates
+        first_date,
+        last_date,
+        n_dates
       )
     },
     metric_logscore = paste(

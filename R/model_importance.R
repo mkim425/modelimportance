@@ -143,17 +143,23 @@
 #'   subset_wt = "equal", agg_fun = median
 #' )
 #' }
-model_importance <- function(forecast_data,
-                             oracle_output_data,
-                             ensemble_fun = c("simple_ensemble", "linear_pool"),
-                             importance_algorithm = c("lomo", "lasomo"),
-                             subset_wt = c("equal", "perm_based"),
-                             min_log_score = -10,
-                             ...) {
+model_importance <- function(
+  forecast_data,
+  oracle_output_data,
+  ensemble_fun = c("simple_ensemble", "linear_pool"),
+  importance_algorithm = c("lomo", "lasomo"),
+  subset_wt = c("equal", "perm_based"),
+  min_log_score = -10,
+  ...
+) {
   # validate inputs
   validate_inputs(
-    forecast_data, oracle_output_data, ensemble_fun, importance_algorithm,
-    subset_wt, min_log_score
+    forecast_data,
+    oracle_output_data,
+    ensemble_fun,
+    importance_algorithm,
+    subset_wt,
+    min_log_score
   )
   # set defaults
   ensemble_fun <- match.arg(ensemble_fun)
@@ -174,7 +180,9 @@ model_importance <- function(forecast_data,
 
   # Message for the user to check the forecast dates
   send_message(
-    "date_range", min(forecast_date_list), max(forecast_date_list),
+    "date_range",
+    min(forecast_date_list),
+    max(forecast_date_list),
     length(forecast_date_list)
   )
 
@@ -222,9 +230,15 @@ model_importance <- function(forecast_data,
         function(single_task_data) {
           p()
           compute_importance(
-            single_task_data, oracle_output_data, model_id_list,
-            ensemble_fun, importance_algorithm, subset_wt,
-            metric, min_log_score, ...
+            single_task_data,
+            oracle_output_data,
+            model_id_list,
+            ensemble_fun,
+            importance_algorithm,
+            subset_wt,
+            metric,
+            min_log_score,
+            ...
           )
         }
       )
@@ -234,9 +248,15 @@ model_importance <- function(forecast_data,
       valid_df_list_by_task,
       function(single_task_data) {
         compute_importance(
-          single_task_data, oracle_output_data, model_id_list,
-          ensemble_fun, importance_algorithm, subset_wt,
-          metric, min_log_score, ...
+          single_task_data,
+          oracle_output_data,
+          model_id_list,
+          ensemble_fun,
+          importance_algorithm,
+          subset_wt,
+          metric,
+          min_log_score,
+          ...
         )
       }
     )
@@ -245,12 +265,11 @@ model_importance <- function(forecast_data,
   # task-related columns in the middle, and `output_type` and `importance` last.
   df_scores <- score_result |>
     dplyr::select(
-      "model_id", "reference_date",
+      "model_id",
+      "reference_date",
       dplyr::everything()
     ) |>
-    dplyr::relocate(c("output_type", "importance"),
-      .after = dplyr::last_col()
-    )
+    dplyr::relocate(c("output_type", "importance"), .after = dplyr::last_col())
   # return result as model_imp_tbl class
   structure(df_scores, class = c("model_imp_tbl", class(df_scores)))
 }

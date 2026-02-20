@@ -29,10 +29,17 @@
 #' @importFrom utils combn
 #' @inherit model_importance details
 #' @noRd
-compute_importance <- function(single_task_data, oracle_output_data,
-                               model_id_list, ensemble_fun,
-                               importance_algorithm, subset_wt,
-                               metric, min_log_score, ...) {
+compute_importance <- function(
+  single_task_data,
+  oracle_output_data,
+  model_id_list,
+  ensemble_fun,
+  importance_algorithm,
+  subset_wt,
+  metric,
+  min_log_score,
+  ...
+) {
   # models in the single_task_data
   models <- unique(single_task_data$model_id)
   missing_model <- setdiff(model_id_list, single_task_data$model_id)
@@ -43,7 +50,8 @@ compute_importance <- function(single_task_data, oracle_output_data,
   # Compute importance score when importance_algorithm is 'lomo'
   if (importance_algorithm == "lomo") {
     # build an ensemble with the specified method using all models available
-    ens_all <- ens_fun(single_task_data,
+    ens_all <- ens_fun(
+      single_task_data,
       weights = NULL,
       model_id = "ensemble-all",
       ...
@@ -61,16 +69,19 @@ compute_importance <- function(single_task_data, oracle_output_data,
     # store all ensemble forecasts in a dataframe
     ensemble_data <- rbind(ens_all, dplyr::bind_rows(ens_lomo))
     # score the ensemble forecasts and add it to the input dataset
-    score_ens_all <- score_model_out(ensemble_data,
+    score_ens_all <- score_model_out(
+      ensemble_data,
       oracle_output_data,
       metrics = metric
     ) |>
       # adjust the metric if needed
       adjust_metric(log_min_val = min_log_score) |>
       # rename the calculated metric column to a common name
-      rename(calculated_metric = any_of(
-        c("ae_point", "rse_point", "wis", "log_score")
-      )) |>
+      rename(
+        calculated_metric = any_of(
+          c("ae_point", "rse_point", "wis", "log_score")
+        )
+      ) |>
       left_join(ensemble_data, by = "model_id") |>
       as_tibble()
     # calculate importance scores
@@ -114,8 +125,10 @@ compute_importance <- function(single_task_data, oracle_output_data,
         data_subset <- single_task_data |>
           filter(.data$model_id %in% get_modelsubset)
         # build an ensemble forecast using the models in the subset S
-        ensemble_forecast <- ens_fun(data_subset,
-          model_id = paste0("ensemble_", i), ...
+        ensemble_forecast <- ens_fun(
+          data_subset,
+          model_id = paste0("ensemble_", i),
+          ...
         )
         # add index and weight to the ensemble forecast
         ens_dat <- ensemble_forecast |>
@@ -133,9 +146,11 @@ compute_importance <- function(single_task_data, oracle_output_data,
       # adjust the metric if needed
       adjust_metric(log_min_val = min_log_score) |>
       # rename the calculated metric column to a common name
-      rename(calculated_metric = any_of(
-        c("ae_point", "rse_point", "wis", "log_score")
-      )) |>
+      rename(
+        calculated_metric = any_of(
+          c("ae_point", "rse_point", "wis", "log_score")
+        )
+      ) |>
       left_join(
         dat_all_ens |>
           select(c("model_id", "subset_weight")) |>
@@ -196,7 +211,9 @@ compute_importance <- function(single_task_data, oracle_output_data,
       select(-c("model_id", "importance")) |>
       distinct()
     missing_model_rows <- data.frame(
-      model_id = missing_model, fixed_cols, importance = NA
+      model_id = missing_model,
+      fixed_cols,
+      importance = NA
     )
     # bind the new rows to df_importance
     combined_df <- bind_rows(df_importance, missing_model_rows)

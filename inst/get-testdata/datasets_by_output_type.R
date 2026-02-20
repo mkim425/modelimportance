@@ -8,7 +8,8 @@ target_data_mean <- readRDS(
   testthat::test_path(
     "testdata/for-validate_input_data/flu_example_target_data.rds"
   )
-) |> mutate(target_end_date = as.Date(target_end_date))
+) |>
+  mutate(target_end_date = as.Date(target_end_date))
 # forecast data with mean output
 forecast_mean <- readRDS(
   testthat::test_path(
@@ -16,7 +17,8 @@ forecast_mean <- readRDS(
   )
 )
 valid_tbl_mean <- validate_input_data(forecast_mean, target_data_mean)
-mean_data_list <- split_data_by_task(valid_tbl_mean,
+mean_data_list <- split_data_by_task(
+  valid_tbl_mean,
   weighted = FALSE,
   training_window_length = 0
 )
@@ -37,16 +39,19 @@ idx <- with(
 target_data_mean$oracle_value[idx] <- 10
 
 # save data
-saveRDS(dat_mean,
+saveRDS(
+  dat_mean,
   file = "tests/testthat/testdata/for-compute_importance/dat_mean.rds"
 )
 
 saveRDS(
-  target_data_mean |> filter(
-    target_end_date %in% unique(dat_mean$target_end_date) &
-      output_type == unique(dat_mean$output_type) &
-      location %in% unique(dat_mean$location)
-  ),
+  target_data_mean |>
+    filter(
+      target_end_date %in%
+        unique(dat_mean$target_end_date) &
+        output_type == unique(dat_mean$output_type) &
+        location %in% unique(dat_mean$location)
+    ),
   file = "tests/testthat/testdata/for-compute_importance/target_mean.rds"
 )
 
@@ -56,7 +61,8 @@ target_data_median <- readRDS(
   testthat::test_path(
     "testdata/for-validate_input_data/flu_example_target_data.rds"
   )
-) |> mutate(target_end_date = as.Date(target_end_date))
+) |>
+  mutate(target_end_date = as.Date(target_end_date))
 # forecast data with median output
 forecast_median <- readRDS(
   testthat::test_path(
@@ -64,7 +70,8 @@ forecast_median <- readRDS(
   )
 )
 valid_tbl_median <- validate_input_data(forecast_median, target_data_median)
-median_data_list <- split_data_by_task(valid_tbl_median,
+median_data_list <- split_data_by_task(
+  valid_tbl_median,
   weighted = FALSE,
   training_window_length = 0
 )
@@ -84,16 +91,19 @@ idx <- with(
 # replace the target oracle value with a simple value
 target_data_median$oracle_value[idx] <- 10
 # save data
-saveRDS(dat_median,
+saveRDS(
+  dat_median,
   file = "tests/testthat/testdata/for-compute_importance/dat_median.rds"
 )
 
 saveRDS(
-  target_data_median |> filter(
-    target_end_date %in% unique(dat_median$target_end_date) &
-      output_type == unique(dat_median$output_type) &
-      location %in% unique(dat_median2$location)
-  ),
+  target_data_median |>
+    filter(
+      target_end_date %in%
+        unique(dat_median$target_end_date) &
+        output_type == unique(dat_median$output_type) &
+        location %in% unique(dat_median2$location)
+    ),
   file = "tests/testthat/testdata/for-compute_importance/target_median.rds"
 )
 ##### quantile output ########################################
@@ -102,7 +112,8 @@ target_data_qntl <- readRDS(
   testthat::test_path(
     "testdata/for-validate_input_data/flu_example_target_data.rds"
   )
-) |> mutate(target_end_date = as.Date(target_end_date))
+) |>
+  mutate(target_end_date = as.Date(target_end_date))
 
 ## forecast data with quantile output
 forecast_qntl <- readRDS(
@@ -111,22 +122,23 @@ forecast_qntl <- readRDS(
   )
 )
 valid_tbl_qntl <- validate_input_data(forecast_qntl, target_data_qntl)
-qntl_data_list <- split_data_by_task(valid_tbl_qntl,
+qntl_data_list <- split_data_by_task(
+  valid_tbl_qntl,
   weighted = FALSE,
   training_window_length = 0
 )
 dat_qntl <- qntl_data_list[[16]]
 # save data
-saveRDS(dat_qntl,
-  file = "tests/testthat/testdata/dat_qntl.rds"
-)
+saveRDS(dat_qntl, file = "tests/testthat/testdata/dat_qntl.rds")
 
 saveRDS(
-  target_data_qntl |> filter(
-    target_end_date %in% unique(dat_qntl$target_end_date) &
-      output_type == unique(dat_qntl$output_type) &
-      location %in% unique(dat_qntl$location)
-  ),
+  target_data_qntl |>
+    filter(
+      target_end_date %in%
+        unique(dat_qntl$target_end_date) &
+        output_type == unique(dat_qntl$output_type) &
+        location %in% unique(dat_qntl$location)
+    ),
   file = "tests/testthat/testdata/for-compute_importance/target_qntl.rds"
 )
 ##### pmf output ########################################
@@ -135,7 +147,8 @@ target_data_pmf <- readRDS(
   testthat::test_path(
     "testdata/for-validate_input_data/flu_example_target_data.rds"
   )
-) |> mutate(target_end_date = as.Date(target_end_date))
+) |>
+  mutate(target_end_date = as.Date(target_end_date))
 # forecast data with pmf output
 forecast_pmf <- readRDS(
   testthat::test_path(
@@ -143,21 +156,25 @@ forecast_pmf <- readRDS(
   )
 )
 valid_tbl_pmf <- validate_input_data(forecast_pmf, target_data_pmf)
-pmf_data_list <- split_data_by_task(valid_tbl_pmf,
+pmf_data_list <- split_data_by_task(
+  valid_tbl_pmf,
   weighted = FALSE,
   training_window_length = 0
 )
 dat_pmf <- pmf_data_list[[16]]
 
 # save data
-saveRDS(dat_pmf,
+saveRDS(
+  dat_pmf,
   file = "tests/testthat/testdata/for-compute_importance/dat_pmf.rds"
 )
 saveRDS(
-  target_data_pmf |> filter(
-    target_end_date %in% unique(dat_pmf$target_end_date) &
-      output_type == unique(dat_pmf$output_type) &
-      location %in% unique(dat_pmf$location)
-  ),
+  target_data_pmf |>
+    filter(
+      target_end_date %in%
+        unique(dat_pmf$target_end_date) &
+        output_type == unique(dat_pmf$output_type) &
+        location %in% unique(dat_pmf$location)
+    ),
   file = "tests/testthat/testdata/for-compute_importance/target_pmf.rds"
 )
