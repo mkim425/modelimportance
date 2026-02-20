@@ -18,8 +18,7 @@ print.model_imp_tbl <- function(x, ...) {
 #' @export
 summary.model_imp_tbl <- function(object, ...) {
   # columns in the importance score table
-  required_cols <- c("model_id", "reference_date", "output_type", "importance")
-  task_id_cols <- setdiff(colnames(object), required_cols)
+  task_id_cols <- get_task_id_cols(object)
 
   # compute model statistics
   model_stats <- object |>
@@ -91,8 +90,7 @@ print.summary.model_imp_tbl <- function(x, ...) {
 #' @export
 plot.model_imp_tbl <- function(x, ...) {
   # columns in the importance score table
-  required_cols <- c("model_id", "reference_date", "output_type", "importance")
-  task_id_cols <- setdiff(colnames(x), required_cols)
+  task_id_cols <- get_task_id_cols(x)
 
   # create ggplot object
   ggplot(

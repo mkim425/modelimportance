@@ -23,3 +23,24 @@ validate_inputs <- function(forecast_data, oracle_output_data,
   importance_algorithm <- match.arg(importance_algorithm)
   subset_wt <- match.arg(subset_wt)
 }
+
+
+#' get the columns that identify the task in the input data
+#'
+#' @param data a data frame containing the forecast related data
+#' @return a character vector of column names that identify the task in the
+#' input data
+#'
+#' @noRd
+get_task_id_cols <- function(data) {
+  non_task_id_cols <- c(
+    "model_id",
+    "reference_date",
+    "output_type",
+    "output_type_id",
+    "value",
+    "importance"
+  )
+  task_id_cols <- setdiff(colnames(data), non_task_id_cols)
+  task_id_cols
+}
