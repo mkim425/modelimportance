@@ -76,7 +76,7 @@ model_importance_summary <- function(importance_scores, by = "model_id",
   na_action <- match.arg(na_action)
 
   # task specific columns
-  task_id_cols <- setdiff(colnames(importance_scores), required_cols)
+  task_id_cols <- get_task_id_cols(importance_scores)
   # column name for the summary importance score
   fun_args <- list(...)
   colname <- paste0("importance_score_", deparse(substitute(fun)), sep = "")
