@@ -145,8 +145,9 @@ plot.model_imp_tbl <- function(x, ...) {
 #' used (e.g., `importance_score_mean` when `fun = mean`).
 #' The output is sorted in descending order of the summary importance scores.
 #' @details
-#' This method extends `stats::aggregate` for objects of class `{model_imp_tbl`.
+#' This method extends `stats::aggregate` for objects of class `model_imp_tbl`.
 #' @importFrom checkmate assert_data_frame assert_subset assert_function
+#' @importFrom stats aggregate
 #' @export
 
 aggregate.model_imp_tbl <- function(
