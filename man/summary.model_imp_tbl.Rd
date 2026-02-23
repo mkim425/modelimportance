@@ -4,10 +4,12 @@
 \alias{summary.model_imp_tbl}
 \title{Summary method for model importance score table}
 \usage{
-\method{summary}{model_imp_tbl}(object)
+\method{summary}{model_imp_tbl}(object, ...)
 }
 \arguments{
 \item{object}{An object of class \code{model_imp_tbl}.}
+
+\item{...}{Additional arguments passed to the print method.}
 }
 \description{
 Summary method for model importance score table

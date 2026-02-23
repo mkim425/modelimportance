@@ -1,9 +1,9 @@
 #' Print method for model importance score table
 #'
 #' @param x An object of class `model_imp_tbl`.
-#'
+#' @param ... Additional arguments passed to the print method.
 #' @export
-print.model_imp_tbl <- function(x) {
+print.model_imp_tbl <- function(x, ...) {
   cat("Model importance result by task\n")
   cat("---------------------------------\n")
   print(as.data.frame(x))
@@ -12,9 +12,9 @@ print.model_imp_tbl <- function(x) {
 #' Summary method for model importance score table
 #'
 #' @param object An object of class `model_imp_tbl`.
-#'
+#' @param ... Additional arguments passed to the print method.
 #' @export
-summary.model_imp_tbl <- function(object) {
+summary.model_imp_tbl <- function(object, ...) {
   # columns in the importance score table
   task_id_cols <- get_task_id_cols(object)
 
@@ -59,9 +59,9 @@ summary.model_imp_tbl <- function(object) {
 #' Print method for summary of model importance score table
 #'
 #' @param x An object of class `summary.model_imp_tbl`.
-#'
+#' @param ... Additional arguments passed to the print method.
 #' @export
-print.summary.model_imp_tbl <- function(x) {
+print.summary.model_imp_tbl <- function(x, ...) {
   # summary statements
   cat("\n=== Summary of importance scores by task ===\n")
   cat("Number of models:", length(x$all_models), "\n")
@@ -84,12 +84,12 @@ print.summary.model_imp_tbl <- function(x) {
 #' Plot method for model importance score table
 #'
 #' @param x An object of class `model_imp_tbl`.
-#'
+#' @param ... Additional arguments passed to the print method.
 #' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_hline facet_grid
 #' @importFrom ggplot2 labs theme vars
 #' @importFrom rlang sym syms
 #' @export
-plot.model_imp_tbl <- function(x) {
+plot.model_imp_tbl <- function(x, ...) {
   # columns in the importance score table
   task_id_cols <- get_task_id_cols(x)
 
@@ -144,6 +144,8 @@ plot.model_imp_tbl <- function(x) {
 #' where `<fun>` is the name of the summary function
 #' used (e.g., `importance_score_mean` when `fun = mean`).
 #' The output is sorted in descending order of the summary importance scores.
+#' @details
+#' This method extends `stats::aggregate` for objects of class `{model_imp_tbl`.
 #' @importFrom checkmate assert_data_frame assert_subset assert_function
 #' @export
 
