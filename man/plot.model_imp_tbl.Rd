@@ -4,12 +4,10 @@
 \alias{plot.model_imp_tbl}
 \title{Plot method for model importance score table}
 \usage{
-\method{plot}{model_imp_tbl}(x, ...)
+\method{plot}{model_imp_tbl}(x)
 }
 \arguments{
 \item{x}{An object of class \code{model_imp_tbl}.}
-
-\item{...}{Additional arguments passed to the plot method.}
 }
 \description{
 Plot method for model importance score table
