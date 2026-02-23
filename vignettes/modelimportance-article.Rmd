@@ -796,7 +796,7 @@ We summarize the importance scores for each model by averaging across all tasks.
 argument to `"drop"`.
 
 
-```{r lomo-NAdrop}
+```{r lomo-NAdrop, eval=FALSE}
 scores_lomo <- model_importance(
   forecast_data = forecast_data,
   oracle_output_data = target_data,
@@ -827,7 +827,7 @@ Another approach to handling missing values is to use the `"worst"` option for
 among the other models for the same task.
 
 
-```{r lomo-NAworst}
+```{r lomo-NAworst, eval=FALSE}
 model_importance_summary(
   importance_scores = scores_lomo,
   by = "model_id",
@@ -864,7 +864,7 @@ assigning the average importance scores of other models in the same task.
 This strategy may offer a more balanced trade-off by mitigating the influence of
 the missing data without overly penalizing or overlooking them. 
 
-```{r lomo-NAaverage}
+```{r lomo-NAaverage, eval=FALSE}
 model_importance_summary(
   scores_lomo, by = "model_id", na_action = "average", fun = mean
 )
@@ -883,7 +883,7 @@ subsets of models when calculating importance scores, with `na_action` fixed to
 The following code and corresponding outputs illustrate the evaluation using 
 each weighting scheme.
 
-```{r lasomo-NAdrop-equal}
+```{r lasomo-NAdrop-equal, eval=FALSE}
 scores_lasomo_eq <- model_importance(
   forecast_data = forecast_data,
   oracle_output_data = target_data,
@@ -897,7 +897,7 @@ model_importance_summary(
 ```
 
 
-```{r lasomo-NAdrop-perm}
+```{r lasomo-NAdrop-perm, eval=FALSE}
 scores_lasomo_perm <- model_importance(
   forecast_data = forecast_data,
   oracle_output_data = target_data,

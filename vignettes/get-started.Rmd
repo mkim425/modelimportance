@@ -188,7 +188,7 @@ We summarize the importance scores for each model by averaging across all tasks.
 `NA` values are removed during the averaging process by setting the `na_action`
 argument to `"drop"`.
 
-```{r lomo-NAdrop}
+```{r lomo-NAdrop, eval=FALSE}
 summary.lomo.drop <- model_importance_summary(
   scores_lomo,
   by = "model_id", na_action = "drop", fun = mean
@@ -213,7 +213,7 @@ Another approach to handling `NA` values is to use the `"worst"` option for
 `na_action`, which replaces `NA` values with the worst (i.e., minimum) score 
 among the other models for the same task.
 
-```{r lomo-NAworst}
+```{r lomo-NAworst, eval=FALSE}
 summary.lomo.worst <- model_importance_summary(
   scores_lomo,
   by = "model_id", na_action = "worst", fun = mean
@@ -243,7 +243,7 @@ assigning the average importance scores of other models in the same task.
 This strategy may offer a more balanced trade-off by mitigating the influence of
 the missing data without overly penalizing or overlooking them. 
 
-```{r lomo-NAaverage}
+```{r lomo-NAaverage, eval=FALSE}
 summary.lomo.avg <- model_importance_summary(
   scores_lomo,
   by = "model_id", na_action = "average", fun = mean
@@ -270,7 +270,7 @@ are assigned to subsets of models when calculating importance scores, with
 The following code and corresponding outputs illustrate the evaluation using 
 each weighting scheme.
 
-```{r lasomo-NAdrop-equal}
+```{r lasomo-NAdrop-equal, eval=FALSE}
 #| message: false
 # LASOMO - equal weights
 scores_lasomo_eq <- model_importance(
@@ -294,7 +294,7 @@ summary.lasomo_eq |>
   )
 ```
 
-```{r lasomo-NAdrop-perm}
+```{r lasomo-NAdrop-perm, eval=FALSE}
 #| message: false
 # LASOMO - perm based weights
 scores_lasomo_perm <- model_importance(
