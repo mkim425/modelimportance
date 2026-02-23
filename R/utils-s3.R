@@ -136,13 +136,13 @@ plot.model_imp_tbl <- function(x) {
 #' of the other models.
 #' * `"average"` replaces `NA`s with the average value from the other
 #' models' importance metrics.
-#' @param FUN A function used to summarize importance scores.
+#' @param fun A function used to summarize importance scores.
 #' Default is `mean()`
-#' @param ... Additional arguments passed to the summary function `FUN`.
-#' (e.g., `FUN = quantile, probs = 0.25` for a quartile summary)
-#' @returns A data frame with columns `model_id` and `importance_score_<FUNn>`,
-#' where `<FUN>` is the name of the summary function
-#' used (e.g., `importance_score_mean` when `FUN = mean`).
+#' @param ... Additional arguments passed to the summary function `fun`.
+#' (e.g., `fun = quantile, probs = 0.25` for a quartile summary)
+#' @returns A data frame with columns `model_id` and `importance_score_<fun>`,
+#' where `<fun>` is the name of the summary function
+#' used (e.g., `importance_score_mean` when `fun = mean`).
 #' The output is sorted in descending order of the summary importance scores.
 #' @importFrom checkmate assert_data_frame assert_subset assert_function
 #' @export
@@ -151,7 +151,7 @@ aggregate.model_imp_tbl <- function(
   x,
   by = "model_id",
   na_action = c("drop", "worst", "average"),
-  FUN = mean,
+  fun = mean,
   ...
 ) {
   # check inputs
@@ -159,14 +159,14 @@ aggregate.model_imp_tbl <- function(
   required_cols <- c("model_id", "reference_date", "output_type", "importance")
   assert_subset(required_cols, names(x), empty.ok = FALSE)
   assert_subset(by, names(x), empty.ok = FALSE)
-  assert_function(FUN)
+  assert_function(fun)
   na_action <- match.arg(na_action)
 
   # task specific columns
   task_id_cols <- get_task_id_cols(x)
   # column name for the summary importance score
   fun_args <- list(...)
-  colname <- paste0("importance_score_", deparse(substitute(FUN)), sep = "")
+  colname <- paste0("importance_score_", deparse(substitute(fun)), sep = "")
   # NA handling
   if (na_action == "worst") {
     imputed_scores <- x |>
@@ -197,7 +197,7 @@ aggregate.model_imp_tbl <- function(
     # arguments passed through `fun_args`
     dplyr::summarise(
       !!colname := {
-        do.call(FUN, list(x = .data$importance, !!!fun_args))
+        do.call(fun, list(x = .data$importance, !!!fun_args))
       },
       .groups = "drop"
     ) |>
