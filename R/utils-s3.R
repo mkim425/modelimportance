@@ -148,6 +148,7 @@ plot.model_imp_tbl <- function(x, ...) {
 #' This method extends `stats::aggregate` for objects of class `model_imp_tbl`.
 #' @importFrom checkmate assert_data_frame assert_subset assert_function
 #' @importFrom stats aggregate
+#' @rdname aggregate.model_imp_tbl
 #' @export
 
 aggregate.model_imp_tbl <- function(
