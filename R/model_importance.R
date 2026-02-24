@@ -116,7 +116,8 @@
 #' Users can summarize the task-level scores with specified summary statistics
 #' of interest (e.g., mean, median, quantiles) for a more comprehensive view of
 #' model importance.
-#' See `?aggregate.model_imp_tbl` for more details on how to use this method.
+#' See \code{\link{aggregate.model_imp_tbl}} for more details on how to use
+#' this method.
 #'
 #' @examples \dontrun{
 #' library(dplyr)
