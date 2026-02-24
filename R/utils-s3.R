@@ -84,7 +84,7 @@ print.summary.model_imp_tbl <- function(x, ...) {
 #' Plot method for model importance score table
 #'
 #' @param x An object of class `model_imp_tbl`.
-#' @param ... Additional arguments passed to the print method.
+#' @param ... Additional arguments passed to the plot method.
 #' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_hline facet_grid
 #' @importFrom ggplot2 labs theme vars
 #' @importFrom rlang sym syms
