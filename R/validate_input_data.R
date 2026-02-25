@@ -4,8 +4,8 @@
 #'
 #' @return a model_out_tbl format for forecast data
 #'
-#' @import hubUtils
-#' @import dplyr
+#' @importFrom hubUtils as_model_out_tbl validate_model_out_tbl
+#' @importFrom dplyr select distinct all_of
 #' @importFrom methods as
 #' @noRd
 

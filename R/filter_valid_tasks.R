@@ -9,6 +9,7 @@
 #' @returns A list of data.frames that only includes tasks with models of at
 #' least `min_models`.
 #' @importFrom utils capture.output
+#' @importFrom dplyr select distinct all_of
 #' @noRd
 filter_valid_tasks <- function(df_list_by_task, min_models = 2) {
   # task_id_cols are the columns that identify a task,

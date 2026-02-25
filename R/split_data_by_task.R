@@ -8,6 +8,7 @@
 #' processed by the function `validate_input_data()`.
 
 #' @return A list of data sets, each corresponding to a single task.
+#' @importFrom dplyr across all_of
 #' @noRd
 split_data_by_task <- function(valid_tbl) {
   # Get task specific columns
