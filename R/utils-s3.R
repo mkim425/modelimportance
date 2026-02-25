@@ -13,6 +13,8 @@ print.model_imp_tbl <- function(x, ...) {
 #'
 #' @param object An object of class `model_imp_tbl`.
 #' @param ... Additional arguments passed to the print method.
+#' @importFrom dplyr n
+#' @importFrom rlang .data
 #' @export
 summary.model_imp_tbl <- function(object, ...) {
   # columns in the importance score table
@@ -60,6 +62,7 @@ summary.model_imp_tbl <- function(object, ...) {
 #'
 #' @param x An object of class `summary.model_imp_tbl`.
 #' @param ... Additional arguments passed to the print method.
+#' @importFrom rlang .data
 #' @export
 print.summary.model_imp_tbl <- function(x, ...) {
   # summary statements
@@ -148,6 +151,8 @@ plot.model_imp_tbl <- function(x, ...) {
 #' This method extends `stats::aggregate` for objects of class `model_imp_tbl`.
 #' @importFrom checkmate assert_data_frame assert_subset assert_function
 #' @importFrom stats aggregate
+#' @importFrom dplyr desc ungroup
+#' @importFrom rlang .data sym syms
 #' @rdname aggregate.model_imp_tbl
 #' @export
 

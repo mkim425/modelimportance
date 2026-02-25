@@ -9,6 +9,7 @@
 #'
 #' @returns A data.frame with adjusted metric values.
 #' @importFrom dplyr mutate select
+#' @importFrom rlang .data
 #' @noRd
 adjust_metric <- function(df, log_min_val = -10) {
   # if metric is se_point, convert it to rse_point

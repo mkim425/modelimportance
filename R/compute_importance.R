@@ -28,6 +28,7 @@
 #' @importFrom dplyr mutate pull select distinct
 #' @importFrom utils getFromNamespace
 #' @importFrom utils combn
+#' @importFrom rlang .data
 #' @inherit model_importance details
 #' @noRd
 compute_importance <- function(
