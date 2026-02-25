@@ -12,7 +12,8 @@ forecast_data_raw <- hubExamples::forecast_outputs |>
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
   )
 
-# Specify forecasts to remove
+# Specify forecasts to remove: MOBS-GLEAM_FLUH for location 25 on 2022-11-26,
+# PSI-DICE for location 48 on 2022-12-10
 forecast_to_remove <- tibble(
   model_id = c("MOBS-GLEAM_FLUH", "PSI-DICE"),
   location = c("25", "48"),

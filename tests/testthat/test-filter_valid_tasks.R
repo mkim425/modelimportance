@@ -45,6 +45,8 @@ test_that("filter_valid_tasks() works as expected", {
 
   # Case 3: All tasks invalid
   # Create a modified df_list_by_task with all tasks having only one model
+  # remove forecasts for MOBS-GLEAM_FLUH on 2022-12-24 and
+  # Flusight-baseline on 2022-11-26
   forecast_to_remove <- tibble(
     model_id = c("MOBS-GLEAM_FLUH", "Flusight-baseline"),
     target_end_date = as.Date(c("2022-12-24", "2022-11-26"))
