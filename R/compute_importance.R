@@ -22,9 +22,10 @@
 #'
 #' @returns A data.frame with columns
 #' `task_id`, `output_type`, `model_id`, (task level) `importance`.
-#'
 #' @import hubEnsembles
-#' @import hubEvals
+#' @importFrom hubEvals score_model_out
+#' @importFrom dplyr filter bind_rows rename any_of left_join as_tibble
+#' @importFrom dplyr mutate pull select distinct
 #' @importFrom utils getFromNamespace
 #' @importFrom utils combn
 #' @inherit model_importance details

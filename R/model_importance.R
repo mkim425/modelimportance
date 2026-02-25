@@ -71,6 +71,7 @@
 #' regardless of its original name in the input `forecast_data`.
 #'
 #' @importFrom methods is
+#' @importFrom dplyr case_when
 #' @export
 #'
 #' @details

@@ -4,8 +4,8 @@
 #'
 #' @return a model_out_tbl format for forecast data
 #'
-#' @import hubUtils
-#' @import dplyr
+#' @importFrom hubUtils as_model_out_tbl validate_model_out_tbl
+#' @importFrom dplyr select distinct all_of setdiff
 #' @importFrom methods as
 #' @noRd
 
@@ -79,7 +79,12 @@ validate_input_data <- function(forecast_data, oracle_output_data) {
   unique_tasks_observation <- oracle_output_data |>
     select(all_of(core_task_id_cols)) |>
     distinct()
-  if (nrow(setdiff(unique_tasks_forecast, unique_tasks_observation)) != 0) {
+  if (
+    nrow(
+      dplyr::setdiff(unique_tasks_forecast, unique_tasks_observation)
+    ) !=
+      0
+  ) {
     stop(
       paste(
         "All the different tasks on the 'forecast_data' must present",
