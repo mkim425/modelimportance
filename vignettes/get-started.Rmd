@@ -64,24 +64,26 @@ Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022,
 and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 
 ```{r forecast_data}
-forecast_data <- hubExamples::forecast_outputs |>
+# Load the forecast data from hubExamples
+forecast_data_raw <- hubExamples::forecast_outputs |>
   dplyr::filter(
     output_type %in% c("median"),
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
-  ) |>
-  filter(
-    !(
-      model_id == "MOBS-GLEAM_FLUH" &
-        location == "25" &
-        target_end_date == as.Date("2022-11-26")
-    ),
-    !(
-      model_id == "PSI-DICE" &
-        location == "48" &
-        target_end_date == as.Date("2022-12-10")
-    )
   )
 
+# Specify forecasts to remove: MOBS-GLEAM_FLUH for location 25 on 2022-11-26,
+# PSI-DICE for location 48 on 2022-12-10
+forecast_to_remove <- tibble(
+  model_id = c("MOBS-GLEAM_FLUH", "PSI-DICE"),
+  location = c("25", "48"),
+  target_end_date = as.Date(c("2022-11-26", "2022-12-10"))
+)
+
+# Filter out the specified forecasts from the original data
+forecast_data <- forecast_data_raw |>
+  anti_join(forecast_to_remove, by = c("model_id", "location", "target_end_date"))
+
+# Display the forecast data
 forecast_data |>
   knitr::kable(
     format = "html"
@@ -187,7 +189,7 @@ We summarize the importance scores for each model by averaging across all tasks.
 `NA` values are removed during the averaging process by setting the `na_action`
 argument to `"drop"`.
 
-```{r lomo-NAdrop}
+```{r lomo-NAdrop, eval=FALSE}
 summary.lomo.drop <- model_importance_summary(
   scores_lomo,
   by = "model_id", na_action = "drop", fun = mean
@@ -212,7 +214,7 @@ Another approach to handling `NA` values is to use the `"worst"` option for
 `na_action`, which replaces `NA` values with the worst (i.e., minimum) score 
 among the other models for the same task.
 
-```{r lomo-NAworst}
+```{r lomo-NAworst, eval=FALSE}
 summary.lomo.worst <- model_importance_summary(
   scores_lomo,
   by = "model_id", na_action = "worst", fun = mean
@@ -242,7 +244,7 @@ assigning the average importance scores of other models in the same task.
 This strategy may offer a more balanced trade-off by mitigating the influence of
 the missing data without overly penalizing or overlooking them. 
 
-```{r lomo-NAaverage}
+```{r lomo-NAaverage, eval=FALSE}
 summary.lomo.avg <- model_importance_summary(
   scores_lomo,
   by = "model_id", na_action = "average", fun = mean
@@ -269,7 +271,7 @@ are assigned to subsets of models when calculating importance scores, with
 The following code and corresponding outputs illustrate the evaluation using 
 each weighting scheme.
 
-```{r lasomo-NAdrop-equal}
+```{r lasomo-NAdrop-equal, eval=FALSE}
 #| message: false
 # LASOMO - equal weights
 scores_lasomo_eq <- model_importance(
@@ -293,7 +295,7 @@ summary.lasomo_eq |>
   )
 ```
 
-```{r lasomo-NAdrop-perm}
+```{r lasomo-NAdrop-perm, eval=FALSE}
 #| message: false
 # LASOMO - perm based weights
 scores_lasomo_perm <- model_importance(

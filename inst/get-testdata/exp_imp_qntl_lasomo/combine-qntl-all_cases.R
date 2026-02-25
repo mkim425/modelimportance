@@ -11,17 +11,25 @@ file_names <- c(
 root <- paste0(
   "./inst/get-testdata/exp_imp_qntl_lasomo/"
 )
-for (i in 1:4) source(paste0(root, file_names[i]))
+for (i in 1:4) {
+  source(paste0(root, file_names[i]))
+}
 
 exp_imp_qntl <- rbind(
-  exp_imp_qntl_case1perm, exp_imp_qntl_case1eq,
-  exp_imp_qntl_case2perm, exp_imp_qntl_case2eq,
-  exp_imp_qntl_case3perm, exp_imp_qntl_case3eq,
-  exp_imp_qntl_case4perm, exp_imp_qntl_case4eq
-) |> as_tibble()
+  exp_imp_qntl_case1perm,
+  exp_imp_qntl_case1eq,
+  exp_imp_qntl_case2perm,
+  exp_imp_qntl_case2eq,
+  exp_imp_qntl_case3perm,
+  exp_imp_qntl_case3eq,
+  exp_imp_qntl_case4perm,
+  exp_imp_qntl_case4eq
+) |>
+  as_tibble()
 
 # save data
-saveRDS(exp_imp_qntl,
+saveRDS(
+  exp_imp_qntl,
   file = paste0(
     "tests/testthat/testdata/for-compute_importance/",
     "exp_imp_qntl_lasomo.rds"

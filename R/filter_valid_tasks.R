@@ -9,6 +9,7 @@
 #' @returns A list of data.frames that only includes tasks with models of at
 #' least `min_models`.
 #' @importFrom utils capture.output
+#' @importFrom dplyr select distinct all_of
 #' @noRd
 filter_valid_tasks <- function(df_list_by_task, min_models = 2) {
   # task_id_cols are the columns that identify a task,
@@ -39,7 +40,8 @@ filter_valid_tasks <- function(df_list_by_task, min_models = 2) {
       paste0(
         "\nNote: ",
         "The following tasks do not meet the minimum model requirement of ",
-        min_models, " models:\n",
+        min_models,
+        " models:\n",
         paste(capture.output(print(invalid_tasks)), collapse = "\n")
       )
     )
@@ -51,22 +53,27 @@ filter_valid_tasks <- function(df_list_by_task, min_models = 2) {
   # Handle different scenarios based on the number of valid tasks
   if (length(valid_df_list_by_task) == 0) {
     # If no valid tasks remain after filtering, stop execution
-    stop("No valid tasks with at least 2 distinct models to evaluate.",
-         call. = FALSE)
+    stop(
+      "No valid tasks with at least 2 distinct models to evaluate.",
+      call. = FALSE
+    )
   } else if (length(valid_df_list_by_task) == length(df_list_by_task)) {
     # If all tasks are valid, print a confirmation message
     message(paste0(
       "\nAll tasks meet the minimum model requirement of ",
-      min_models, " models."
+      min_models,
+      " models."
     ))
   } else {
     # If some tasks were filtered out, print a summary message
     message(
       paste0(
         "\nModel evaluation will proceed with only the valid tasks.",
-        "\n  Number of tasks before filtering: ", length(df_list_by_task),
+        "\n  Number of tasks before filtering: ",
+        length(df_list_by_task),
         "\n  Number of valid tasks after filtering: ",
-        length(valid_df_list_by_task), "\n"
+        length(valid_df_list_by_task),
+        "\n"
       )
     )
   }

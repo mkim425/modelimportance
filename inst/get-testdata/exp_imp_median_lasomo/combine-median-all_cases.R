@@ -10,16 +10,23 @@ file_names <- c(
 root <- paste0(
   "./inst/get-testdata/exp_imp_median_lasomo/"
 )
-for (i in 1:3) source(paste0(root, file_names[i]))
+for (i in 1:3) {
+  source(paste0(root, file_names[i]))
+}
 
 exp_imp_median <- rbind(
-  exp_imp_median_case1perm, exp_imp_median_case1eq,
-  exp_imp_median_case2perm, exp_imp_median_case2eq,
-  exp_imp_median_case3perm, exp_imp_median_case3eq
-) |> as_tibble()
+  exp_imp_median_case1perm,
+  exp_imp_median_case1eq,
+  exp_imp_median_case2perm,
+  exp_imp_median_case2eq,
+  exp_imp_median_case3perm,
+  exp_imp_median_case3eq
+) |>
+  as_tibble()
 
 # save data
-saveRDS(exp_imp_median,
+saveRDS(
+  exp_imp_median,
   file = paste0(
     "tests/testthat/testdata/for-compute_importance/",
     "exp_imp_median_lasomo.rds"

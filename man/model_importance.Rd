@@ -77,8 +77,6 @@ regardless of its original name in the input \code{forecast_data}.
 \description{
 We measure each ensemble component model's contribution to the ensemble
 prediction accuracy for each model task.
-(See also \code{\link{model_importance_summary}} for a summary of importance
-scores across multiple tasks.)
 
 This function requires that one column represent the forecast date (or
 a date from which each forecast originates or is made in reference to) and
@@ -127,6 +125,28 @@ This function uses the \code{furrr} and \code{future} for parallelization.
 To enable parallel execution, please set a parallel backend, e.g., via
 \code{future::plan()}.
 }
+\section{Progress reporting}{
+
+Optional progress bars are displayed via the \code{progressr} package when it is
+installed and the session is interactive.
+If \code{progressr} is not installed, the function will run without progress bars.
+To enable progress bars,
+\preformatted{
+progressr::handlers(global = TRUE)
+}
+}
+
+\section{Aggregation over tasks}{
+
+model importance scores calculated for individual prediction tasks can be
+aggregated across multiple tasks to obtain an overall importance score for
+each model via the \code{aggregate()} method for \code{model_imp_tbl} objects.
+Users can summarize the task-level scores with specified summary statistics
+of interest (e.g., mean, median, quantiles) for a more comprehensive view of
+model importance.
+See \code{\link[=aggregate.model_imp_tbl]{aggregate.model_imp_tbl()}} for more details on how to use this method.
+}
+
 \examples{
 \dontrun{
 library(dplyr)
@@ -158,7 +178,4 @@ model_importance(
   subset_wt = "equal", agg_fun = median
 )
 }
-}
-\seealso{
-\code{\link{model_importance_summary}}
 }

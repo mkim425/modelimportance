@@ -2,7 +2,6 @@
 #'
 #' @param x An object of class `model_imp_tbl`.
 #' @param ... Additional arguments passed to the print method.
-#'
 #' @export
 print.model_imp_tbl <- function(x, ...) {
   cat("Model importance result by task\n")
@@ -13,13 +12,13 @@ print.model_imp_tbl <- function(x, ...) {
 #' Summary method for model importance score table
 #'
 #' @param object An object of class `model_imp_tbl`.
-#' @param ... Additional arguments passed to the summary method.
-#'
+#' @param ... Additional arguments passed to the print method.
+#' @importFrom dplyr n
+#' @importFrom rlang .data
 #' @export
 summary.model_imp_tbl <- function(object, ...) {
   # columns in the importance score table
-  required_cols <- c("model_id", "reference_date", "output_type", "importance")
-  task_id_cols <- setdiff(colnames(object), required_cols)
+  task_id_cols <- get_task_id_cols(object)
 
   # compute model statistics
   model_stats <- object |>
@@ -36,7 +35,8 @@ summary.model_imp_tbl <- function(object, ...) {
   task_winners <- object |>
     dplyr::group_by(across(all_of(task_id_cols))) |>
     dplyr::slice_max(importance, n = 1, with_ties = FALSE) |>
-    dplyr::select(all_of(task_id_cols),
+    dplyr::select(
+      all_of(task_id_cols),
       top_model = model_id,
       max_score = importance
     ) |>
@@ -62,13 +62,13 @@ summary.model_imp_tbl <- function(object, ...) {
 #'
 #' @param x An object of class `summary.model_imp_tbl`.
 #' @param ... Additional arguments passed to the print method.
-#'
+#' @importFrom rlang .data
 #' @export
 print.summary.model_imp_tbl <- function(x, ...) {
   # summary statements
   cat("\n=== Summary of importance scores by task ===\n")
   cat("Number of models:", length(x$all_models), "\n")
-  cat("Number of tasks:", nrow(x$all_tasks), "\n\n")
+  cat("Number of tasks:", nrow(x$all_tasks), "\n")
 
   cat("\n=== Top scoring model by task", strrep("=", 40), "\n")
   x$task_winners |>
@@ -76,7 +76,11 @@ print.summary.model_imp_tbl <- function(x, ...) {
     dplyr::select(-.data$max_score) |>
     print(row.names = FALSE)
   cat("--------------------------------------------\n")
-  cat("* More details available in the summary object (e.g., $all_tasks).\n")
+  cat(paste(
+    "* More details available in the summary object",
+    "(e.g., $all_tasks, $model_summary, $task_winners).\n",
+    sep = " "
+  ))
   invisible(x)
 }
 
@@ -84,22 +88,21 @@ print.summary.model_imp_tbl <- function(x, ...) {
 #'
 #' @param x An object of class `model_imp_tbl`.
 #' @param ... Additional arguments passed to the plot method.
-#'
 #' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_hline facet_grid
 #' @importFrom ggplot2 labs theme vars
 #' @importFrom rlang sym syms
 #' @export
 plot.model_imp_tbl <- function(x, ...) {
   # columns in the importance score table
-  required_cols <- c("model_id", "reference_date", "output_type", "importance")
-  task_id_cols <- setdiff(colnames(x), required_cols)
+  task_id_cols <- get_task_id_cols(x)
 
   # create ggplot object
   ggplot(
     x,
     aes(
       x = model_id,
-      y = importance, fill = model_id
+      y = importance,
+      fill = model_id
     )
   ) +
     # create bar plot
@@ -118,60 +121,99 @@ plot.model_imp_tbl <- function(x, ...) {
     theme(legend.position = "none")
 }
 
-# =============================================================================
-#' Print method for overall importance summary
-#'
-#' @param x An object of class `importance_summary`.
-#' @param ... Additional arguments passed to the print method.
-#'
+
+#' Aggregate model importance scores across tasks to compute overall importance
+#' for each model
+#' @param x An object of class `model_imp_tbl`.
+#' @param by A character vector with column names specifying the grouping
+#' variable(s) for summarization. Default is `"model_id"`, which summarizes
+#' importance scores for each model across all tasks.
+#' @param na_action A character string specifying how to handle `NA` values
+#' generated during importance score calculation for each task, occurring when a
+#' model did not contribute to the ensemble prediction for a given task by
+#' missing its forecast submission.
+#' Three options are available: `c("drop", "worst", "average")`.
+#' For each specific prediction task, each option works as follows:
+#' * `"drop"` removes `NA`s.
+#' * `"worst"` replaces `NA`s with the smallest value among importance metrics
+#' of the other models.
+#' * `"average"` replaces `NA`s with the average value from the other
+#' models' importance metrics.
+#' @param fun A function used to summarize importance scores.
+#' Default is `mean()`
+#' @param ... Additional arguments passed to the summary function `fun`.
+#' (e.g., `fun = quantile, probs = 0.25` for a quartile summary)
+#' @returns A data frame with columns `model_id` and `importance_score_<fun>`,
+#' where `<fun>` is the name of the summary function
+#' used (e.g., `importance_score_mean` when `fun = mean`).
+#' The output is sorted in descending order of the summary importance scores.
+#' @details
+#' This method extends `stats::aggregate` for objects of class `model_imp_tbl`.
+#' @importFrom checkmate assert_data_frame assert_subset assert_function
+#' @importFrom stats aggregate
+#' @importFrom dplyr desc ungroup
+#' @importFrom rlang .data sym syms
+#' @rdname aggregate.model_imp_tbl
 #' @export
-print.importance_summary <- function(x, ...) {
+
+aggregate.model_imp_tbl <- function(
+  x,
+  by = "model_id",
+  na_action = c("drop", "worst", "average"),
+  fun = mean,
+  ...
+) {
+  # check inputs
+  assert_data_frame(x)
+  required_cols <- c("model_id", "reference_date", "output_type", "importance")
+  assert_subset(required_cols, names(x), empty.ok = FALSE)
+  assert_subset(by, names(x), empty.ok = FALSE)
+  assert_function(fun)
+  na_action <- match.arg(na_action)
+
+  # task specific columns
+  task_id_cols <- get_task_id_cols(x)
+  # column name for the summary importance score
+  fun_args <- list(...)
+  colname <- paste0("importance_score_", deparse(substitute(fun)), sep = "")
+  # NA handling
+  if (na_action == "worst") {
+    imputed_scores <- x |>
+      dplyr::group_by(across(all_of(task_id_cols))) |>
+      dplyr::mutate(across(
+        importance,
+        ~ coalesce(., min(., na.rm = TRUE))
+      )) |>
+      ungroup()
+  } else if (na_action == "average") {
+    imputed_scores <- x |>
+      dplyr::group_by(across(all_of(task_id_cols))) |>
+      dplyr::mutate(across(
+        importance,
+        ~ coalesce(., mean(., na.rm = TRUE))
+      )) |>
+      ungroup()
+  } else {
+    imputed_scores <- x |>
+      dplyr::filter(!is.na(importance)) |>
+      ungroup()
+  }
+  # summarize importance scores by the specified grouping variable(s)
+  summary_df <- imputed_scores |>
+    # use unquote symbols: !!!syms(by) to handles column(s) specified in `by`
+    dplyr::group_by(!!!syms(by)) |>
+    # dynamically created a column named by summary function and additional
+    # arguments passed through `fun_args`
+    dplyr::summarise(
+      !!colname := {
+        do.call(fun, list(x = .data$importance, !!!fun_args))
+      },
+      .groups = "drop"
+    ) |>
+    # unquote symbol !!sym(colname) handles the dynamically created column name
+    dplyr::arrange(desc(!!sym(colname)))
+
   cat("Overall model importance across tasks\n")
   cat(strrep("-", 40), "\n")
-  print(as.data.frame(x))
-}
-
-
-#' Summary method for overall importance summary
-#'
-#' @param object An object of class `importance_summary`.
-#' @param ... Additional arguments passed to the summary method.
-#'
-#' @export
-summary.importance_summary <- function(object, ...) {
-  cat("Summary statistics of overall model importance scores\n")
-  cat(strrep("-", 55), "\n")
-  summary.data.frame(object)
-}
-
-#' Plot method for overall importance summary
-#'
-#' @param x An object of class `importance_summary`.
-#' @param ... Additional arguments passed to the plot method.
-#'
-#' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_hline labs theme vars
-#' @importFrom rlang sym syms
-#' @export
-plot.importance_summary <- function(x, ...) {
-  y_col <- names(x)[startsWith(names(x), "importance_score_")]
-  # create ggplot object
-  ggplot(
-    x,
-    aes(
-      x = model_id,
-      y = !!sym(y_col), fill = model_id
-    )
-  ) +
-    # create bar plot
-    geom_col() +
-    # flip coordinates
-    coord_flip() +
-    # add a line at y = 0 to indicate baseline
-    geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
-    labs(
-      title = "Overall model importance across tasks",
-      x = "Model ID",
-      y = "Importance"
-    ) +
-    theme(legend.position = "none")
+  print(summary_df)
 }

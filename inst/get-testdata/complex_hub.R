@@ -26,7 +26,8 @@ example_quantile_model_output <- example_complex_model_output |>
     output_type_id %in% q_levels
   )
 
-saveRDS(example_quantile_model_output,
+saveRDS(
+  example_quantile_model_output,
   file = paste0(
     "tests/testthat/testdata/for-validate_input_data/",
     "flu_example_qntl_model_output.rds"
@@ -41,7 +42,8 @@ example_mean_model_output <- example_complex_model_output |>
     output_type == "mean"
   )
 
-saveRDS(example_mean_model_output,
+saveRDS(
+  example_mean_model_output,
   file = paste0(
     "tests/testthat/testdata/for-validate_input_data/",
     "flu_example_mean_model_output.rds"
@@ -56,7 +58,8 @@ example_pmf_model_output <- example_complex_model_output |>
     output_type == "pmf"
   )
 
-saveRDS(example_pmf_model_output,
+saveRDS(
+  example_pmf_model_output,
   file = paste0(
     "tests/testthat/testdata/for-validate_input_data/",
     "flu_example_pmf_model_output.rds"
@@ -67,7 +70,8 @@ saveRDS(example_pmf_model_output,
 flu_example_target_data <-
   read.csv(paste0(hub_path, "/target-data/oracle-output.csv"))
 
-saveRDS(flu_example_target_data,
+saveRDS(
+  flu_example_target_data,
   file = paste0(
     "tests/testthat/testdata/for-validate_input_data/",
     "flu_example_target_data.rds"
