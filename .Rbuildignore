@@ -5,3 +5,8 @@
 ^LICENSE\.md$
 ^inst/ongoing-work$
 ^\.lintr$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^[.]?air[.]toml$
+^\.vscode$

@@ -55,21 +55,22 @@ Ignored if \code{lomo} method is used. Default is \code{"equal"}, if not specifi
 }}
 
 \item{min_log_score}{A numeric value specifying a minimum threshold for log
-scores for the \code{pmf} output to avoid issues with extremely low probabilities
-assigned to the true outcome, which can lead to undefined or negative
-infinite log scores. Any probability lower than this threshold will be
-adjusted to this minimum value. The default value is set to -10, which is an
-arbitrary choice. Users may choose a different value based on their practical
-needs.}
+scores for the \code{pmf} output. This threshold prevents issues with extremely
+low probabilities assigned to the true outcome, which would otherwise lead to
+undefined or negative infinite log scores.
+Any probability lower than this threshold will be adjusted to this minimum
+value. The default value is set to -10, following the CDC FluSight
+thresholding convention. Users may choose a different value based on their
+practical needs.}
 
 \item{...}{Optional arguments passed to \code{ensemble_fun} when it is specified
 as \code{"simple_ensemble"}. See 'Details'.}
 }
 \value{
-A data.frame with columns \code{model_id}, \code{reference_date},
-\code{output_type}, and \code{importance}, along with any task ID columns (e.g.,
-\code{location}, \code{horizon}, and \code{target_end_date}) present in the input
-\code{forecast_data}.
+A \code{model_imp_tbl} S3 class object with columns \code{model_id},
+\code{reference_date}, \code{output_type}, and \code{importance}, along with any task ID
+columns (e.g., \code{location}, \code{horizon}, and \code{target_end_date}) present in the
+input \code{forecast_data}.
 Note that \code{reference_date} is used as the name for the forecast date column,
 regardless of its original name in the input \code{forecast_data}.
 }
@@ -124,10 +125,31 @@ This function uses the \code{furrr} and \code{future} for parallelization.
 To enable parallel execution, please set a parallel backend, e.g., via
 \code{future::plan()}.
 }
+\section{Progress reporting}{
+
+Optional progress bars are displayed via the \code{progressr} package when it is
+installed and the session is interactive.
+If \code{progressr} is not installed, the function will run without progress bars.
+To enable progress bars,
+\preformatted{
+progressr::handlers(global = TRUE)
+}
+}
+
+\section{Aggregation over tasks}{
+
+model importance scores calculated for individual prediction tasks can be
+aggregated across multiple tasks to obtain an overall importance score for
+each model via the \code{aggregate()} method for \code{model_imp_tbl} objects.
+Users can summarize the task-level scores with specified summary statistics
+of interest (e.g., mean, median, quantiles) for a more comprehensive view of
+model importance.
+See \code{\link[=aggregate.model_imp_tbl]{aggregate.model_imp_tbl()}} for more details on how to use this method.
+}
+
 \examples{
 \dontrun{
 library(dplyr)
-library(hubExamples)
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
     output_type \%in\% c("quantile"),
@@ -136,12 +158,11 @@ forecast_data <- hubExamples::forecast_outputs |>
   )
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
-    date \%in\% unique(forecast_data$target_end_date),
+    target_end_date \%in\% unique(forecast_data$target_end_date),
     location == "25"
   ) |>
   # Rename columns to match the oracle output format
   rename(
-    target_end_date = date,
     oracle_value = observation
   )
 # Example with the default arguments.

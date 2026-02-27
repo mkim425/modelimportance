@@ -8,15 +8,11 @@
 #' processed by the function `validate_input_data()`.
 
 #' @return A list of data sets, each corresponding to a single task.
-
+#' @importFrom dplyr across all_of group_by group_split
+#' @noRd
 split_data_by_task <- function(valid_tbl) {
-  # Get columns to use for splitting data by task
-  ## commonly required columns
-  required_cols <- c(
-    "reference_date", "model_id", "output_type", "output_type_id", "value"
-  )
-  ## task specific columns
-  split_cols <- setdiff(colnames(valid_tbl), required_cols)
+  # Get task specific columns
+  split_cols <- get_task_id_cols(valid_tbl)
   # List of data split by task
   valid_tbl |>
     dplyr::group_by(across(all_of(split_cols))) |>

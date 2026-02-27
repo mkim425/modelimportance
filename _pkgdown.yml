@@ -1,0 +1,23 @@
+url: https://mkim425.github.io/modelimportance/
+template:
+  bootstrap: 5
+  extra_css: pkgdown/extra.css
+remove_empty_sections: false
+
+navbar:
+  structure:
+    right: [search, github]
+  components:
+    home:
+    intro:
+      text: Get started
+      href: articles/get-started.html
+
+articles:
+  - title: Article
+    contents:
+    - modelimportance-article
+
+  - title: Get started
+    contents:
+    - get-started

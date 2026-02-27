@@ -53,24 +53,25 @@
 #' a linear pool of component model outputs. This method supports only
 #' an `output_type` of `mean`, `quantile`, or `pmf`.
 #' @param min_log_score A numeric value specifying a minimum threshold for log
-#' scores for the `pmf` output to avoid issues with extremely low probabilities
-#' assigned to the true outcome, which can lead to undefined or negative
-#' infinite log scores. Any probability lower than this threshold will be
-#' adjusted to this minimum value. The default value is set to -10, which is an
-#' arbitrary choice. Users may choose a different value based on their practical
-#' needs.
+#' scores for the `pmf` output. This threshold prevents issues with extremely
+#' low probabilities assigned to the true outcome, which would otherwise lead to
+#' undefined or negative infinite log scores.
+#' Any probability lower than this threshold will be adjusted to this minimum
+#' value. The default value is set to -10, following the CDC FluSight
+#' thresholding convention. Users may choose a different value based on their
+#' practical needs.
 #' @param ... Optional arguments passed to `ensemble_fun` when it is specified
 #' as `"simple_ensemble"`. See 'Details'.
 #'
-#' @return A data.frame with columns `model_id`, `reference_date`,
-#' `output_type`, and `importance`, along with any task ID columns (e.g.,
-#' `location`, `horizon`, and `target_end_date`) present in the input
-#' `forecast_data`.
+#' @return A `model_imp_tbl` S3 class object with columns `model_id`,
+#' `reference_date`, `output_type`, and `importance`, along with any task ID
+#' columns (e.g., `location`, `horizon`, and `target_end_date`) present in the
+#' input `forecast_data`.
 #' Note that `reference_date` is used as the name for the forecast date column,
 #' regardless of its original name in the input `forecast_data`.
 #'
-#' @import hubExamples
 #' @importFrom methods is
+#' @importFrom dplyr case_when
 #' @export
 #'
 #' @details
@@ -101,9 +102,25 @@
 #' To enable parallel execution, please set a parallel backend, e.g., via
 #' `future::plan()`.
 #'
+#' @section Progress reporting:
+#' Optional progress bars are displayed via the `progressr` package when it is
+#' installed and the session is interactive.
+#' If `progressr` is not installed, the function will run without progress bars.
+#' To enable progress bars,
+#' \preformatted{
+#' progressr::handlers(global = TRUE)
+#' }
+#' @section Aggregation over tasks:
+#' model importance scores calculated for individual prediction tasks can be
+#' aggregated across multiple tasks to obtain an overall importance score for
+#' each model via the `aggregate()` method for `model_imp_tbl` objects.
+#' Users can summarize the task-level scores with specified summary statistics
+#' of interest (e.g., mean, median, quantiles) for a more comprehensive view of
+#' model importance.
+#' See [aggregate.model_imp_tbl()] for more details on how to use this method.
+#'
 #' @examples \dontrun{
 #' library(dplyr)
-#' library(hubExamples)
 #' forecast_data <- hubExamples::forecast_outputs |>
 #'   dplyr::filter(
 #'     output_type %in% c("quantile"),
@@ -112,12 +129,11 @@
 #'   )
 #' target_data <- hubExamples::forecast_target_ts |>
 #'   dplyr::filter(
-#'     date %in% unique(forecast_data$target_end_date),
+#'     target_end_date %in% unique(forecast_data$target_end_date),
 #'     location == "25"
 #'   ) |>
 #'   # Rename columns to match the oracle output format
 #'   rename(
-#'     target_end_date = date,
 #'     oracle_value = observation
 #'   )
 #' # Example with the default arguments.
@@ -133,17 +149,23 @@
 #'   subset_wt = "equal", agg_fun = median
 #' )
 #' }
-model_importance <- function(forecast_data,
-                             oracle_output_data,
-                             ensemble_fun = c("simple_ensemble", "linear_pool"),
-                             importance_algorithm = c("lomo", "lasomo"),
-                             subset_wt = c("equal", "perm_based"),
-                             min_log_score = -10,
-                             ...) {
+model_importance <- function(
+  forecast_data,
+  oracle_output_data,
+  ensemble_fun = c("simple_ensemble", "linear_pool"),
+  importance_algorithm = c("lomo", "lasomo"),
+  subset_wt = c("equal", "perm_based"),
+  min_log_score = -10,
+  ...
+) {
   # validate inputs
   validate_inputs(
-    forecast_data, oracle_output_data, ensemble_fun, importance_algorithm,
-    subset_wt, min_log_score
+    forecast_data,
+    oracle_output_data,
+    ensemble_fun,
+    importance_algorithm,
+    subset_wt,
+    min_log_score
   )
   # set defaults
   ensemble_fun <- match.arg(ensemble_fun)
@@ -164,7 +186,9 @@ model_importance <- function(forecast_data,
 
   # Message for the user to check the forecast dates
   send_message(
-    "date_range", min(forecast_date_list), max(forecast_date_list),
+    "date_range",
+    min(forecast_date_list),
+    max(forecast_date_list),
     length(forecast_date_list)
   )
 
@@ -172,7 +196,10 @@ model_importance <- function(forecast_data,
   model_id_list <- unique(valid_tbl$model_id)
   # Message for the user to check the model IDs
   send_message("model_list", model_id_list)
-
+  # Warning message about LASOMO computational time when there are many models
+  if (length(model_id_list) > 12 && importance_algorithm == "lasomo") {
+    send_message("lasomo_computational_time_warning")
+  }
   # Corresponding metric to the output type
   metric <- case_when(
     unique(valid_tbl$output_type) == "median" ~ "ae_point",
@@ -193,26 +220,62 @@ model_importance <- function(forecast_data,
 
   # Group by single task
   df_list_by_task <- split_data_by_task(valid_tbl)
+  # Check if each task has at least 2 distinct models, and filter out tasks that
+  valid_df_list_by_task <- filter_valid_tasks(
+    df_list_by_task,
+    min_models = 2
+  )
 
   # Call the function to calculate importance scores
-  score_result <- furrr::future_map_dfr(
-    df_list_by_task,
-    function(single_task_data) {
-      compute_importance(
-        single_task_data, oracle_output_data, model_id_list,
-        ensemble_fun, importance_algorithm, subset_wt,
-        metric, min_log_score, ...
+  if (interactive() && requireNamespace("progressr", quietly = TRUE)) {
+    progressr::with_progress({
+      p <- progressr::progressor(steps = length(valid_df_list_by_task))
+
+      score_result <- furrr::future_map_dfr(
+        valid_df_list_by_task,
+        function(single_task_data) {
+          p()
+          compute_importance(
+            single_task_data,
+            oracle_output_data,
+            model_id_list,
+            ensemble_fun,
+            importance_algorithm,
+            subset_wt,
+            metric,
+            min_log_score,
+            ...
+          )
+        }
       )
-    }
-  )
+    })
+  } else {
+    score_result <- furrr::future_map_dfr(
+      valid_df_list_by_task,
+      function(single_task_data) {
+        compute_importance(
+          single_task_data,
+          oracle_output_data,
+          model_id_list,
+          ensemble_fun,
+          importance_algorithm,
+          subset_wt,
+          metric,
+          min_log_score,
+          ...
+        )
+      }
+    )
+  }
   # Reorder columns to place `model_id` and `reference_date` first,
   # task-related columns in the middle, and `output_type` and `importance` last.
-  score_result |>
+  df_scores <- score_result |>
     dplyr::select(
-      "model_id", "reference_date",
+      "model_id",
+      "reference_date",
       dplyr::everything()
     ) |>
-    dplyr::relocate(c("output_type", "importance"),
-      .after = dplyr::last_col()
-    )
+    dplyr::relocate(c("output_type", "importance"), .after = dplyr::last_col())
+  # return result as model_imp_tbl class
+  structure(df_scores, class = c("model_imp_tbl", class(df_scores)))
 }
