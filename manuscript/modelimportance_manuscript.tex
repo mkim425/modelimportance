@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, interior hidden, sharp corners, breakable, enhanced, frame hidden, boxrule=0pt]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, boxrule=0pt, interior hidden, breakable, enhanced, sharp corners, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -990,7 +990,10 @@ summary object as follows:
 
 \texttt{plot()} visualizes the importance scores across models faceted
 by task IDs. Thus, users can compare importance scores across models and
-tasks.
+tasks. Additional modifications to the plot can be applied using
+standard \texttt{ggplot2} functions. For example, to rotate the x-axis
+labels, users can add
+\texttt{+\ theme(axis.text.x\ =\ element\_text(angle\ =\ 90,\ hjust\ =\ 1,\ vjust\ =\ 0.5))}.
 
 \subsection{Aggregate method}\label{aggregate-method}
 
@@ -1362,16 +1365,18 @@ of the four tasks, while `Flusight-baseline' is the best for the
 remaining task.
 
 We visualize the importance scores across models and tasks using the
-\texttt{plot()} method.
+\texttt{plot()} method, which allows for further modification with
+\texttt{ggplot2} functions.
 
 \begin{verbatim}
-> plot(scores_lomo)
+> plot(scores_lomo) + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) 
 \end{verbatim}
 
 \small
 
 \begin{center}
-\includegraphics[width=0.8\linewidth,height=\textheight,keepaspectratio]{modelimportance_manuscript_files/figure-pdf/plot_scores_lomo-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{modelimportance_manuscript_files/figure-pdf/plot_scores_lomo-1.pdf}}
 \end{center}
 
 \normalsize

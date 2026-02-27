@@ -557,7 +557,9 @@ Additional summary details are available by specifying individual elements of th
 
 ### Plot method
 
-`plot()` visualizes the importance scores across models faceted by task IDs. Thus, users can compare importance scores across models and tasks.
+`plot()` visualizes the importance scores across models faceted by task IDs. Thus, users can compare importance scores across models and tasks. Additional modifications to the plot can be applied using standard `ggplot2` functions. 
+For example, to rotate the x-axis labels, users can add
+`+ theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))`.
 
 ### Aggregate method
 `aggregate()` allows users to obtain an overall importance score for each model by aggregating its importance scores across all evaluated tasks. 
@@ -915,19 +917,21 @@ s$task_winners
 
 Models with the highest importance scores for each task are identified in the `top_model` column with its importance score in the `max_score` column. 'PSI-DICE' is the best model for three out of the four tasks, while 'Flusight-baseline' is the best for the remaining task.
 
-We visualize the importance scores across models and tasks using the `plot()` method. 
+We visualize the importance scores across models and tasks using the `plot()` method, which allows for further modification with `ggplot2` functions.
 ```{r}
 #| eval: false
-> plot(scores_lomo)
+> plot(scores_lomo) + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) 
 ```
 
 \small
 ```{r}
 #| label: plot_scores_lomo
 #| echo: false
-#| out.width: "80%"
 #| fig-align: "center"
-plot(scores_lomo)
+plot(scores_lomo) + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+          strip.text = element_text(size = 10)) 
 ```
 
 \normalsize
