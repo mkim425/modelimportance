@@ -632,13 +632,6 @@ tbl_argument2 |>
 ```
 
 
-## Implementation and availability {#sec:implementation-and-availability}
-
-This package is implemented in [R]{.proglang} and distributed via CRAN and GitHhub (\url{https://github.com/mkim425/modelimportance}). 
-We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure that all functions work correctly as expected,  including those used internally. We also performed continuous integration testing using GitHub Actions to maintain functionality across platforms, including Windows, macOS, and Linux. Integrated GitHub Action, we employed the [lintr]{.pkg} package to maintain code quality and detect potential issues, and the Air formatter to ensure consistent code style across the codebase.
-All code changes were systematically reviewed by fellow team members, and this enhanced reliability. 
-
-
 ## Examples {#sec:examples}
 
 The examples in this section illustrate the use of the `model_importance()` function to evaluate the importance of component models within an ensemble, using various combinations of the arguments described in \hyperref[sec:main-function]{Section~\ref{sec:main-function}}. We use some example forecast and target data from the [hubExamples]{.pkg} package, which provides sample datasets for multiple modeling hubs in the hubverse format. 
@@ -792,7 +785,7 @@ simple mean ensemble using the LOMO algorithm.
 
 ```{r code-model_importance-lomo}
 #| eval: false
-> model_importance(
+> scores_lomo <- model_importance(
         forecast_data = forecast_data,
         oracle_output_data = target_data,
         ensemble_fun = "simple_ensemble",
@@ -825,7 +818,6 @@ All tasks meet the minimum model requirement of 2 models.
 The function output is a data frame containing model ids and their corresponding
 importance scores for each prediction task, along with task id columns. 
 
-\small
 ```{r}
 #| label: scores_lomo
 #| echo: false
@@ -835,14 +827,110 @@ scores_lomo <- model_importance(
         ensemble_fun = "simple_ensemble",
         importance_algorithm = "lomo"
 )
-
-scores_lomo
 ```
 
-\vspace{0.35cm} 
+
+```{r}
+#| eval: false
+
+> print(scores_lomo)
+```
+
+\small
+```{r}
+#| label: print_scores_lomo
+#| echo: false
+print(scores_lomo)
+```
+
 \normalsize
 For models that missed forecasts for certain tasks, `NA` values were assigned in 
 the importance column for those tasks.
+
+Calling `summary()` shows that three models were used and four tasks were evaluated, along with a sneak peek of the top-performing model for each task.
+
+```{r}
+#| eval: false
+
+> summary(scores_lomo)
+```
+
+\small
+```{r}
+#| label: summary_scores_lomo
+#| echo: false
+summary(scores_lomo)
+```
+
+\normalsize
+As indicated in the output, more details of the summary are accessed through the elements of the summary object as below.
+
+```{r}
+#| eval: false
+
+> s <- summary(scores_lomo)
+> s$all_tasks
+```
+
+\small
+```{r}
+#| label: summary_scores_lomo_all_tasks
+#| echo: false
+s <- summary(scores_lomo)
+s$all_tasks
+```
+\normalsize
+
+Each row represent a unique combination of task IDs, from which we verify that four different tasks were evaluated. 
+
+
+```{r}
+#| eval: false
+> s$model_summary
+```
+
+\small
+```{r}
+#| label: summary_scores_lomo_model_summary
+#| echo: false
+s$model_summary
+```
+
+\normalsize
+We observe that 'Flusight-baseline' submitted forecasts for all four tasks (n_NA = 0), while 'MOBS-GLEAM_FLUH' and 'PSI-DICE' submitted forecasts for only three tasks due to one missing forecast (n_NA = 1). Each model's importance scores vary across tasks. 'Flusight-baseline' shows the largest range of scores from a negative value to a positive value, while 'MOBS-GLEAM_FLUH' and 'PSI-DICE' have scores that are all positive or all negative across the three tasks they submitted forecasts for.
+
+```{r}
+#| eval: false
+> s$task_winners
+```
+
+\small
+```{r}
+#| label: summary_scores_lomo_task_winners
+#| echo: false
+s$task_winners
+```
+
+\normalsize
+
+Models with the highest importance scores for each task are identified in the `top_model` column with its importance score in the `max_score` column. 'PSI-DICE' is the best model for three out of the four tasks, while 'Flusight-baseline' is the best for the remaining task.
+
+We visualize the importance scores across models and tasks using the `plot()` method. 
+```{r}
+#| eval: false
+> plot(scores_lomo)
+```
+
+\small
+```{r}
+#| label: plot_scores_lomo
+#| echo: false
+#| out.width: "80%"
+#| fig-align: "center"
+plot(scores_lomo)
+```
+
+\normalsize
 
 We summarize the importance scores for each model by averaging across all tasks.
 `NA` values are removed during the averaging process by setting the `na_action`
@@ -1063,6 +1151,12 @@ In this section, we explored each component model's contribution to the ensemble
 accuracy with only three models. An extensive application in more complex 
 scenarios with a larger number of models can be found in @kim2026beyond.
 
+## Computational complexity {#sec:computational-complexity}
+
+This section describes computational complexity of LOMO and LASOMO algorithms implemented in the package, depending the numbers of models and tasks.
+
+
+
 
 ## Summary and discussion {#sec:discussion}
 
@@ -1073,6 +1167,12 @@ We note that unit testing with continuous integration ensures the reliability of
 
 There is a room to enhance the current version of this package. Although this package supports four different output types ('mean', 'median', 'quantile, and 'pmf'), other output types are widely used in practice. For example, 'sample' output type is commonly used in the US Flu Scenario Modeling Hub [@FluSMH]. This format includes multiple simulated values (samples) from the forecast distribution. The `output_type_id` is specified for each sample, which typically indexes the samples or indicates their source, depending on the context. The package can be extended to support this output type, which is under consideration for future releases. 
 These extensions would aim to broaden the scope of applications in real-world forecasting tasks.
+
+## Implementation and availability {#sec:implementation-and-availability}
+
+This package is implemented in [R]{.proglang} and distributed via CRAN and GitHhub (\url{https://github.com/mkim425/modelimportance}). 
+We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure that all functions work correctly as expected,  including those used internally. We also performed continuous integration testing using GitHub Actions to maintain functionality across platforms, including Windows, macOS, and Linux. Integrated GitHub Action, we employed the [lintr]{.pkg} package to maintain code quality and detect potential issues, and the Air formatter to ensure consistent code style across the codebase.
+All code changes were systematically reviewed by fellow team members, and this enhanced reliability. 
 
 
 ## Acknowledgements {.unnumbered}
