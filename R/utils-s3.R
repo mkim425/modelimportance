@@ -70,10 +70,15 @@ print.summary.model_imp_tbl <- function(x, ...) {
   cat("Number of models:", length(x$all_models), "\n")
   cat("Number of tasks:", nrow(x$all_tasks), "\n")
 
-  cat("\n=== Top scoring model by task", strrep("=", 40), "\n")
+  cat(
+    "\n=== Top scoring model by task for a subset of tasks",
+    strrep("=", 40),
+    "\n"
+  )
   x$task_winners |>
     dplyr::mutate(importance = round(.data$max_score, 2)) |>
     dplyr::select(-.data$max_score) |>
+    head(3) |>
     print(row.names = FALSE)
   cat("--------------------------------------------\n")
   cat(paste(
