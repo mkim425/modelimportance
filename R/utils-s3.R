@@ -94,18 +94,21 @@ print.summary.model_imp_tbl <- function(x, ...) {
 #' @param x An object of class `model_imp_tbl`.
 #' @param ... Additional arguments passed to the plot method.
 #' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_hline facet_grid
-#' @importFrom ggplot2 labs theme vars
+#' @importFrom ggplot2 labs theme vars label_wrap_gen
 #' @importFrom rlang sym syms
+#' @importFrom stringr str_replace
+#' @importFrom rlang .data
 #' @export
 plot.model_imp_tbl <- function(x, ...) {
   # columns in the importance score table
   task_id_cols <- get_task_id_cols(x)
-
+  # wrap model_id for better visualization
+  x2 <- x |> mutate(model_id_wrap = str_replace(model_id, "[-_]", "\\0\n"))
   # create ggplot object
   ggplot(
-    x,
+    x2,
     aes(
-      x = model_id,
+      x = .data$model_id_wrap,
       y = importance,
       fill = model_id
     )
@@ -117,7 +120,11 @@ plot.model_imp_tbl <- function(x, ...) {
     # add a line at y = 0 to indicate baseline
     geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
     # plot by task
-    facet_grid(cols = vars(!!!syms(task_id_cols)), scales = "free_x") +
+    facet_grid(
+      cols = vars(!!!syms(task_id_cols)),
+      scales = "free_x",
+      labeller = label_wrap_gen(width = 12)
+    ) +
     labs(
       title = "Model Importance by Task",
       x = "Model ID",
