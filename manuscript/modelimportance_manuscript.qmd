@@ -98,7 +98,7 @@ The paper proceeds as follows. \hyperref[sec:data]{Section~\ref{sec:data}} descr
 algorithms implemented in \pkg{modelimportance} for calculating the
 model importance metric: leave-one-model-out and
 leave-all-subsets-of-models-out. We demonstrate the various
-functionalities \pkg{modelimportance} supports in \hyperref[sec:main-functions]{Section~\ref{sec:main-functions}} and highlight our quality assurance measures and its open access in \hyperref[sec:implementation-and-availability]{Section~\ref{sec:implementation-and-availability}}. Some examples are provided in \hyperref[sec:examples]{Section~\ref{sec:examples}}. We close this paper with concluding remarks and a discussion of possible extensions.
+functionalities \pkg{modelimportance} supports in \hyperref[sec:main-function]{Section~\ref{sec:main-function}} and highlight our quality assurance measures and its open access in \hyperref[sec:implementation-and-availability]{Section~\ref{sec:implementation-and-availability}}. Some examples are provided in \hyperref[sec:examples]{Section~\ref{sec:examples}}. We close this paper with concluding remarks and a discussion of possible extensions.
  
 
 ## Data {#sec:data}
@@ -433,12 +433,11 @@ data.frame(n = 2:10) |>
 
 
 
-## Main functions {#sec:main-functions}
+## Main function {#sec:main-function}
 
-In this section, we describe the usage of the function `model_importance()`, where multiple options are available to customize the evaluation framework (@tbl-arguments1, @tbl-arguments2).
+In this section, we describe the usage of the function `model_importance()`, where multiple options are available to customize the evaluation framework (@tbl-arguments1).
 
 ### model_importance( )
-
 
 ```{r}
 #| echo: false
@@ -538,14 +537,61 @@ Users may choose a different value based on their practical needs.
 `model_id`, `reference_date`, `output_type`, and `importance`, along with any task ID columns (e.g., `location`, `horizon`, and `target_end_date`) present in the input `forecast_data`. 
 Regardless of the original column name for the forecast generation date in the `forecast_data`, it is standardized to `reference_date` in the output. The `importance` column contains the calculated importance scores for each model and specific task, which are derived from the specified algorithm and ensemble method. 
 
+## S3 class and methods {#sec:s3-infrastructure}
 
-### model_importance_summary( )
+We have defined a custom S3 class, `model_imp_tbl` that represents the output of the `model_importance()` function, which extends the base `data.frame` class. Objects of this class enable dispatch for class-specific methods for printing, summarizing, plotting the model importance scores, and aggregating them across tasks.
 
+### Print method
 
+`print()` provides all computation results in a clear and organized manner. It displays `model_id` and `importance` by grouped task IDs (e.g., `reference_date`, `location`, and `target_end_date`) to facilitate easy interpretation of the importance scores for each model across different tasks.
+
+### Summary method
+
+`summary()` provides a concise summary of the importance scores, including key statistics such as number of models and tasks evaluated. 
+It also displays top scoring models for a subset of tasks.
+Additional summary details are available by specifying individual elements of the summary object as follows:
+
+- `.$all_tasks` lists all the unique tasks evaluated, which are defined by the combinations of task ID columns present in the input `forecast_data`. This allows users to identify the scope of the evaluation.
+- `.$model_summary` provides each model's performance summary across tasks (e.g., the number of tasks each model submitted its forecast for and the range of scores it achieved). This helps users understand the consistency and variability of each model's importance across different tasks.
+- `.$task_winners` identifies which model is the best for each task based on the highest importance score across the full set of tasks. This information allows users to quickly identify the most important model in each task. 
+
+### Plot method
+
+`plot()` visualizes the importance scores across models faceted by task IDs. Thus, users can compare importance scores across models and tasks.
+
+### Aggregate method
+`aggregate()` allows users to obtain an overall importance score for each model by aggregating its importance scores across all evaluated tasks. 
+This `model_imp_tbl` class-specific method provides arguments that users can specify to customize the aggregation process, including the handling of `NA` values and the choice of summary function (@tbl-arguments2). 
+
+The `by` argument specifies the grouping variable(s) for summarization. 
+The default is `"model_id"` to summarize importance scores for each model. 
+Users can also specify other columns present in the `importance_scores` data 
+frame as needed.
+
+The `na_action` argument allows for specifying how to handle `NA` values 
+generated during importance score calculation for each task, occurring when a 
+model did not contribute to the ensemble prediction for a given task by missing 
+its forecast submission.
+Three options are available: `"worst"`, `"average"`, and `"drop"`. 
+In each specific prediction task, if a model has any missing predictions, the 
+`"worst"` option replaces the `NA` values with the smallest value among other 
+models' importance metrics, while the `"average"` option replaces them with the 
+average of the other models' importance metrics in that task. 
+The `"drop"` option removes the `NA` values, which results in the exclusion of 
+the model from the evaluation for that task.
+
+The `fun` argument specifies a function used to summarize importance scores. 
+`fun = mean` is a default choice, but other summary functions are also 
+applicable (e.g., `fun = median`).
+Additional arguments can be passed to the summary function `fun` through `...`
+if needed (e.g., `fun = quantile, probs = 0.25` for a quartile summary).
+
+This function returns a data frame with columns 
+`model_id` and `importance_score_<fun>`, where `<fun>` is the name of the summary function used (e.g., `importance_score_mean` when `fun = mean`). The output is sorted in descending order of the summarized importance scores, `importance_score_<fun>`.
 ```{r}
 #| echo: false
 #| label: tbl-arguments2
-#| tbl-cap: "Description of the arguments for the `model_importance_summary()` function, including their purpose, possible values, and default settings."
+#| tbl-cap: "Description of the arguments for the `aggregate()` function for `model_imp_tbl` objects, including their purpose, possible values, and default settings."
 
 tbl_argument2 <- data.frame(
   "Argument" = c(
@@ -586,58 +632,16 @@ tbl_argument2 |>
 ```
 
 
-
-The `model_importance_summary()` function summarizes the importance scores 
-produced by `model_importance()` across tasks for each model.
-
-```{r code-model_importance_summary}
-#| eval: false
-> model_importance_summary(importance_scores, by = "model_id",
-                           na_action = c("drop", "worst", "average"),
-                           fun = mean, ...)
-```
-
-The `importance_scores` is a data frame containing model importance 
-scores for individual prediction tasks, as produced by the `model_importance()`
-function. 
-
-The `by` argument specifies the grouping variable(s) for summarization. 
-The default is `"model_id"` to summarize importance scores for each model. 
-Users can also specify other columns present in the `importance_scores` data 
-frame as needed.
-
-The `na_action` argument allows for specifying how to handle `NA` values 
-generated during importance score calculation for each task, occurring when a 
-model did not contribute to the ensemble prediction for a given task by missing 
-its forecast submission.
-Three options are available: `"worst"`, `"average"`, and `"drop"`. 
-In each specific prediction task, if a model has any missing predictions, the 
-`"worst"` option replaces the `NA` values with the smallest value among other 
-models' importance metrics, while the `"average"` option replaces them with the 
-average of the other models' importance metrics in that task. 
-The `"drop"` option removes the `NA` values, which results in the exclusion of 
-the model from the evaluation for that task.
-
-The `fun` argument specifies a function used to summarize importance scores. 
-`fun = mean` is a default choice, but other summary functions are also 
-applicable (e.g., `fun = median`).
-Additional arguments can be passed to the summary function `fun` through `...`
-if needed (e.g., `fun = quantile, probs = 0.25` for a quartile summary).
-
-
-`model_importance_summary()` function returns an object of S3 class `importance_summary`, with columns 
-`model_id` and `importance_score_<fun>`, where `<fun>` is the name of the summary function used (e.g., `importance_score_mean` when `fun = mean`). The output is sorted in descending order of the summarized importance scores, `importance_score_<fun>`.
-
-
 ## Implementation and availability {#sec:implementation-and-availability}
 
-This package is implemented in [R]{.proglang} and distributed via CRAN and GitHhub. 
-We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure that all functions work correctly as expected,  including those used internally. We also performed continuous integration testing using GitHub Actions to maintain functionality across platforms, including Windows, macOS, and Linux. Integrated GitHub Action, we used \pkg{lintr} package to maintain consistent code style, code quality, and detection potential issues. All code changes were systematically reviewed by fellow team members, and this enhanced reliability. 
+This package is implemented in [R]{.proglang} and distributed via CRAN and GitHhub (\url{https://github.com/mkim425/modelimportance}). 
+We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure that all functions work correctly as expected,  including those used internally. We also performed continuous integration testing using GitHub Actions to maintain functionality across platforms, including Windows, macOS, and Linux. Integrated GitHub Action, we employed the [lintr]{.pkg} package to maintain code quality and detect potential issues, and the Air formatter to ensure consistent code style across the codebase.
+All code changes were systematically reviewed by fellow team members, and this enhanced reliability. 
 
 
 ## Examples {#sec:examples}
 
-The examples in this section illustrate the use of the `model_importance()` function to evaluate the importance of component models within an ensemble, using various combinations of the arguments described in \hyperref[sec:main-functions]{Section~\ref{sec:main-functions}}. We use some example forecast and target data from the [hubExamples]{.pkg} package, which provides sample datasets for multiple modeling hubs in the hubverse format. 
+The examples in this section illustrate the use of the `model_importance()` function to evaluate the importance of component models within an ensemble, using various combinations of the arguments described in \hyperref[sec:main-function]{Section~\ref{sec:main-function}}. We use some example forecast and target data from the [hubExamples]{.pkg} package, which provides sample datasets for multiple modeling hubs in the hubverse format. 
 
 ### Example data {#sec:example-data}
 
@@ -664,15 +668,24 @@ and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 \small
 ```{r forecast_data, tidy = FALSE}
 #| echo: false
-forecast_data <- hubExamples::forecast_outputs |>
+# Load the forecast data from hubExamples
+forecast_data_raw <- hubExamples::forecast_outputs |>
   dplyr::filter(
     output_type %in% c("median"),
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
-  ) |>
-  filter(
-    !(model_id == "MOBS-GLEAM_FLUH" & location == "25" & target_end_date == as.Date("2022-11-26")),
-    !(model_id == "PSI-DICE" & location == "48" & target_end_date == as.Date("2022-12-10"))
   )
+
+# Specify forecasts to remove: MOBS-GLEAM_FLUH for location 25 on 2022-11-26,
+# PSI-DICE for location 48 on 2022-12-10
+forecast_to_remove <- data.frame(
+  model_id = c("MOBS-GLEAM_FLUH", "PSI-DICE"),
+  location = c("25", "48"),
+  target_end_date = as.Date(c("2022-11-26", "2022-12-10"))
+)
+
+# Filter out the specified forecasts from the original data
+forecast_data <- forecast_data_raw |>
+  anti_join(forecast_to_remove, by = c("model_id", "location", "target_end_date"))
 
 print(forecast_data, width = Inf)
 ```
@@ -788,18 +801,23 @@ simple mean ensemble using the LOMO algorithm.
 ```
 
 
-This call generates both the result and informative messages, summarizing the 
-input data, including the number of dates on which forecasts were produced and 
-the number of models with ids as follows.
+This call generates informative messages, summarizing the 
+input data, including the number of dates on which forecasts were produced, the number of models with ids, and whether the prediction tasks meet the minimum model requirement, alongside with a note on how to use parallel processing to speed up the computation when there are many models and tasks.
 
 \small
 ```r
-Forecasts from 2022-11-19 to 2022-11-19 (a total of 1 forecast date(s)).
+Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
+
 The available model IDs are:
  	 Flusight-baseline
 	 MOBS-GLEAM_FLUH
 	 PSI-DICE 
 (a total of 3 models)
+
+Note: This function uses 'furrr' and 'future' for parallelization.
+To enable parallel execution, please set future::plan(multisession).
+
+All tasks meet the minimum model requirement of 2 models.
 ```
 \vspace{0.35cm} 
 \normalsize
@@ -830,7 +848,7 @@ We summarize the importance scores for each model by averaging across all tasks.
 `NA` values are removed during the averaging process by setting the `na_action`
 argument to `"drop"`.
 
-```{r code-model_importance-summary-lomo-drop}
+```{r code-model_importance-summary-lomo-drop, eval=FALSE}
 #| eval: false
 > scores_lomo <- model_importance(
         forecast_data = forecast_data,
@@ -848,7 +866,7 @@ argument to `"drop"`.
 ```
 
 \small
-```{r lomo-NAdrop}
+```{r lomo-NAdrop, eval=FALSE}
 #| echo: false
 model_importance_summary(
         scores_lomo, by = "model_id", na_action = "drop", fun = mean
@@ -872,7 +890,7 @@ Another approach to handling missing values is to use the `"worst"` option for
 among the other models for the same task.
 
 
-```{r code-model_importance-summary-lomo-worst}
+```{r code-model_importance-summary-lomo-worst, eval=FALSE}
 #| eval: false
 > model_importance_summary(
         importance_scores = scores_lomo, 
@@ -883,7 +901,7 @@ among the other models for the same task.
 ```
 
 \small 
-```{r lomo-NAworst}
+```{r lomo-NAworst, eval=FALSE}
 #| echo: false
 model_importance_summary(
         importance_scores = scores_lomo, 
@@ -924,7 +942,7 @@ This strategy may offer a more balanced trade-off by mitigating the influence of
 the missing data without overly penalizing or overlooking them. 
 
 
-```{r code-model_importance-summary-lomo-avg}
+```{r code-model_importance-summary-lomo-avg, eval=FALSE}
 #| eval: false
 > model_importance_summary(
         importance_scores = scores_lomo, 
@@ -935,7 +953,7 @@ the missing data without overly penalizing or overlooking them.
 ```
 
 \small 
-```{r lomo-NAaverage}
+```{r lomo-NAaverage, eval=FALSE}
 #| echo: false
 model_importance_summary(
         scores_lomo, by = "model_id", na_action = "average", fun = mean
@@ -959,7 +977,7 @@ The following code and corresponding outputs illustrate the evaluation using
 each weighting scheme.
 
 
-```{r code-model_importance-summary-lasomo-equal}
+```{r code-model_importance-summary-lasomo-equal, eval=FALSE}
 #| eval: false
 > scores_lasomo_eq <- model_importance(
         forecast_data = forecast_data,
@@ -979,7 +997,7 @@ each weighting scheme.
 
 
 \small 
-```{r lasomo-NAdrop-equal}
+```{r lasomo-NAdrop-equal, eval=FALSE}
 #| echo: false
 scores_lasomo_eq <- model_importance(
         forecast_data = forecast_data,
@@ -996,7 +1014,7 @@ model_importance_summary(
 \vspace{0.35cm} 
 \normalsize
 
-```{r code-model_importance-summary-lasomo-perm}
+```{r code-model_importance-summary-lasomo-perm, eval=FALSE}
 #| eval: false
 > scores_lasomo_perm <- model_importance(
         forecast_data = forecast_data,
@@ -1016,7 +1034,7 @@ model_importance_summary(
 
 
 \small 
-```{r lasomo-NAdrop-perm}
+```{r lasomo-NAdrop-perm, eval=FALSE}
 #| echo: false
 scores_lasomo_perm <- model_importance(
         forecast_data = forecast_data,
@@ -1044,17 +1062,6 @@ may yield quite different importance scores for each model.
 In this section, we explored each component model's contribution to the ensemble
 accuracy with only three models. An extensive application in more complex 
 scenarios with a larger number of models can be found in @kim2026beyond.
-
-## Classes and S3 methods {#sec:s3-infrastructure}
-
-We have defined S3 classes and methods to facilitate the use of the main functions in the package. In this section, we describe 
-the S3 infrastructure underlying our package, including `print`, `summary`, and `plot` methods for the output of the main functions.
-
-### model_importance_tbl class
-
-
-
-
 
 
 ## Summary and discussion {#sec:discussion}
