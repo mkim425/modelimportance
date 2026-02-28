@@ -559,7 +559,7 @@ Additional summary details are available by specifying individual elements of th
 
 `plot()` visualizes the importance scores across models faceted by task IDs. Thus, users can compare importance scores across models and tasks. Additional modifications to the plot can be applied using standard `ggplot2` functions. 
 For example, to rotate the x-axis labels, users can add
-`+ theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))`.
+`+ theme(axis.text.x = element_text(angle = 90))`.
 
 ### Aggregate method
 `aggregate()` allows users to obtain an overall importance score for each model by aggregating its importance scores across all evaluated tasks. 
@@ -834,7 +834,6 @@ scores_lomo <- model_importance(
 
 ```{r}
 #| eval: false
-
 > print(scores_lomo)
 ```
 
@@ -930,47 +929,31 @@ We visualize the importance scores across models and tasks using the `plot()` me
 #| echo: false
 #| fig-align: "center"
 plot(scores_lomo) + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-          strip.text = element_text(size = 10)) 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) 
 ```
 
 \normalsize
 
-We summarize the importance scores for each model by averaging across all tasks.
+We aggregate the importance scores for each model by averaging across all tasks.
 `NA` values are removed during the averaging process by setting the `na_action`
 argument to `"drop"`.
 
-```{r code-model_importance-summary-lomo-drop, eval=FALSE}
+```{r}
 #| eval: false
-> scores_lomo <- model_importance(
-        forecast_data = forecast_data,
-        oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble",
-        importance_algorithm = "lomo"
-)
-
-> model_importance_summary(
-        importance_scores = scores_lomo, 
-        by = "model_id", 
-        na_action = "drop", 
-        fun = mean
-)
+> aggregate(scores_lomo, by = "model_id", na_action = "drop", fun = mean) 
 ```
 
 \small
-```{r lomo-NAdrop, eval=FALSE}
+```{r}
+#| label: aggregate_scores_lomo_drop
 #| echo: false
-model_importance_summary(
-        scores_lomo, by = "model_id", na_action = "drop", fun = mean
-)
+aggregate(scores_lomo, by = "model_id", na_action = "drop", fun = mean) 
 ```
-
 \vspace{0.35cm} 
 \normalsize
 The results show that the model 'PSI-DICE' has the highest importance score, 
 followed by 'Flusight-baseline' and 'MOBS-GLEAM_FLUH'.
-That is, 'PSI-DICE' contributes the most to improving the ensemble's predictive performance, whereas 'MOBS-GLEAM_FLUH', which has a negative score, detracts 
-from the ensemble’s performance.
+That is, 'PSI-DICE' contributes the most to improving the ensemble's predictive performance, whereas 'MOBS-GLEAM_FLUH', which has a negative score, detracts from the ensemble’s performance.
 The low importance score of 'MOBS-GLEAM_FLUH' is mainly due to a substantially 
 larger prediction error for Texas on the target end date of December 10, 2022, 
 compared to other models, while its missing forecast for Massachusetts for 
@@ -981,28 +964,17 @@ Another approach to handling missing values is to use the `"worst"` option for
 `na_action`, which replaces missing values with the worst (i.e., minimum) score 
 among the other models for the same task.
 
-
-```{r code-model_importance-summary-lomo-worst, eval=FALSE}
+```{r}
 #| eval: false
-> model_importance_summary(
-        importance_scores = scores_lomo, 
-        by = "model_id", 
-        na_action = "worst", 
-        fun = mean
-)
+> aggregate(scores_lomo, by = "model_id", na_action = "worst", fun = mean) 
 ```
 
-\small 
-```{r lomo-NAworst, eval=FALSE}
+\small
+```{r}
+#| label: aggregate_scores_lomo_worst
 #| echo: false
-model_importance_summary(
-        importance_scores = scores_lomo, 
-        by = "model_id", 
-        na_action = "worst", 
-        fun = mean
-)
+aggregate(scores_lomo, by = "model_id", na_action = "worst", fun = mean) 
 ```
-
 \vspace{0.35cm} 
 \normalsize
 
@@ -1033,26 +1005,17 @@ assigning the average importance scores of other models in the same task.
 This strategy may offer a more balanced trade-off by mitigating the influence of
 the missing data without overly penalizing or overlooking them. 
 
-
-```{r code-model_importance-summary-lomo-avg, eval=FALSE}
+```{r}
 #| eval: false
-> model_importance_summary(
-        importance_scores = scores_lomo, 
-        by = "model_id", 
-        na_action = "average", 
-        fun = mean
-)
+> aggregate(scores_lomo, by = "model_id", na_action = "average", fun = mean) 
 ```
 
-\small 
-```{r lomo-NAaverage, eval=FALSE}
+\small
+```{r}
+#| label: aggregate_scores_lomo_avg
 #| echo: false
-model_importance_summary(
-        scores_lomo, by = "model_id", na_action = "average", fun = mean
-)
+aggregate(scores_lomo, by = "model_id", na_action = "average", fun = mean) 
 ```
-
-
 \normalsize
 
 
@@ -1068,7 +1031,6 @@ subsets of models when calculating importance scores, with `na_action` fixed to
 The following code and corresponding outputs illustrate the evaluation using 
 each weighting scheme.
 
-
 ```{r code-model_importance-summary-lasomo-equal, eval=FALSE}
 #| eval: false
 > scores_lasomo_eq <- model_importance(
@@ -1078,29 +1040,22 @@ each weighting scheme.
         importance_algorithm = "lasomo",
         subset_wt = "equal"
 )
-
-> model_importance_summary(
-        importance_scores = scores_lasomo_eq, 
-        by = "model_id", 
-        na_action = "drop", 
-        fun = mean
-)
+> aggregate(scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean)
 ```
 
 
 \small 
-```{r lasomo-NAdrop-equal, eval=FALSE}
+```{r}
+#| label: lasomo-NAdrop-equal
 #| echo: false
-scores_lasomo_eq <- model_importance(
+scores_lasomo_eq <- suppressMessages(model_importance(
         forecast_data = forecast_data,
         oracle_output_data = target_data,
         ensemble_fun = "simple_ensemble",
         importance_algorithm = "lasomo",
         subset_wt = "equal"
-)
-model_importance_summary(
-        scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean
-)
+))
+aggregate(scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean)
 ```
 
 \vspace{0.35cm} 
@@ -1115,29 +1070,22 @@ model_importance_summary(
         importance_algorithm = "lasomo",
         subset_wt = "perm_based"
 )
-
-> model_importance_summary(
-        importance_scores = scores_lasomo_perm, 
-        by = "model_id", 
-        na_action = "drop", 
-        fun = mean
-)
+> aggregate(scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean)
 ```
 
 
 \small 
-```{r lasomo-NAdrop-perm, eval=FALSE}
+```{r}
+#| label: lasomo-NAdrop-perm
 #| echo: false
-scores_lasomo_perm <- model_importance(
+scores_lasomo_perm <- suppressMessages(model_importance(
         forecast_data = forecast_data,
         oracle_output_data = target_data,
         ensemble_fun = "simple_ensemble",
         importance_algorithm = "lasomo",
         subset_wt = "perm_based"
-)
-model_importance_summary(
-        scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean
-)
+))
+aggregate(scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean)
 ```
 
 

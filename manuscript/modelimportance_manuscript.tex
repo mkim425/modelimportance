@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, boxrule=0pt, interior hidden, breakable, enhanced, sharp corners, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, interior hidden, enhanced, breakable, sharp corners]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -993,7 +993,7 @@ by task IDs. Thus, users can compare importance scores across models and
 tasks. Additional modifications to the plot can be applied using
 standard \texttt{ggplot2} functions. For example, to rotate the x-axis
 labels, users can add
-\texttt{+\ theme(axis.text.x\ =\ element\_text(angle\ =\ 90,\ hjust\ =\ 1,\ vjust\ =\ 0.5))}.
+\texttt{+\ theme(axis.text.x\ =\ element\_text(angle\ =\ 90))}.
 
 \subsection{Aggregate method}\label{aggregate-method}
 
@@ -1381,27 +1381,26 @@ We visualize the importance scores across models and tasks using the
 
 \normalsize
 
-We summarize the importance scores for each model by averaging across
+We aggregate the importance scores for each model by averaging across
 all tasks. \texttt{NA} values are removed during the averaging process
 by setting the \texttt{na\_action} argument to \texttt{"drop"}.
 
 \begin{verbatim}
-> scores_lomo <- model_importance(
-        forecast_data = forecast_data,
-        oracle_output_data = target_data,
-        ensemble_fun = "simple_ensemble",
-        importance_algorithm = "lomo"
-)
-
-> model_importance_summary(
-        importance_scores = scores_lomo, 
-        by = "model_id", 
-        na_action = "drop", 
-        fun = mean
-)
+> aggregate(scores_lomo, by = "model_id", na_action = "drop", fun = mean) 
 \end{verbatim}
 
 \small
+
+\begin{verbatim}
+Overall model importance across tasks
+---------------------------------------- 
+# A tibble: 3 x 2
+  model_id          importance_score_mean
+  <chr>                             <dbl>
+1 PSI-DICE                           37.2
+2 Flusight-baseline                  28.4
+3 MOBS-GLEAM_FLUH                   -75  
+\end{verbatim}
 
 \vspace{0.35cm} 
 \normalsize
@@ -1423,15 +1422,21 @@ values with the worst (i.e., minimum) score among the other models for
 the same task.
 
 \begin{verbatim}
-> model_importance_summary(
-        importance_scores = scores_lomo, 
-        by = "model_id", 
-        na_action = "worst", 
-        fun = mean
-)
+> aggregate(scores_lomo, by = "model_id", na_action = "worst", fun = mean) 
 \end{verbatim}
 
 \small
+
+\begin{verbatim}
+Overall model importance across tasks
+---------------------------------------- 
+# A tibble: 3 x 2
+  model_id          importance_score_mean
+  <chr>                             <dbl>
+1 Flusight-baseline                  28.4
+2 PSI-DICE                          -17.6
+3 MOBS-GLEAM_FLUH                   -61.1
+\end{verbatim}
 
 \vspace{0.35cm} 
 \normalsize
@@ -1465,15 +1470,21 @@ mitigating the influence of the missing data without overly penalizing
 or overlooking them.
 
 \begin{verbatim}
-> model_importance_summary(
-        importance_scores = scores_lomo, 
-        by = "model_id", 
-        na_action = "average", 
-        fun = mean
-)
+> aggregate(scores_lomo, by = "model_id", na_action = "average", fun = mean) 
 \end{verbatim}
 
 \small
+
+\begin{verbatim}
+Overall model importance across tasks
+---------------------------------------- 
+# A tibble: 3 x 2
+  model_id          importance_score_mean
+  <chr>                             <dbl>
+1 Flusight-baseline                  28.4
+2 PSI-DICE                           27.9
+3 MOBS-GLEAM_FLUH                   -56.2
+\end{verbatim}
 
 \normalsize
 
@@ -1498,16 +1509,21 @@ using each weighting scheme.
         importance_algorithm = "lasomo",
         subset_wt = "equal"
 )
-
-> model_importance_summary(
-        importance_scores = scores_lasomo_eq, 
-        by = "model_id", 
-        na_action = "drop", 
-        fun = mean
-)
+> aggregate(scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean)
 \end{verbatim}
 
 \small
+
+\begin{verbatim}
+Overall model importance across tasks
+---------------------------------------- 
+# A tibble: 3 x 2
+  model_id          importance_score_mean
+  <chr>                             <dbl>
+1 PSI-DICE                           47.4
+2 Flusight-baseline                  24.3
+3 MOBS-GLEAM_FLUH                   -79.8
+\end{verbatim}
 
 \vspace{0.35cm} 
 \normalsize
@@ -1520,16 +1536,21 @@ using each weighting scheme.
         importance_algorithm = "lasomo",
         subset_wt = "perm_based"
 )
-
-> model_importance_summary(
-        importance_scores = scores_lasomo_perm, 
-        by = "model_id", 
-        na_action = "drop", 
-        fun = mean
-)
+> aggregate(scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean)
 \end{verbatim}
 
 \small
+
+\begin{verbatim}
+Overall model importance across tasks
+---------------------------------------- 
+# A tibble: 3 x 2
+  model_id          importance_score_mean
+  <chr>                             <dbl>
+1 PSI-DICE                           44.8
+2 Flusight-baseline                  25.3
+3 MOBS-GLEAM_FLUH                   -78.6
+\end{verbatim}
 
 \normalsize
 
