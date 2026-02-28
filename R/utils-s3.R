@@ -102,13 +102,11 @@ print.summary.model_imp_tbl <- function(x, ...) {
 plot.model_imp_tbl <- function(x, ...) {
   # columns in the importance score table
   task_id_cols <- get_task_id_cols(x)
-  # wrap model_id for better visualization
-  x2 <- x |> mutate(model_id_wrap = str_replace(model_id, "[-_]", "\\0\n"))
   # create ggplot object
   ggplot(
-    x2,
+    x,
     aes(
-      x = .data$model_id_wrap,
+      x = model_id,
       y = importance,
       fill = model_id
     )
