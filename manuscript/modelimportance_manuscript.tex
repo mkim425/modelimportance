@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, interior hidden, enhanced, breakable, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, interior hidden, boxrule=0pt, sharp corners, breakable, enhanced, frame hidden]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -1571,7 +1571,75 @@ more complex scenarios with a larger number of models can be found in
 
 This section describes computational complexity of LOMO and LASOMO
 algorithms implemented in the package, depending the numbers of models
-and tasks.
+and tasks. We conducted a computational experiment with simulated date.
+The execution time was measured for both algorithms across varying
+numbers of models and tasks. We also compared the execution times
+between sequential and multisession computing environments to
+demonstrate the efficiency of parallelization in handling
+computationally intensive tasks.
+
+All experiments were performed on a machine running macOS 15 with an
+Apple M4 chip and 16 GB RAM under R version 4.4.3. Parallel computations
+were implemented using the \pkg{future} (\texttt{multisession} backend)
+with four worker processes. The execution times were recorded in
+seconds.
+
+The results are visualized in Figure~\ref{fig-feasibility-comparison},
+which shows that the execution time increases with the number of models
+and tasks for both algorithms. In LOMO algorithm,
+
+r, LASOMO has a much steeper increase in the elapsed time compared to
+LOMO, especially as the number of models grows, due to its combinatorial
+nature of evaluating all subsets of models. This highlights the
+trade-off between the comprehensiveness of the LASOMO algorithm and its
+computational feasibility in practice, particularly when dealing with a
+large number of models. This shows the efficiency of parallel execution,
+especially for LASOMO, which is computationally intensive. The plot
+demonstrates that while both algorithms show an increase in execution
+time as the number of models and tasks increases, LASOMO's execution
+time grows much more rapidly than LOMO's, especially as the number of
+models exceeds 12.
+
+Figure~\ref{fig-feasibility-parallel} displays the computational runtime
+under the parallel execution mode. In LOMO, the elapsed time increases
+linearly with the number of models, and the rate of increase depends on
+the number of tasks, with a steeper increase as the number of tasks
+grows. In contrast, in LASOMO, the elapsed time increases much more
+rapidly as the ensemble size grows. In particular, when the number of
+models exceeds 12, it takes more than 20 minutes to compute the
+importance scores, even with fixed 5 tasks. It is because the number of
+subsets of models that need to be evaluated in LASOMO grows
+exponentially with the number of models, leading to a combinatorial
+explosion in the computational requirements. This highlights the
+computational challenges of LASOMO as the number of models grows.
+
+\begin{figure}[t]
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{runtime_comparison.pdf}
+
+}
+
+\caption{\label{fig-feasibility-comparison}Elapsed time by number of
+models and tasks (Sequential vs Parallel execution). Color denotes the
+execution mode (\emph{coral} for sequentail and \emph{steelblue} for
+parallel).}
+
+\end{figure}%
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{runtime_parallel.pdf}
+
+}
+
+\caption{\label{fig-feasibility-parallel}Elapsed time by number of
+models and tasks during parallel execution via multisession backend.}
+
+\end{figure}%
 
 \section{Summary and discussion}\label{sec:discussion}
 
