@@ -1102,44 +1102,44 @@ scenarios with a larger number of models can be found in @kim2026beyond.
 
 ## Computational complexity {#sec:computational-complexity}
 
-This section describes computational complexity of LOMO and LASOMO algorithms implemented in the package, depending the numbers of models and tasks.
+This section describes the computational complexity of LOMO and LASOMO algorithms implemented in the package, depending on the numbers of ensemble component models and prediction tasks.
 We conducted a computational experiment with simulated date. The execution time was measured for both algorithms across varying numbers of models and tasks. We also compared the execution times between sequential and multisession computing environments to demonstrate the efficiency of parallelization in handling computationally intensive tasks. 
 
 All experiments were performed on a machine running macOS 15 with an Apple M4 chip and 16 GB RAM under R version 4.4.3.
-Parallel computations were implemented using the [future]{.pkg} (`multisession` backend) with four worker processes. 
+Parallel computations were implemented using the [future]{.pkg} (`multisession` backend) with 4 worker processes. 
 The execution times were recorded in seconds.
-
-@fig-feasibility-comparison illustrates the efficiency of parallel computation in both algorithms. With the tasks of 10 or 20, the difference between the computation times of sequential and parallel execution is not significant. However, as the prediction tasks increase to 50, the difference becomes more pronounced. 
-Considering the different scales between the two algorithms, the efficiency of parallel execution is more pronounced for LASOMO than for LOMO. 
-
 
 ```{r, fig.pos="t"}
 #| echo: false
 #| label: fig-feasibility-comparison
-#| fig-cap: "Elapsed time by number of models and tasks (Sequential vs Parallel execution). Color denotes the execution mode (*coral* for sequentail and *steelblue* for parallel)."
+#| fig-cap: "Runtime to compute model importance scores by number of ensemble component models (ranging from 2 to 10) and number of prediction tasks (10, 20, 50, and 100) under sequential and parallel execution modes (multisession backend) for LOMO and LASOMO algorithms. The elapsed time is represented in seconds. The computing mode is indicated by color: *coral* for sequential and *steelblue* for parallel. The scale of the y-axis is different between two alorithms."
 #| out.width: "100%"
 #| fig-align: "center"
 knitr::include_graphics("runtime_comparison.pdf")
 ```
 
-
-@fig-feasibility-parallel displays the computational runtime under the parallel execution mode.
-In LOMO, the elapsed time increases linearly with the number of models, and the rate of increase depends on the number of tasks, with a steeper increase as the number of tasks grows. 
-In contrast, in LASOMO, the elapsed time increases much more rapidly as the ensemble size grows. In particular, when the number of models exceeds 12, it takes more than 20 minutes to compute the importance scores, even with fixed 5 tasks. 
-It is because the number of subsets of models that need to be evaluated in LASOMO grows exponentially with the number of models, leading to a combinatorial explosion in the computational requirements.
-This highlights the computational challenges of LASOMO as the number of models grows.
+@fig-feasibility-comparison illustrates the computational runtime for 4 different numbers of prediction tasks (10, 20, 50, and 100) and varying numbers of models (ranging from 2 to 10) for both the LOMO and LASOMO algorithms under sequential and parallel execution modes, indicated by color. The scale of the $y$-axis approximately range 0 to 12 seconds for LOMO and 0 to 1110 seconds for LASOMO.
+Overall, the time needed to compute model importance scores increases with the number of models and tasks for both algorithms.
+Specifically, when the number of tasks is 10 or 20, the difference in computation time between sequential and parallel executions is not significant. However, as the number of prediction tasks rises to 50, the difference becomes more noticeable.
+The efficiency of parallel execution is more pronounced for LASOMO than for LOMO. 
+In particular, for a high volume of prediction tasks, it results in a substantial improvement when 8 or more models are involved in the ensemble construction.
 
 
 
 ```{r, fig.pos="t"}
 #| echo: false
 #| label: fig-feasibility-parallel
-#| fig-cap: "Elapsed time by number of models and tasks during parallel execution via multisession backend."
+#| fig-cap: "Runtime to compute model importance scores by number of ensemble component models and prediction tasks during parallel execution via multisession backend. The elapsed time is represented in seconds. For LOMO, the number of models evaluated varies from 2 to 100 for each 5, 20, 50, and 100 prediction tasks. For LASOMO, the number of models evaluated varies from 2 to 14 while fixing 5 prediction tasks due to exponentially growing computational intensity with the number of models. The exact elapsed time is shown for LASOMO, which captures the steep increase in runtime as the number of models grows, even before the high jump occurs with models over 12."
 #| out.width: "100%"
 #| fig-align: "center"
 knitr::include_graphics("runtime_parallel.pdf")
 ```
 
+We further explored computational feasibility, focusing on the parallel execution mode (@fig-feasibility-parallel).
+We observe that, in LOMO, the elapsed time increases linearly with the number of models and the rate of increase depends on the number of tasks, with a steeper increase as the number of tasks grows. 
+In contrast, in LASOMO, the elapsed time increases much more rapidly as the ensemble size grows. In particular, when the number of models exceeds 12, it takes more than 20 minutes to compute the importance scores, even with fixed 5 prediction tasks. 
+It is because the number of subsets of models that need to be evaluated in LASOMO grows exponentially with the number of models, leading to a rapidly rising computational intensity.
+This highlights the trade-off between the comprehensiveness of the LASOMO algorithm and its computational challenges in practice, particularly with large number of models.
 
 
 ## Summary and discussion {#sec:discussion}
