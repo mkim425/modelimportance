@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, frame hidden, interior hidden, breakable, boxrule=0pt, enhanced, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, interior hidden, enhanced, sharp corners, breakable]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -557,8 +557,9 @@ and 2), but it over-predicted the outcome for the last target date
 two models, which indicates that it is more confident about its
 predictions. However, two of three prediction intervals (horizons 1 and
 2) failed to cover the eventually observed values, implying that the
-model was apparently overconfident. \#\#\# Forecast data representation
-\{\#subsec:model\_output\}
+model was apparently overconfident.
+
+\subsection{Forecast data representation}\label{subsec:model_output}
 
 Generally, quantitative forecasts can be categorized into either point
 forecasts or probabilistic forecasts. For a specific prediction task,
@@ -925,7 +926,7 @@ value is set to -10, following the CDC FluSight thresholding convention
 \citep{brooks2018nonmechanistic, reich_accuracy_2019}. Users may choose
 a different value based on their practical needs.
 
-\texttt{model\_importance()} function returns an object of S3 class
+The \texttt{model\_importance()} function returns an object of S3 class
 \texttt{model\_imp\_tbl}, with columns \texttt{model\_id},
 \texttt{reference\_date}, \texttt{output\_type}, and
 \texttt{importance}, along with any task ID columns (e.g.,

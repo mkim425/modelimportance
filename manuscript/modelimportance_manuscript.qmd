@@ -239,6 +239,7 @@ forecast_data |>
 
 @fig-example-model_output visualizes the information on the prediction task provided by @tbl-example-model_output for three models. 
 For each model, the quantile-based forecasts are shown for the target end dates of December 24, 2022 (horizon 1), December 31, 2022 (horizon 2), and January 07, 2023 (horizon 3), which were made on December 17, 2022 based on the historical data available as of that date. The prediction intervals defined by the lowest and highest quantiles (0.05 and 0.95) represent the uncertainty of the predictions. To give brief details in the interpretation, the Flusight-baseline model under-predicted the outcomes for the first two target dates (horizon 1 and 2), but it over-predicted the outcome for the last target date (horizon 3). Its prediction intervals are narrow compared to the other two models, which indicates that it is more confident about its predictions. However, two of three prediction intervals (horizons 1 and 2) failed to cover the eventually observed values, implying that the model was apparently overconfident. 
+
 ### Forecast data representation {#subsec:model_output}
 
 Generally, quantitative forecasts can be categorized into either point forecasts or probabilistic forecasts. 
@@ -528,7 +529,7 @@ before calculating the importance metric based on the log score.
 The default value is set to -10, following the CDC FluSight thresholding convention [@brooks2018nonmechanistic; @reich_accuracy_2019].
 Users may choose a different value based on their practical needs. 
 
-`model_importance()` function returns an object of S3 class `model_imp_tbl`, with columns 
+The `model_importance()` function returns an object of S3 class `model_imp_tbl`, with columns 
 `model_id`, `reference_date`, `output_type`, and `importance`, along with any task ID columns (e.g., `location`, `horizon`, and `target_end_date`) present in the input `forecast_data`. 
 Regardless of the original column name for the forecast generation date in the `forecast_data`, it is standardized to `reference_date` in the output. The `importance` column contains the calculated importance scores for each model and specific task, which are derived from the specified algorithm and ensemble method. 
 
