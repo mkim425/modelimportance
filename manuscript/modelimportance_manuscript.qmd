@@ -329,8 +329,8 @@ We note that a model can make an ensemble better or worse, and thus the importan
  \end{spacing}
 \end{algorithm}
 
-On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays a role of ${\cal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}).
-For example, using the earlier setup of three forecast models, LASOMO considers three subsets, which we denote by $S_1=\{2\}$, $S_2=\{3\}$, and $S_3=\{2, 3\}$, to calculate the importance score of model 1 (excluding all subsets that include model 1). The ensemble forecasts $F^{\{2\}}, F^{\{3\}}$, and $F^{\{2,3\}}$ are then compared to $F^{\{1,2\}}, F^{\{1,3\}}$, and $F^{\{1,2,3\}}$, respectively. The performance differences attributable to model 1's inclusion are aggregated, which results in the importance score for model 1. We note that the subsets (e.g., $S_1, S_2,$ and $S_3$) may have different weights during the aggregating process. 
+On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays the role of ${\cal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}).
+For example, using the earlier setup of three forecast models, LASOMO considers three subsets, which we denote by $S_1=\{2\}$, $S_2=\{3\}$, and $S_3=\{2, 3\}$, to calculate the importance score of model 1 (excluding all subsets that include model 1). The ensemble forecasts $F^{\{2\}}, F^{\{3\}}$, and $F^{\{2,3\}}$ are then compared to $F^{\{1,2\}}, F^{\{1,3\}}$, and $F^{\{1,2,3\}}$, respectively. The performance differences attributable to model 1's inclusion are aggregated, which results in the importance score for model 1. We note that the subsets (e.g., $S_1, S_2,$ and $S_3$) may have different weights during the aggregation process. 
 
 
 \begin{algorithm}[t!]
@@ -505,14 +505,14 @@ task, an `NA` value will be assigned for that task.
 ```
 
 
-The `forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
+The `forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from the [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
 
 The `oracle_output_data` is a data frame containing the actual observed values of the variables used to specify modeling targets. Details are provided in \hyperref[subsec:oracle_output_data]{Section~\ref{subsec:oracle_output_data}}.
 
 The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance, which relies on implementations in the \pkg{hubEnsembles} package (@Rpackage-hubEnsembles).
 The currently supported methods are `"simple_ensemble"` and `"linear_pool"`. 
 The `"simple_ensemble"` method returns the average of the predicted values from 
-all component models per prediction task defined by task IDs, `output_type`, and `output_type_id` columns. 
+all component models per prediction task defined by the task IDs, `output_type`, and `output_type_id` columns. 
 The default aggregation function for this method is `"mean"`, but it can be 
 customized by specifying additional arguments through `...`, such as 
 `agg_fun="median"`.

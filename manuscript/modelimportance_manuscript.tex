@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, frame hidden, interior hidden, breakable, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, sharp corners, boxrule=0pt, interior hidden, borderline west={3pt}{0pt}{shadecolor}, enhanced, breakable]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -368,20 +368,20 @@ Our methods are based on the concept of Shapley values in cooperative
 game theory, which measure a player's average contribution to the game's
 overall outcome (\citet{Shapley1953}). There are several approaches that
 utilize Shapley values in black-box machine learning models to
-understand the extent to which individual features' contribute to the
-model's predictive power (\citet{lundberg2017unified};
-\citet{lundberg2020local}; \citet{covert2020understanding}). Related
-work by \citet{lipiecki2024postprocessing} used Shapley-based
-attribution to study contributions of component models in a combined
-ensemble after postprocessing point forecasts into probabilistic
-forecasts. That methodology was later implemented in
-\pkg{PostForecasts.jl} \citep{Jlpackage-lipiecki2025postforecast}.
-\pkg{PostForecasts.jl} is conceptually aligned with our work in that
-both approaches leverage Shapley values to evaluate component
-forecasters. However, while \pkg{PostForecasts.jl} was developed for
-\proglang{Julia} users originally focusing on energy economics, our
-\proglang{R} package focuses on epidemiological forecasts and offers a
-broader range of capabilities, such as handling missing forecasts.
+understand how each feature affects the model's predictive power
+(\citet{lundberg2017unified}; \citet{lundberg2020local};
+\citet{covert2020understanding}). Related work by
+\citet{lipiecki2024postprocessing} used Shapley-based attribution to
+study contributions of component models in a combined ensemble after
+postprocessing point forecasts into probabilistic forecasts. That
+methodology was later implemented in \pkg{PostForecasts.jl}
+\citep{Jlpackage-lipiecki2025postforecast}. \pkg{PostForecasts.jl} is
+conceptually aligned with our work in that both approaches leverage
+Shapley values to evaluate component forecasters. However, while
+\pkg{PostForecasts.jl} was developed for \proglang{Julia} users
+originally focusing on energy economics, our \proglang{R} package
+focuses on epidemiological forecasts and offers a broader range of
+capabilities, such as handling missing forecasts.
 
 These capabilities are particularly useful for hub organizers, who
 oversee collaborative forecasting systems that combine submissions from
@@ -425,8 +425,8 @@ followed by examples of their usage in
 discusses computational complexity. We highlight our quality assurance
 measures and its open access in
 \hyperref[sec:implementation-and-availability]{Section~\ref{sec:implementation-and-availability}},
-and then close this paper with concluding remarks and a discussion of
-possible extensions.
+and then close this paper with a summary and a discussion of possible
+extensions.
 
 \section{Data}\label{sec:data}
 
@@ -712,7 +712,7 @@ accordingly.
 
 On the other hand, LASOMO involves ensemble constructions from all
 possible subsets of models. For each subset \(S\) that does not contain
-the model \(i\), \(S \cup \{i\}\) plays a role of \({\cal A}\) in the
+the model \(i\), \(S \cup \{i\}\) plays the role of \({\cal A}\) in the
 LOMO; the score associated with the subset \(S\) is the difference of
 measures between \(F^S\) and \(F^{S \cup \{i\}}\). Then, all scores are
 aggregated across all possible subsets that the model \(i\) does not
@@ -726,7 +726,7 @@ compared to \(F^{\{1,2\}}, F^{\{1,3\}}\), and \(F^{\{1,2,3\}}\),
 respectively. The performance differences attributable to model 1's
 inclusion are aggregated, which results in the importance score for
 model 1. We note that the subsets (e.g., \(S_1, S_2,\) and \(S_3\)) may
-have different weights during the aggregating process.
+have different weights during the aggregation process.
 
 \begin{algorithm}[t!]
 \caption{Importance score calculation for one prediction task using leave all subsets of models out (LASOMO) algorithm} 
@@ -878,7 +878,7 @@ The \texttt{forecast\_data} is a data frame containing predictions and
 should be or can be coerced to a \texttt{model\_out\_tbl} format, which
 is the standard S3 class model output format defined by the hubverse
 convention. If it fails to be coerced to a \texttt{model\_out\_tbl}
-format, an error message will be returned from \pkg{hubUtils}, which
+format, an error message will be returned from the \pkg{hubUtils}, which
 provides the function \texttt{as\_model\_out\_tbl()} for this purpose.
 Users may need to manually transform their data to meet the hubverse
 standards.
@@ -894,7 +894,7 @@ the \pkg{hubEnsembles} package (\citet{Rpackage-hubEnsembles}). The
 currently supported methods are \texttt{"simple\_ensemble"} and
 \texttt{"linear\_pool"}. The \texttt{"simple\_ensemble"} method returns
 the average of the predicted values from all component models per
-prediction task defined by task IDs, \texttt{output\_type}, and
+prediction task defined by the task IDs, \texttt{output\_type}, and
 \texttt{output\_type\_id} columns. The default aggregation function for
 this method is \texttt{"mean"}, but it can be customized by specifying
 additional arguments through \texttt{...}, such as
@@ -957,10 +957,10 @@ importance scores for each model across different tasks.
 \subsection{Summary method}\label{summary-method}
 
 \texttt{summary()} provides a concise summary of the importance scores,
-including key statistics such as number of models and tasks evaluated.
-It also displays top scoring models for a subset of tasks. Additional
-summary details are available by specifying individual elements of the
-summary object as follows:
+including key statistics such as the number of models and tasks
+evaluated. It also displays top-scoring models for a subset of tasks.
+Additional summary details are available by specifying individual
+elements of the summary object as follows:
 
 \begin{itemize}
 \tightlist
@@ -972,13 +972,13 @@ summary object as follows:
 \item
   \texttt{.\$model\_summary} provides each model's performance summary
   across tasks (e.g., the number of tasks each model submitted its
-  forecast for and the range of scores it achieved). This helps users
+  forecast for, and the range of scores it achieved). This helps users
   understand the consistency and variability of each model's importance
   across different tasks.
 \item
   \texttt{.\$task\_winners} identifies which model is the best for each
   task based on the highest importance score across the full set of
-  tasks. This information allows users to quickly identify the most
+  tasks. From this information, users can quickly identify the most
   important model in each task.
 \end{itemize}
 
@@ -1052,7 +1052,8 @@ Additional arguments can be passed to the summary function \texttt{fun}
 through \texttt{...} if needed (e.g.,
 \texttt{fun\ =\ quantile,\ probs\ =\ 0.25} for a quartile summary).
 
-This function returns a data frame with columns \texttt{model\_id} and
+The output returned by this function is a data frame with columns
+\texttt{model\_id} and
 \texttt{importance\_score\_\textless{}fun\textgreater{}}, where
 \texttt{\textless{}fun\textgreater{}} is the name of the summary
 function used (e.g., \texttt{importance\_score\_mean} when
@@ -1192,7 +1193,7 @@ LOMO algorithm.
 This call generates informative messages, summarizing the input data,
 including the number of dates on which forecasts were produced, the
 number of models with ids, and whether the prediction tasks meet the
-minimum model requirement, alongside with a note on how to use parallel
+minimum model requirement, alongside a note on how to use parallel
 processing to speed up the computation when there are many models and
 tasks.
 
@@ -1290,8 +1291,8 @@ Number of tasks: 4
 
 \normalsize
 
-As indicated in the output, more details of the summary are accessed
-through the elements of the summary object as below.
+As indicated in the output, more details about the summary are available
+through the summary object's elements as follows.
 
 \begin{verbatim}
 > s <- summary(scores_lomo)
@@ -1354,7 +1355,7 @@ for.
 \normalsize
 
 Models with the highest importance scores for each task are identified
-in the \texttt{top\_model} column with its importance score in the
+in the \texttt{top\_model} column with their importance score in the
 \texttt{max\_score} column. `PSI-DICE' is the best model for three out
 of the four tasks, while `Flusight-baseline' is the best for the
 remaining task.
@@ -1436,8 +1437,8 @@ Overall model importance across tasks
 \vspace{0.35cm} 
 \normalsize
 
-The results show that the importance scores of `Flusight-baseline' is
-unchanged because it has no missing forecast. We observe that the
+The results show that the importance score of `Flusight-baseline' is
+unchanged because it has no missing forecasts. We observe that the
 importance score of `PSI-DICE', which was previously positive, has now
 decreased to a negative value when compared to the evaluation using the
 \texttt{"drop"} option for \texttt{na\_action}. Moreover,
@@ -1485,9 +1486,9 @@ Overall model importance across tasks
 
 \subsection{Evaluation using LASOMO algorithm}\label{sec:example-lasomo}
 
-Now we demonstrate the use of the LASOMO algorithm in the evaluation of
-model importance. As we explored the difference of \texttt{na\_action}
-options in the previous LOMO example
+We now demonstrate the use of the LASOMO algorithm for evaluating model
+importance. As we explored the difference of \texttt{na\_action} options
+in the previous LOMO example
 (\hyperref[sec:example-lomo]{Section~\ref{sec:example-lomo}}), we focus
 on options for \texttt{subset\_wt}, which specifies how weights are
 assigned to subsets of models when calculating importance scores, with
@@ -1567,16 +1568,16 @@ companion methodological paper \citep{kim2026beyond}.
 This section describes the computational complexity of LOMO and LASOMO
 algorithms implemented in the package, depending on the numbers of
 ensemble component models and prediction tasks. We conducted a
-computational experiment with simulated date. The execution time was
+computational experiment with simulated data. The execution time was
 measured for both algorithms across varying numbers of models and tasks.
 We also compared the execution times between sequential and multisession
 computing environments to demonstrate the efficiency of parallelization
 in handling computationally intensive tasks.
 
-All experiments were performed on a machine running macOS 15 with an
-Apple M4 chip and 16 GB RAM under R version 4.4.3. Parallel computations
-were implemented using the \pkg{future} (\texttt{multisession} backend)
-with 4 worker processes. The execution times were recorded in seconds.
+We performed all experiments on a machine running macOS 15 with an Apple
+M4 chip and 16 GB RAM under R version 4.4.3. Parallel computations were
+implemented using the \pkg{future} (\texttt{multisession} backend) with
+4 worker processes. The execution times were recorded in seconds.
 
 \begin{figure}[t]
 
@@ -1602,16 +1603,16 @@ runtime for 4 different numbers of prediction tasks (10, 20, 50, and
 100) and varying numbers of models (ranging from 2 to 10) for both the
 LOMO and LASOMO algorithms under sequential and parallel execution
 modes, indicated by color. The scale of the \(y\)-axis approximately
-range 0 to 12 seconds for LOMO and 0 to 1110 seconds for LASOMO.
-Overall, the time needed to compute model importance scores increases
-with the number of models and tasks for both algorithms. Specifically,
-when the number of tasks is 10 or 20, the difference in computation time
-between sequential and parallel executions is not significant. However,
-as the number of prediction tasks rises to 50, the difference becomes
-more noticeable. The efficiency of parallel execution is more pronounced
-for LASOMO than for LOMO. In particular, for a high volume of prediction
-tasks, it results in a substantial improvement when 8 or more models are
-involved in the ensemble construction.
+ranges from 0 to 12 seconds for LOMO and from 0 to 1110 seconds for
+LASOMO. Overall, the time needed to compute model importance scores
+increases with the number of models and tasks for both algorithms.
+Specifically, when the number of tasks is 10 or 20, the difference in
+computation time between sequential and parallel executions is not
+significant. However, as the number of prediction tasks rises to 50, the
+difference becomes more noticeable. The efficiency of parallel execution
+is more pronounced for LASOMO than for LOMO. In particular, for a high
+volume of prediction tasks, it results in a substantial improvement when
+8 or more models are involved in the ensemble construction.
 
 \begin{figure}[t]
 
@@ -1646,8 +1647,8 @@ tasks. It is because the number of subsets of models that need to be
 evaluated in LASOMO grows exponentially with the number of models,
 leading to a rapidly rising computational intensity. This highlights the
 trade-off between the comprehensiveness of the LASOMO algorithm and its
-computational challenges in practice, particularly with large number of
-models.
+computational challenges in practice, particularly with a large number
+of models.
 
 \section{Implementation and
 availability}\label{sec:implementation-and-availability}
@@ -1676,7 +1677,7 @@ ensemble performance in different evaluation contexts.
 
 The primary function of the package is \texttt{model\_importance()},
 which returns a data frame with component models and their importance
-metrics. Users can choose the various ensemble methods to apply and
+metrics. Users can choose the various ensemble methods to apply and the
 model importance algorithm between LOMO and LASOMO. Additionally,
 customizable options are available for handling missing values. These
 features enable the package to serve as a versatile tool to aid
@@ -1685,10 +1686,10 @@ wide range of forecasting tasks. We note that unit testing with
 continuous integration ensures the reliability of all functions and the
 overall quality of code across multiple platforms.
 
-There is a room to enhance the current version of this package. Although
+There is room to enhance the current version of this package. Although
 this package supports four different output types (`mean', `median',
 `quantile, and 'pmf'), other output types are widely used in practice.
-For example, `sample' output type is commonly used in the US Flu
+For example, the `sample' output type is commonly used in the US Flu
 Scenario Modeling Hub \citep{FluSMH}. This format includes multiple
 simulated values (samples) from the forecast distribution. The
 \texttt{output\_type\_id} is specified for each sample, which typically
