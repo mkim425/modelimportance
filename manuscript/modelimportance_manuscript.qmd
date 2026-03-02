@@ -396,9 +396,12 @@ data.frame(n = 2:10) |>
     w_perm_max = 1 / (n - 1)
   ) |>
   ggplot(aes(x = n)) +
-  geom_line(aes(y = w_eq, color = "eq"), size = 1) +
-  geom_line(aes(y = w_perm_min, color = "perm_min"), size = 1) +
-  geom_line(aes(y = w_perm_max, color = "perm_max"), size = 1) +
+  geom_line(aes(y = w_eq, color = "eq"), size = 0.75) +
+  geom_point(aes(y = w_eq, color = "eq"), size = 2, shape = 15) +
+  geom_line(aes(y = w_perm_min, color = "perm_min"), size = 0.75) +
+  geom_point(aes(y = w_perm_min, color = "perm_min"), size = 2, shape = 16) +
+  geom_line(aes(y = w_perm_max, color = "perm_max"), size = 0.75) +
+  geom_point(aes(y = w_perm_max, color = "perm_max"), size = 2, shape = 17) +
   scale_color_manual(
     name = "Weights",
     values = c(
@@ -418,12 +421,16 @@ data.frame(n = 2:10) |>
     y = "Weight assigned to a subset",
     color = "Weighting Scheme"
   ) +
-  theme_minimal() +
   theme(
+    axis.title.x = element_text(size = 9),
+    axis.title.y = element_text(size = 9),
+    axis.text.x = element_text(size = 8),
+    axis.text.y = element_text(size = 8),
     legend.title = element_text(size = 9),
     legend.position = "bottom",
-    legend.spacing.x = unit(0.25, "mm"),
-    legend.key.width = unit(0.4, "cm")
+    legend.text = element_text(size = 9),
+    legend.spacing.x = unit(0.5, "mm"),
+    legend.key.width = unit(1, "cm")
   )
 ```
 
