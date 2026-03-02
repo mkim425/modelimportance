@@ -63,10 +63,11 @@ summary.model_imp_tbl <- function(object, ...) {
 #' @param x An object of class `summary.model_imp_tbl`.
 #' @param ... Additional arguments passed to the print method.
 #' @importFrom rlang .data
+#' @importFrom utils head
 #' @export
 print.summary.model_imp_tbl <- function(x, ...) {
   # summary statements
-  cat("\n=== Summary of importance scores by task ===\n")
+  cat("=== Summary of importance scores by task ===\n")
   cat("Number of models:", length(x$all_models), "\n")
   cat("Number of tasks:", nrow(x$all_tasks), "\n")
 
@@ -96,8 +97,6 @@ print.summary.model_imp_tbl <- function(x, ...) {
 #' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_hline facet_grid
 #' @importFrom ggplot2 labs theme vars label_wrap_gen
 #' @importFrom rlang sym syms
-#' @importFrom stringr str_replace
-#' @importFrom rlang .data
 #' @export
 plot.model_imp_tbl <- function(x, ...) {
   # columns in the importance score table
