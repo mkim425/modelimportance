@@ -63,17 +63,23 @@ summary.model_imp_tbl <- function(object, ...) {
 #' @param x An object of class `summary.model_imp_tbl`.
 #' @param ... Additional arguments passed to the print method.
 #' @importFrom rlang .data
+#' @importFrom utils head
 #' @export
 print.summary.model_imp_tbl <- function(x, ...) {
   # summary statements
-  cat("\n=== Summary of importance scores by task ===\n")
+  cat("=== Summary of importance scores by task ===\n")
   cat("Number of models:", length(x$all_models), "\n")
   cat("Number of tasks:", nrow(x$all_tasks), "\n")
 
-  cat("\n=== Top scoring model by task", strrep("=", 40), "\n")
+  cat(
+    "\n=== Top scoring model by task for a subset of tasks",
+    strrep("=", 40),
+    "\n"
+  )
   x$task_winners |>
     dplyr::mutate(importance = round(.data$max_score, 2)) |>
     dplyr::select(-.data$max_score) |>
+    head(3) |>
     print(row.names = FALSE)
   cat("--------------------------------------------\n")
   cat(paste(
@@ -89,13 +95,12 @@ print.summary.model_imp_tbl <- function(x, ...) {
 #' @param x An object of class `model_imp_tbl`.
 #' @param ... Additional arguments passed to the plot method.
 #' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_hline facet_grid
-#' @importFrom ggplot2 labs theme vars
+#' @importFrom ggplot2 labs theme vars label_wrap_gen
 #' @importFrom rlang sym syms
 #' @export
 plot.model_imp_tbl <- function(x, ...) {
   # columns in the importance score table
   task_id_cols <- get_task_id_cols(x)
-
   # create ggplot object
   ggplot(
     x,
@@ -112,7 +117,11 @@ plot.model_imp_tbl <- function(x, ...) {
     # add a line at y = 0 to indicate baseline
     geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
     # plot by task
-    facet_grid(cols = vars(!!!syms(task_id_cols)), scales = "free_x") +
+    facet_grid(
+      cols = vars(!!!syms(task_id_cols)),
+      scales = "free_x",
+      labeller = label_wrap_gen(width = 12)
+    ) +
     labs(
       title = "Model Importance by Task",
       x = "Model ID",
