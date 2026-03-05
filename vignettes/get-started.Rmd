@@ -18,9 +18,6 @@ knitr::opts_chunk$set(
   message = FALSE
 )
 options(width = 200)
-library(dplyr)
-library(ggplot2)
-library(kableExtra)
 ```
 
 
@@ -41,11 +38,30 @@ library(hubExamples)
 library(modelimportance)
 library(dplyr)
 library(ggplot2)
+library(kableExtra)
 ```
-
 
 We use some example forecast and target data from the `hubExamples` package, 
 which provides sample datasets for multiple modeling hubs in the hubverse format. 
+
+For better output of tables in this vignette, we create a helper function `tbl_format()` to format tables using the `kable` and `kable_styling` functions from the `knitr` and `kableExtra` packages, respectively.
+
+```{r}
+tbl_format <- function(x) {
+  x |>
+  knitr::kable(
+    format = "html"
+  ) |>
+  kableExtra::kable_styling(
+    font_size = 12,
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = TRUE
+  )
+}
+```
+
+
+also load the `kableExtra` package, which provides
 
 
 ## Example data
@@ -84,15 +100,7 @@ forecast_data <- forecast_data_raw |>
   anti_join(forecast_to_remove, by = c("model_id", "location", "target_end_date"))
 
 # Display the forecast data
-forecast_data |>
-  knitr::kable(
-    format = "html"
-  ) |>
-  kableExtra::kable_styling(
-    font_size = 12,
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    full_width = TRUE
-  )
+forecast_data |> tbl_format()
 ```
 
 The corresponding target data contains the observed hospitalization counts for 
@@ -108,14 +116,7 @@ target_data <- hubExamples::forecast_target_ts |>
   # Rename columns to match the oracle output format
   rename(oracle_value = observation)
 
-target_data |>
-  knitr::kable(
-    format = "html"
-  ) |>
-  kableExtra::kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    full_width = TRUE
-  )
+target_data |> tbl_format()
 ```
 
 We visualize the forecasts and the observed values.
@@ -166,44 +167,81 @@ simple mean ensemble using the LOMO algorithm.
 
 ```{r lomo}
 scores_lomo <- model_importance(
-  forecast_data = forecast_data, oracle_output_data = target_data,
+  forecast_data = forecast_data, 
+  oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble",
   importance_algorithm = "lomo"
 )
 
-scores_lomo |>
-  knitr::kable(
-    format = "html"
-  ) |>
-  kableExtra::kable_styling(
-    font_size = 12,
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    full_width = TRUE
-  )
+scores_lomo |> tbl_format()
 ```
 
 For models that missed forecasts for certain tasks, `NA` values are assigned in 
 the importance column for those tasks.
 
-We summarize the importance scores for each model by averaging across all tasks.
-`NA` values are removed during the averaging process by setting the `na_action`
-argument to `"drop"`.
-
-```{r lomo-NAdrop, eval=FALSE}
-summary.lomo.drop <- model_importance_summary(
-  scores_lomo,
-  by = "model_id", na_action = "drop", fun = mean
-)
-
-summary.lomo.drop |>
-  knitr::kable(
-    format = "html"
-  ) |>
-  kableExtra::kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    full_width = TRUE
-  )
+The output of model_importance() is an S3 object of class ‘model_imp_tbl’:
+```{r}
+class(scores_lomo)[1]
 ```
+
+Objects of this class enable dispatch for class-specific methods for printing, summarizing, plotting the modelimportance scores, and aggregating them across tasks. 
+
+```{r}
+print(scores_lomo)
+```
+
+Calling `summary()` shows that three models were used and four tasks were evaluated, along
+with a sneak peek of the top-performing model for each task.
+
+```{r}
+s <- summary(scores_lomo)
+s
+```
+
+As indicated in the output, more details about the summary are available through the summary object’s elements as follows.
+
+```{r}
+# Verify unique combination of task IDs
+s$all_tasks 
+```
+
+```{r}
+# Check each model's performance across all tasks
+s$model_summary 
+```
+
+We observe that ‘Flusight-baseline’ submitted forecasts for all four tasks (n_NA = 0), while ‘MOBS-GLEAM_FLUH’ and ‘PSI-DICE’ submitted forecasts for only three tasks due to one missing forecast (n_NA = 1).
+
+```{r}
+# Check the top-performing model for each task
+s$task_winners 
+```
+
+Models with the highest importance scores for each task are identified in the `top_model` column with their importance score in the `max_score` column. 
+‘PSI-DICE’ is the best model for three out of the four tasks, while ‘Flusight-baseline’ is the best for the remaining task.
+
+
+To visualize the model importance scores across tasks, we can use the `plot()` method together with `ggplot2` functions for further modification.
+
+```{r}
+plot(scores_lomo) + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+```
+
+We can average the importance scores for each model across all tasks using the `aggregate()`, which allows for different strategies to handle `NA` values.
+We can customize the aggregation process with the following arguments:
+
+- `by`: a character vector specifying the column(s) to group by for aggregation. 
+- `na_action`: a character string specifying how to handle `NA` values during aggregation. Options include `"drop"`, `"worst"`, and `"average"`.
+- `fun`: a function to apply for aggregation, such as `mean` and `median`.
+
+One straightforward approach is to simply drop the `NA` values during aggregation, which is the default value for `na_action`.
+```{r lomo-NAdrop}
+# Aggregate importance scores by model_id, dropping NA values
+aggregate(scores_lomo, by = "model_id", na_action = "drop", fun = mean) 
+```
+
+The function name used for aggregation is prefixed with 'importance score'. In this case, the function is `mean`, so the returned data frame includes the column `importance_score_mean`.
 The results show that the model 'PSI-DICE' has the highest importance score, 
 followed by 'Flusight-baseline' and 'MOBS-GLEAM_FLUH'.
 That is, 'PSI-DICE' contributes the most to improving the ensemble's predictive 
@@ -214,22 +252,10 @@ Another approach to handling `NA` values is to use the `"worst"` option for
 `na_action`, which replaces `NA` values with the worst (i.e., minimum) score 
 among the other models for the same task.
 
-```{r lomo-NAworst, eval=FALSE}
-summary.lomo.worst <- model_importance_summary(
-  scores_lomo,
-  by = "model_id", na_action = "worst", fun = mean
-)
-
-summary.lomo.worst |>
-  knitr::kable(
-    format = "html"
-  ) |>
-  kableExtra::kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    full_width = TRUE
-  )
+```{r lomo-NAworst}
+# Aggregate importance scores by model_id, replacing NA values with the worst score
+aggregate(scores_lomo, by = "model_id", na_action = "worst", fun = mean) 
 ```
-
 
 The results show that the importance scores of 'Flusight-baseline' is unchanged 
 because it has no missing forecast. 
@@ -238,26 +264,14 @@ positive, has now decreased to a negative value when compared to the evaluation
 using the `"drop"` option for `na_action`. Moreover, 'MOBS-GLEAM_FLUH' still 
 ranks the lowest, but the importance score has increased. 
 
-
 It is also possible to impute the missing scores with intermediate values by 
 assigning the average importance scores of other models in the same task. 
 This strategy may offer a more balanced trade-off by mitigating the influence of
 the missing data without overly penalizing or overlooking them. 
 
-```{r lomo-NAaverage, eval=FALSE}
-summary.lomo.avg <- model_importance_summary(
-  scores_lomo,
-  by = "model_id", na_action = "average", fun = mean
-)
-
-summary.lomo.avg |>
-  knitr::kable(
-    format = "html"
-  ) |>
-  kableExtra::kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    full_width = TRUE
-  )
+```{r lomo-NAaverage}
+# Aggregate importance scores by model_id, replacing NA values with the average score
+aggregate(scores_lomo, by = "model_id", na_action = "average", fun = mean) 
 ```
 
 ## Evaluation using LASOMO algorithm
@@ -271,31 +285,20 @@ are assigned to subsets of models when calculating importance scores, with
 The following code and corresponding outputs illustrate the evaluation using 
 each weighting scheme.
 
-```{r lasomo-NAdrop-equal, eval=FALSE}
+```{r lasomo-NAdrop-equal}
 #| message: false
 # LASOMO - equal weights
 scores_lasomo_eq <- model_importance(
-  forecast_data = forecast_data, oracle_output_data = target_data,
+  forecast_data = forecast_data, 
+  oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble",
   importance_algorithm = "lasomo", subset_wt = "equal"
 )
 
-summary.lasomo_eq <- model_importance_summary(
-  scores_lasomo_eq,
-  by = "model_id", na_action = "drop", fun = mean
-)
-
-summary.lasomo_eq |>
-  knitr::kable(
-    format = "html"
-  ) |>
-  kableExtra::kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    full_width = TRUE
-  )
+aggregate(scores_lasomo_eq, by = "model_id", na_action = "drop", fun = mean) 
 ```
 
-```{r lasomo-NAdrop-perm, eval=FALSE}
+```{r lasomo-NAdrop-perm}
 #| message: false
 # LASOMO - perm based weights
 scores_lasomo_perm <- model_importance(
@@ -305,19 +308,7 @@ scores_lasomo_perm <- model_importance(
   importance_algorithm = "lasomo", subset_wt = "perm_based"
 )
 
-summary.lasomo_perm <- model_importance_summary(
-  scores_lasomo_perm,
-  by = "model_id", na_action = "drop", fun = mean
-)
-
-summary.lasomo_perm |>
-  knitr::kable(
-    format = "html"
-  ) |>
-  kableExtra::kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    full_width = TRUE
-  )
+aggregate(scores_lasomo_perm, by = "model_id", na_action = "drop", fun = mean) 
 ```
 
 In this example, there are only three models ($n = 3$), and the weights do not 
@@ -335,3 +326,4 @@ An extensive application in more complex scenarios with a larger number of
 models can be found in @kim2024.
 
 ## References
+
