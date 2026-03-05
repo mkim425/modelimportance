@@ -25,8 +25,8 @@ summary.model_imp_tbl <- function(object, ...) {
     dplyr::group_by(model_id) |>
     dplyr::summarise(
       n_tasks = n(),
-      min_importance = min(importance, na.rm = TRUE),
-      max_importance = max(importance, na.rm = TRUE),
+      min_importance = min(importance, na.rm = TRUE) |> round(2),
+      max_importance = max(importance, na.rm = TRUE) |> round(2),
       n_NA = sum(is.na(importance)),
       .groups = "drop"
     ) |>
@@ -38,10 +38,11 @@ summary.model_imp_tbl <- function(object, ...) {
     dplyr::select(
       all_of(task_id_cols),
       top_model = model_id,
-      max_score = importance
+      max_score = importance,
     ) |>
     dplyr::ungroup() |>
-    as.data.frame()
+    as.data.frame() |>
+    dplyr::mutate(max_score = round(max_score, 2))
 
   # create summary list
   summary_list <- list(
@@ -83,7 +84,7 @@ print.summary.model_imp_tbl <- function(x, ...) {
     print(row.names = FALSE)
   cat("--------------------------------------------\n")
   cat(paste(
-    "* More details available in the summary object",
+    "* More details are available in the summary object",
     "(e.g., $all_tasks, $model_summary, $task_winners).\n",
     sep = " "
   ))
@@ -220,7 +221,10 @@ aggregate.model_imp_tbl <- function(
       .groups = "drop"
     ) |>
     # unquote symbol !!sym(colname) handles the dynamically created column name
-    dplyr::arrange(desc(!!sym(colname)))
+    dplyr::arrange(desc(!!sym(colname))) |>
+    dplyr::mutate(
+      dplyr::across(where(is.numeric), round, 2)
+    )
 
   cat("Overall model importance across tasks\n")
   cat(strrep("-", 40), "\n")
