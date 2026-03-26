@@ -62,17 +62,18 @@ options(tibble.width = Inf)
 
 ## Introduction {#sec:intro}
 
-Ensemble forecasting is a method to produce a single, consolidated prediction by combining forecasts generated from different models. While each model's strengths are pronounced, its weaknesses are counterbalanced, which leads to an ensemble forecast that is more robust and accurate [@gneiting2005weather; @hastie01statisticallearning].
+Ensemble forecasting is a method to produce a single, consolidated prediction by combining forecasts generated from different models. The strengths and weaknesses of individual models are both pronounced but tend to offset one another, leading to an ensemble forecast that is more robust and accurate [@gneiting2005weather; @hastie01statisticallearning].
 Specifically, ensembles effectively mitigate the bias and variance arising from the predictions of individual models by averaging them out, and aggregating in this way can reduce prediction errors and improve overall performance. 
-Enhanced prediction accuracy and robustness enable the achievement of more reliable predictions, thereby improving decision-making. For this reason, ensemble forecasting is widely used across various domains such as weather forecasting [@Guerra_2020; @gneiting2005weather], financial modeling [@SUN2020101160; @math11041054], and infectious disease outbreak forecasting [@ray_prediction_2018; @reich_accuracy_2019; @lutz_applying_2019; @viboud_rapidd_2018]. For example, throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub collected individual models developed by over 90 different research groups and built a probabilistic ensemble forecasting model for COVID-19 cases, hospitalizations, and deaths in the US, based on those models’ predictions. The ensemble model served as the official short-term forecasts for the US Centers for Disease Control and Prevention (CDC) [@cramer2022united].
+Enhanced prediction accuracy and robustness enable the achievement of more reliable predictions, thereby improving decision-making. For this reason, ensemble forecasting is widely used across various domains such as weather forecasting [@Guerra_2020; @gneiting2005weather], financial modeling [@SUN2020101160; @math11041054], and infectious disease outbreak forecasting [@ray_prediction_2018; @reich_accuracy_2019; @lutz_applying_2019; @viboud_rapidd_2018] to name a few. For example, throughout the COVID-19 pandemic, the US COVID-19 Forecast Hub collected individual models developed by over 90 different research groups and built a probabilistic ensemble forecasting model for COVID-19 cases, hospitalizations, and deaths in the US, based on those models’ predictions. The ensemble model served as the official short-term forecasts for the US Centers for Disease Control and Prevention (CDC) [@cramer2022united].
 
 The quality of forecasts is assessed by evaluating their errors, biases, sharpness, and/or calibration using different scoring metrics.
 The selection of scoring metrics depends on the type of forecast: 
 point forecasts (e.g., mean, median) and probabilistic forecasts (e.g., quantiles, probability mass function).
 Commonly used assessment tools for point forecasts are the mean absolute error (MAE) and the mean squared error (MSE), which calculate the average magnitude of forecast errors. 
-Scoring metrics for probabilistic forecasts consider the uncertainty and variability in predictions and provide concise evaluations through numerical scores [@gneiting_strictly_2007].  Some examples include the weighted interval score (WIS) for the quantile-based forecasts and the continuous ranked probability score (CRPS) for the forecasts taking the form of predictive cumulative distribution functions [@bracher_evaluating_2021]. We note that CRPS is a general scoring rule that can be computed either analytically in closed form or numerically from samples, and WIS is a quantile-based approximation of CRPS.
+Scoring metrics for probabilistic forecasts consider the uncertainty and variability in predictions and provide concise evaluations through numerical scores [@gneiting_strictly_2007].  Some examples include the weighted interval score (WIS), the continuous ranked probability score (CRPS), and the log score [@bracher_evaluating_2021]. 
+We note that CRPS is a general scoring rule that can be computed either analytically in closed form or numerically from samples, and WIS is a quantile-based approximation of CRPS.
 
-Several [R]{.proglang} packages have been developed for this purpose. To name a few, the [fable]{.pkg} package [@Rpackage-fable] is widely used for univariate time series forecasting and includes functions for accuracy measurement. The [Metrics]{.pkg} [@Rpackage-Metrics] and [MLmetrics]{.pkg} [@Rpackage-MLmetrics] provide a wide range of performance metrics specifically designed for evaluating machine learning models. The [scoringRules]{.pkg} [@Rpackage-scoringRules] package offers a comprehensive set of proper scoring rules for evaluating probabilistic forecasts and supports both univariate and multivariate settings. 
+Several [R]{.proglang} packages have been developed to evaluate forecast quality across both point and probabilistic settings.  To name a few, the [fable]{.pkg} package [@Rpackage-fable] is widely used for univariate time series forecasting and includes functions for accuracy measurement. The [Metrics]{.pkg} [@Rpackage-Metrics] and [MLmetrics]{.pkg} [@Rpackage-MLmetrics] provide a wide range of performance metrics specifically designed for evaluating machine learning models. The [scoringRules]{.pkg} [@Rpackage-scoringRules] package offers a comprehensive set of proper scoring rules for evaluating probabilistic forecasts and supports both univariate and multivariate settings. 
 The [scoringutils]{.pkg} [@bosse2022evaluating] package offers additional features to the functionality provided by
 [scoringRules]{.pkg}, which makes it more useful for certain tasks, such as summarizing, comparing, and visualizing forecast performance. 
 These packages have been valuable to evaluate individual models as independent entities, using performance metrics selected for each specific situation or problem type. However, they do not measure the individual models' contributions to the enhanced predictive accuracy when used as part of an ensemble. 
@@ -88,12 +89,12 @@ Related work by @lipiecki2024postprocessing used Shapley-based attribution to st
 However, while [PostForecasts.jl]{.pkg} was developed for [Julia]{.proglang} users originally focusing on energy economics, our [R]{.proglang} package focuses on epidemiological forecasts and offers a broader range of capabilities, such as handling missing forecasts. 
 
 These capabilities are particularly useful for hub organizers, who oversee collaborative forecasting systems that combine submissions from many teams into a single ensemble forecast [@shandross2026multi]. Examples include efforts coordinated by the US CDC and the European Centre for Disease Prevention and Control. 
-By quantifying each component model's contribution, [modelimportance]{.pkg} can support evidence-based decisions about ensemble design and maintenance. The package follows 'hubverse' conventions, a community-maintained ecosystem of open software and data standards for collaborative forecasting hubs [@hubverse_docs]. Using these shared data structures allows our package to be seamlessly integrated with existing hub pipelines and deployed across multiple active hubs. We note that there are over a dozen active hubs running as of fall 2025, with more in planning stages.
+By quantifying each component model's contribution, [modelimportance]{.pkg} can support evidence-based decisions about ensemble design and maintenance. The package follows 'hubverse' conventions, a community-maintained ecosystem of open software and data standards for collaborative forecasting hubs [@hubverse_docs; @kerr2025coordinating]. Using these shared data structures allows our package to be seamlessly integrated with existing hub pipelines and deployed across multiple active hubs. We note that there are 31 hubs as of March 2026, including model development and training hubs.
 
-We highlight some strong development practices we employed, such as unit testing of individual functions, continuous integration testing on different operating systems, and independent code review by peer developers. This emphasis on quality control is a key strength of this work and distinguishes it from other academic software development projects.
+We highlight some development practices we employed, such as unit testing of individual functions, object-oriented programming using S3 classes, continuous integration testing on different operating systems, and independent code review by peer developers. This emphasis on quality control is a key strength of this work and distinguishes it from some other academic software development projects.
 
 The paper proceeds as follows. 
-\hyperref[sec:data]{Section~\ref{sec:data}} describes how the \pkg{modelimportance} package relates to the hubverse framework, including its dependencies, the model output formats defined within hubverse, and the structure of data presentation for both forecasts and actual observations. 
+\hyperref[sec:data]{Section~\ref{sec:data}} describes (a) how the \pkg{modelimportance} package relates to the hubverse framework, including its dependencies, (b) the model output formats defined within hubverse, and (c) the structure of data presentation for both forecasts and actual observations. 
 \hyperref[sec:algorithms]{Section~\ref{sec:algorithms}} presents two algorithms implemented in \pkg{modelimportance} for calculating the model importance metric: leave-one-model-out and leave-all-subsets-of-models-out. 
 We demonstrate the various functionalities \pkg{modelimportance} supports in \hyperref[sec:main-function]{Section~\ref{sec:main-function}}. 
 We describes the S3 class structure and related methods implemented in the package in  \hyperref[sec:s3-infrastructure]{Section~\ref{sec:s3-infrastructure}}, followed by examples of their usage in \hyperref[sec:examples]{Section~\ref{sec:examples}}.
@@ -139,7 +140,7 @@ forecast_data |>
 
 Model outputs are structured in a tabular format designed specifically for predictions, which is a formal S3 object called `model_out_tbl`.
 In the hubverse standard, each row represents an individual prediction or a component of a prediction for a single task, and its details are described in multiple columns through which one can identify the unique label assigned to each forecasting model, task characteristics, prediction representation type, and predicted values [@shandross2026multi]. 
-To elaborate on the task characteristics, each prediction task means a specific forecasting problem and it can be described by a set of task ID variables. Examples of such variables include a date on which forecasts are generated, the target to predict (e.g., flu-related incident deaths, cases, or hospitalizations), and the prediction horizon, which is the length of time into the future from the point when a model generate its forecast, for a specific location on a certain target date.
+To elaborate on the task characteristics, each prediction task corresponds to a specific forecasting problem and it can be described by a set of task ID variables. Examples of such variables include a date on which forecasts are generated, the target to predict (e.g., flu-related incident deaths, cases, or hospitalizations), and the prediction horizon, which is the length of time into the future from the point when a model generate its forecast, for a specific location on a certain target date.
 @tbl-example-model_output illustrates short-term forecasts of weekly incident influenza hospitalizations in the US for Massachusetts, generated by the model 'Flusight-baseline' on December 17, 2022, in the `model_out_tbl` format.
 The `model_id` column lists a uniquely identified model name. All of the `reference_date`, `target`, `horizon`, `location`, and `target_end_date` columns are all referred to as the task ID variables, which together defines the task characteristics.
 Note that the forecast generation date and the target date for which the prediction is made are mapped to the `reference_date` and `target_end_date` columns, respectively, and the location is represented based on the FIPS code (e.g., '25' for Massachusetts).
@@ -237,13 +238,13 @@ forecast_data |>
 
 
 @fig-example-model_output visualizes the information on the prediction task provided by @tbl-example-model_output for three models. 
-For each model, the quantile-based forecasts are shown for the target end dates of December 24, 2022 (horizon 1), December 31, 2022 (horizon 2), and January 07, 2023 (horizon 3), which were made on December 17, 2022 based on the historical data available as of that date. The prediction intervals defined by the lowest and highest quantiles (0.05 and 0.95) represent the uncertainty of the predictions. To give brief details in the interpretation, the Flusight-baseline model under-predicted the outcomes for the first two target dates (horizon 1 and 2), but it over-predicted the outcome for the last target date (horizon 3). Its prediction intervals are narrow compared to the other two models, which indicates that it is more confident about its predictions. However, two of three prediction intervals (horizons 1 and 2) failed to cover the eventually observed values, implying that the model was apparently overconfident. 
+For each model, the quantile-based forecasts are shown for the target end dates of December 24, 2022 (horizon 1), December 31, 2022 (horizon 2), and January 07, 2023 (horizon 3), which were made on December 17, 2022 based on the historical data available as of that date. The prediction intervals defined by the lowest and highest quantiles (0.05 and 0.95) represent the uncertainty of the predictions. To give a brief interpretation, the Flusight-baseline model under-predicted the outcomes for the first two target dates (horizon 1 and 2), but it over-predicted the outcome for the last target date (horizon 3). Its prediction intervals are narrow compared to the other two models, which indicates that it is more confident about its predictions. However, two of three prediction intervals (horizons 1 and 2) failed to cover the eventually observed values, implying that the model was apparently overconfident and/or biased. 
 
 ### Forecast data representation {#subsec:model_output}
 
 Generally, quantitative forecasts can be categorized into either point forecasts or probabilistic forecasts. 
 For a specific prediction task, point forecasts, represented by a single predicted value, provide a clear and concise prediction, making them easy to interpret and communicate. 
-Probabilistic forecasts, on the other hand, provide a probability distribution over possible future values, which inherently involves uncertainty. They are represented in various ways, such as probability mass functions (pmf), cumulative distribution functions (cdf), samples, or probability quantiles (or intervals). 
+Probabilistic forecasts, on the other hand, provide a probability distribution over possible future values, which inherently involves uncertainty. They are represented in various ways, such as probability mass functions (pmf), cumulative distribution functions (cdf), samples, or probability quantiles (or intervals). Note that there might be other ways, such as named distributions (e.g. Normal(1,2)) that are not currently supported by hubverse.
 
 The `output_type` and `output_type_id` columns in the model output format, as defined by the hubverse convention, specify the forecast structure. 
 Only one `output_type` is allowed, and it must be one of the 'mean', 'median', 'quantile', or 'pmf' in the [modelimportance]{.pkg} package: 'mean' or 'median' for point forecasts and 'quantile' or 'pmf' for probabilistic forecasts. 
@@ -263,10 +264,10 @@ data.frame(
   "Output Type" = c("mean", "median", "quantile", "pmf"),
   "Scoring Rule" = c("RSE", "AE", "WIS", "Log Score"),
   Description = c(
-    "Evaluate using the root squared error (RSE)",
-    "Evaluate using the absolute error (AE)",
-    "Evaluate using the weighted interval score (WIS)",
-    "Evaluate using the logarithm of the probability assigned to the true outcome (LogScore)"
+    "Root squared error (RSE)",
+    "Absolute error (AE)",
+    "Weighted interval score (WIS)",
+    "Logarithm of the probability assigned to the true outcome (LogScore)"
   ),
   check.names = FALSE
 ) |>
@@ -276,7 +277,7 @@ data.frame(
 
 ### Oracle output data {#subsec:oracle_output_data}
 
-The `oracle_output_data` is a data frame that contains the ground truth values for the variables used to define modeling targets. It is referred to as "oracle" because it is formatted as if an oracle made a perfect point prediction equal to the truth.
+The `oracle_output_data` is a data frame that contains the ground truth values for the variables used to define modeling targets [@hubverse_docs; @kerr2025coordinating]. It is referred to as "oracle" because it is formatted as if an oracle made a perfect point prediction equal to the truth.
 This data must follow the oracle output format defined in the hubverse standard, which includes independent task ID columns (e.g., `location`, `target_date`), the `output_type` column specifying the output type of the predictions and an `oracle_value` column for the observed values. 
 As in the forecast data, if the `output_type` is either `"quantile"` or `"pmf"`, the `output_type_id` column is often required to provide further identifying information. 
 
@@ -291,18 +292,18 @@ We apply this idea across many tasks and then average the task-level values to o
 ```{r, fig.pos="t"}
 #| echo: false
 #| label: fig-concept
-#| fig-cap: "Conceptual illustration of measuring model importance in a three-model setting. Each circle represents a forecasting model with component model(s) shown inside. Vertical bars indicate the performance score measured by a positively oriented scoring rule (e.g., $-$WIS), with more bars indicating better accuracy. LOMO computes a single performance difference by removing the target model A from the full ensemble. LASOMO leverages multiple performance differences across all subsets containing the model A and aggregates them."
+#| fig-cap: "Conceptual illustration of measuring model importance in a three-model setting. Each circle represents a forecasting model with component model(s) shown inside. Stars indicate the performance score measured by a positively oriented scoring rule (e.g., $-$WIS), with more stars indicating better accuracy. LOMO computes a single performance difference by removing the target model 1 from the full ensemble. LASOMO leverages multiple performance differences across all subsets containing the model 1 and aggregates them."
 #| out.width: "100%"
 #| fig-align: "center"
-knitr::include_graphics("figure-concept.png")
+knitr::include_graphics("figure-concept.pdf")
 ```
 
 
 LOMO involves creating an ensemble by excluding one component model from the entire set of models. 
-Let ${\cal A}$ be a set of $n$ models and $F^i$ be a forecast produced by model $i$, where $i = 1,2, \dots, n.$
+Let ${\mathcal A}$ be a set of $n$ models and $F^i$ be a forecast produced by model $i$, where $i = 1,2, \dots, n.$
 Each ensemble excludes exactly one model while including all the others. 
-$F^{{\cal A}^{-i}}$ denotes the ensemble forecast constructed using all forecasts $F^{\cal A}$ except $F^i$. 
-Model $i$'s importance score using LOMO is calculated as the difference in accuracy, as measured by a specific scoring rule, between $F^{{\cal A}^{-i}}$ and $F^{\cal A}$  (\hyperref[alg:lomo]{Algorithm~\ref{alg:lomo}}). 
+$F^{{\mathcal A}^{-i}}$ denotes the ensemble forecast constructed using all forecasts $F^{\mathcal A}$ except $F^i$. 
+Model $i$'s importance score using LOMO is calculated as the difference in accuracy, as measured by a specific scoring rule, between $F^{{\mathcal A}^{-i}}$ and $F^{\mathcal A}$  (\hyperref[alg:lomo]{Algorithm~\ref{alg:lomo}}). 
 For example, when evaluating model 1 within an ensemble of three models ($n=3$), LOMO creates an ensemble forecast $F^{\{2,3\}}$ using only $F^2$ and $F^3$. The performance of this reduced ensemble is then compared to the full ensemble forecast $F^{\{1,2,3\}}$, which incorporates all three models. 
 We note that a model can make an ensemble better or worse, and thus the importance score for model 1 can be positive or negative accordingly.
 
@@ -313,23 +314,24 @@ We note that a model can make an ensemble better or worse, and thus the importan
  \begin{spacing}{1.2}
   \begin{algorithmic}[1]
    \REQUIRE{
-    \Statex $\bullet$ Set of $n$ individual models, ${\cal A}=\{1,2,\dots, n\},$ and their forecasts $\{F^1,F^2,...,F^n\}$
+    \Statex $\bullet$ Set of $n$ individual models, ${\mathcal A}=\{1,2,\dots, n\},$ and their forecasts $\{F^1,F^2,...,F^n\}$
     \Statex $\bullet$ Truth value, $y$
     \Statex $\bullet$ Function $g$ to build an ensemble
-    \Statex $\bullet$ A positively oriented scoring rule $\psi$ to evaluate forecast skills}
+    }
    \ENSURE importance metric of model $i$, $\phi^{i,\text{lomo}}$
-    \STATE{Create an ensemble forecast $F^{\cal A}$ using $g$: $F^{\cal A} \gets g(\{F^1,F^2,...,F^n\})$}
-    \STATE{Evaluate $F^{\cal A}$ using $\psi$: $\psi(F^{\cal A},y).$}
+    \STATE{Assign a positively oriented scoring rule $\psi$ to evaluate forecast skills, depending on the output type (\hyperref[tbl-pair-output-scoringrule]{Table~\ref{tbl-pair-output-scoringrule}})}
+    \STATE{Create an ensemble forecast $F^{\mathcal A}$ using $g$: $F^{\mathcal A} \gets g(\{F^1,F^2,...,F^n\})$}
+    \STATE{Evaluate $F^{\mathcal A}$ using $\psi$: $\psi(F^{\mathcal A},y).$}
     \FOR{each $i, (i = 1,2,..., n)$}
-      \STATE {$F^{{\cal A}^{-i}} \gets g(\{F^j|\, j\ne i, j\in {\cal A}\})$}
-      \STATE{Compute $\psi(F^{{\cal A}^{-i}},y).$}
-      \STATE $\phi^{i,\text{lomo}} \gets \psi(F^{\cal A},y) - \psi(F^{{\cal A}^{-i}},y)$
+      \STATE {$F^{{\mathcal A}^{-i}} \gets g(\{F^j|\, j\ne i, j\in {\mathcal A}\})$}
+      \STATE{Compute $\psi(F^{{\mathcal A}^{-i}},y).$}
+      \STATE $\phi^{i,\text{lomo}} \gets \psi(F^{\mathcal A},y) - \psi(F^{{\mathcal A}^{-i}},y)$
     \ENDFOR
   \end{algorithmic}
  \end{spacing}
 \end{algorithm}
 
-On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays the role of ${\cal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}).
+On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays the role of ${\mathcal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}).
 For example, using the earlier setup of three forecast models, LASOMO considers three subsets, which we denote by $S_1=\{2\}$, $S_2=\{3\}$, and $S_3=\{2, 3\}$, to calculate the importance score of model 1 (excluding all subsets that include model 1). The ensemble forecasts $F^{\{2\}}, F^{\{3\}}$, and $F^{\{2,3\}}$ are then compared to $F^{\{1,2\}}, F^{\{1,3\}}$, and $F^{\{1,2,3\}}$, respectively. The performance differences attributable to model 1's inclusion are aggregated, which results in the importance score for model 1. We note that the subsets (e.g., $S_1, S_2,$ and $S_3$) may have different weights during the aggregation process. 
 
 
@@ -339,19 +341,20 @@ For example, using the earlier setup of three forecast models, LASOMO considers 
  \begin{spacing}{1.2}
   \begin{algorithmic}[1]
    \REQUIRE{
-    \Statex $\bullet$ Set of $n$ individual models, ${\cal A}=\{1,2,\dots, n\},$ and their forecasts $\{F^1,F^2,...,F^n\}$
+    \Statex $\bullet$ Set of $n$ individual models, ${\mathcal A}=\{1,2,\dots, n\},$ and their forecasts $\{F^1,F^2,...,F^n\}$
     \Statex $\bullet$ Truth value, $y$
     \Statex $\bullet$ Function $g$ to build an ensemble
-    \Statex $\bullet$ A positively oriented scoring rule $\psi$ to evaluate forecast skills}
+    \Statex $\bullet$ Subset weighting option, either `equal' or `perm\_based' }
    \ENSURE Importance metric of model $i$, $\phi^{i,\text{lasomo}}$
+   \STATE{Assign a positively oriented scoring rule $\psi$ to evaluate forecast skills, depending on the output type (\hyperref[tbl-pair-output-scoringrule]{Table~\ref{tbl-pair-output-scoringrule}})}
    \FOR{$i = 1 \text{ to } n$}
      \STATE $\phi^{i,\text{lasomo}} \gets 0$
-     \STATE Make a list of non-empty subsets of $\cal A$ that does not contain $i$: $S_1, S_2, \cdots, S_{2^{n-1}-1}$
+     \STATE Make a list of non-empty subsets of $\mathcal A$ that does not contain $i$: $S_1, S_2, \cdots, S_{2^{n-1}-1}$
      \FOR{$j = 1 \text{ to } 2^{n-1}-1$}
        \STATE{Assign a weight to the subset $S_j$: }
-         \IF{all subsets have uniform weights}
+         \IF{`equal' subset weighting is selected}
            \STATE $\gamma_{S_j} \gets \displaystyle\frac{1}{2^{n-1}-1}$
-         \ELSE{ (\textit{subset's weight depends on its size})}
+         \ELSE{ (\textit{`perm\_based' subset weighting})}
            \STATE {$\gamma_{S_j} \gets \displaystyle\frac{1}{(n-1)\binom{n-1}{|S_j|}}$}
          \ENDIF
        \STATE{$F^{S_j}\gets g(\{F^j|\, j\in S_j\})$}
@@ -1130,8 +1133,10 @@ This highlights the trade-off between the comprehensiveness of the LASOMO algori
 
 ## Implementation and availability {#sec:implementation-and-availability}
 
-This package is implemented in [R]{.proglang} and distributed via CRAN and GitHhub (\url{https://github.com/mkim425/modelimportance}). 
-We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure that all functions work correctly as expected,  including those used internally. We also performed continuous integration testing using GitHub Actions to maintain functionality across platforms, including Windows, macOS, and Linux. Integrated GitHub Action, we employed the [lintr]{.pkg} package to maintain code quality and detect potential issues, and the Air formatter to ensure consistent code style across the codebase.
+This package is implemented in [R]{.proglang} and distributed via CRAN and GitHub, under the MIT license (\url{https://github.com/mkim425/modelimportance}). 
+We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to 
+to verify that all inputs and outputs are properly formatted and ensure that all functions work correctly as expected, including those used internally. 
+We also performed continuous integration testing using GitHub Actions to maintain functionality across platforms, including Windows, macOS, and Linux. Integrated GitHub Action, we employed the [lintr]{.pkg} package [@Rpackage-lintr] to maintain code quality and detect potential issues, and the Air formatter [@air_formatter] to ensure consistent code style across the codebase.
 All code changes were systematically reviewed by fellow team members, and this enhanced reliability. 
 
 ## Summary and discussion {#sec:discussion}
