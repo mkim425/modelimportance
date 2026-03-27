@@ -373,6 +373,7 @@ The differences in how the two weighting schemes influence the importance scores
 As described in \hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}, the formulas for their subset weights are 
 $$\frac{1}{2^{n-1}-1} \quad\text{and}\quad \frac{1}{(n-1)\binom{n-1}{k}},$$ 
 where $k$ is the size of each subset and $n$ is the total number of models.
+<!-- I find it difficult to remember which is the equal scheme and which is the permutation-based scheme without referencing Algorithm 2, so I recommend denoting them within text, even if you just say something like "The equal scheme (left formula)... The permutation-based scheme (right formula)"--->
 The equal scheme treats all subsets equally, so medium-sized subsets have considerable influence in the final result, as there are many such subsets. In contrast, the permutation-based scheme adjusts the weights according to the subset size, giving the greatest weight to both the smallest and largest subsets while assigning small weights to the mid-sized subsets. 
 Moreover, the weights assigned to the mid-sized subsets under the permutation-based approach decrease much faster with $n$ than those under the equal weighting scheme (see 
 \hyperref[sec:appendix]{Appendix~\ref{sec:appendix}} for details). Consequently, when $n$ is large, middle-sized subsets play a dominant role in determining the importance scores under the equal weighting scheme, whereas extreme-sized subsets primarily drive the scores under the permutation-based weighting approach.
@@ -381,6 +382,7 @@ Overall, the difference between the two weighting schemes is likely to arise
 mainly from the the extreme-sized subsets when $n$ is large.
 This is because the weights given to the mid-sized subsets become increasingly similar, which are very small  values on the order of $10^{-3}$ even when $n=8$, while the weights assigned to the smallest and largest subsets remain substantially different (@fig-lasomo-weights).
 
+<!-- In the figure below, I'd prefer that the lines representing the min and max of the permutation-based weights have either matching shapes or matching colors to indicate that they are from the same weighting scheme (which is different from that of the equal weights scheme).--->
 
 ```{r, fig.pos="t"}
 #| echo: false
