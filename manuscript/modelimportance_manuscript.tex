@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, breakable, boxrule=0pt, interior hidden, borderline west={3pt}{0pt}{shadecolor}, enhanced, frame hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, borderline west={3pt}{0pt}{shadecolor}, interior hidden, frame hidden, breakable, boxrule=0pt, sharp corners]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -430,8 +430,7 @@ extensions.
 
 \section{Data}\label{sec:data}
 
-\subsection{Relationship and dependencies on
-hubverse}\label{subsec:dependence_hubverse}
+\subsection{Dependencies and related software}\label{subsec:dependences}
 
 The \pkg{modelimportance} package is designed to work with the hubverse
 framework and, accordingly, depends on several packages in the hubverse
@@ -452,39 +451,15 @@ the example datasets from \pkg{hubExamples} for testing and
 demonstration purposes (see
 \hyperref[sec:examples]{Section~\ref{sec:examples}}).
 
+For visualization of model importance scores, standard \pkg{ggplot2}
+\citep{Rpackage-ggplot2} functions can be applied for further
+customization. Parallel computing is supported by the \pkg{furrr}
+\citep{Rpackage-furrr} and \pkg{future} \citep{Rpackage-future}
+packages, which allow users to specify the number of cores to use for
+parallel processing when calculating model importance scores across many
+tasks.
+
 \subsection{Model output format}\label{subsec:model_output_format}
-
-\begin{table}
-
-\centering{
-
-\centering
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
-\begin{tabular}{lllrllllr}
-\toprule
-model\_id & reference\_date & target & horizon & location & target\_end\_date & output\_type & output\_type\_id & value\\
-\midrule
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.05 & 496\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.1 & 536\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.25 & 566\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.5 & 582\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.75 & 598\\
-\addlinespace
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.9 & 629\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.95 & 668\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.05 & 454\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.1 & 518\\
-Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.25 & 558\\
-\bottomrule
-\end{tabular}}
-
-}
-
-\caption{\label{tbl-example-model_output}Example of the model output for
-incident influenza hospitalizations (top 10 rows) extracted from
-\texttt{forecast\_outputs} data in the \pkg{hubExamples} package.}
-
-\end{table}%
 
 Model outputs are structured in a tabular format designed specifically
 for predictions, which is a formal S3 object called
@@ -522,7 +497,39 @@ of 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, and 0.95 for each target end date.
 The predicted value corresponding to each quantile is recorded in the
 \texttt{value} column.
 
-\begin{figure}[t]
+\begin{table}
+
+\centering{
+
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}{lllrllllr}
+\toprule
+model\_id & reference\_date & target & horizon & location & target\_end\_date & output\_type & output\_type\_id & value\\
+\midrule
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.05 & 496\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.1 & 536\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.25 & 566\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.5 & 582\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.75 & 598\\
+\addlinespace
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.9 & 629\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 1 & 25 & 2022-12-24 & quantile & 0.95 & 668\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.05 & 454\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.1 & 518\\
+Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantile & 0.25 & 558\\
+\bottomrule
+\end{tabular}}
+
+}
+
+\caption{\label{tbl-example-model_output}Example of the model output for
+incident influenza hospitalizations (top 10 rows) extracted from
+\texttt{forecast\_outputs} data in the \pkg{hubExamples} package.}
+
+\end{table}%
+
+\begin{figure}[h]
 
 \centering{
 
@@ -593,7 +600,13 @@ their associated scoring rules supported by the \pkg{modelimportance}
 package. We note that the scoring rules are listed in the table using
 their conventional names, however, the package uses their negative
 values for evaluation (e.g., \(-\text{RSE}, -\text{WIS}\)) so that
-higher scores indicate better performance.
+higher scores indicate better performance. This positively oriented
+scoring rule facilitates the interpretation of importance scores:
+positive values indicate that the model's inclusion in the ensemble
+improves ensemble performance, whereas negative values indicate that it
+worsens it. Also, a higher importance score indicates a greater
+contribution of the model to the ensemble's predictive performance,
+which aligns with the convention of Shapley values.
 
 \begin{table}
 
@@ -672,24 +685,6 @@ them.}
 
 \end{figure}%
 
-LOMO involves creating an ensemble by excluding one component model from
-the entire set of models. Let \({\mathcal A}\) be a set of \(n\) models
-and \(F^i\) be a forecast produced by model \(i\), where
-\(i = 1,2, \dots, n.\) Each ensemble excludes exactly one model while
-including all the others. \(F^{{\mathcal A}^{-i}}\) denotes the ensemble
-forecast constructed using all forecasts \(F^{\mathcal A}\) except
-\(F^i\). Model \(i\)'s importance score using LOMO is calculated as the
-difference in accuracy, as measured by a specific scoring rule, between
-\(F^{{\mathcal A}^{-i}}\) and \(F^{\mathcal A}\)
-(\hyperref[alg:lomo]{Algorithm~\ref{alg:lomo}}). For example, when
-evaluating model 1 within an ensemble of three models (\(n=3\)), LOMO
-creates an ensemble forecast \(F^{\{2,3\}}\) using only \(F^2\) and
-\(F^3\). The performance of this reduced ensemble is then compared to
-the full ensemble forecast \(F^{\{1,2,3\}}\), which incorporates all
-three models. We note that a model can make an ensemble better or worse,
-and thus the importance score for model 1 can be positive or negative
-accordingly.
-
 \begin{algorithm}[b!]
 \caption{Importance score calculation for one prediction task using leave one model out (LOMO) algorithm} 
 \label{alg:lomo}
@@ -712,6 +707,24 @@ accordingly.
   \end{algorithmic}
  \end{spacing}
 \end{algorithm}
+
+LOMO involves creating an ensemble by excluding one component model from
+the entire set of models. Let \({\mathcal A}\) be a set of \(n\) models
+and \(F^i\) be a forecast produced by model \(i\), where
+\(i = 1,2, \dots, n.\) Each ensemble excludes exactly one model while
+including all the others. \(F^{{\mathcal A}^{-i}}\) denotes the ensemble
+forecast constructed using all forecasts \(F^{\mathcal A}\) except
+\(F^i\). Model \(i\)'s importance score using LOMO is calculated as the
+difference in accuracy, as measured by a specific scoring rule, between
+\(F^{{\mathcal A}^{-i}}\) and \(F^{\mathcal A}\)
+(\hyperref[alg:lomo]{Algorithm~\ref{alg:lomo}}). For example, when
+evaluating model 1 within an ensemble of three models (\(n=3\)), LOMO
+creates an ensemble forecast \(F^{\{2,3\}}\) using only \(F^2\) and
+\(F^3\). The performance of this reduced ensemble is then compared to
+the full ensemble forecast \(F^{\{1,2,3\}}\), which incorporates all
+three models. We note that a model can make an ensemble better or worse,
+and thus the importance score for model 1 can be positive or negative
+accordingly.
 
 On the other hand, LASOMO involves ensemble constructions from all
 possible subsets of models. For each subset \(S\) that does not contain
@@ -771,10 +784,36 @@ Shapley values, where a player's average contribution is aggregated over
 all possible coalitions (or, equivalently, over all permutations of
 players) (\citet{Shapley1953}). Users can choose one to evaluate the
 contribution of each model in a manner suited to their preferred
-framework.
+framework. Uniform weighting may be preferred when each subset size is
+of equal analytical interest, regardless of how many such subsets there
+are, while size-based weighting may be preferred when users want to
+maintain the original Shapley value interpretation, preventing numerous
+medium-sized subsets from dominating the importance scores.
 
 \subsection{Comparison of weighting schemes in
 LASOMO}\label{comparison-of-weighting-schemes-in-lasomo}
+
+\begin{figure}[t]
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{modelimportance_manuscript_files/figure-pdf/fig-lasomo-weights-1.pdf}}
+
+}
+
+\caption{\label{fig-lasomo-weights}Comparison of weights assigned to a
+subset. The plot shows the weights assigned to a subset as the number of
+models \(n\) increases from 2 to 10. The red line represents the weights
+under the equal weighting scheme, while the blue and green lines
+represent the minimum and maximum weights, respectively, under the
+permutation-based weighting scheme. The minimum weight occurs when the
+subset size is around \((n-1)/2\), and the maximum weight occurs when
+the subset size is \(n-1\). As the number of models increases, the
+weights assigned by the two schemes become increasingly similar for
+mid-sized subsets whereas substantial differences remain for
+extreme-sized subsets.}
+
+\end{figure}%
 
 The differences in how the two weighting schemes influence the
 importance scores become more pronounced as the number of models
@@ -805,28 +844,6 @@ increasingly similar, which are very small values on the order of
 smallest and largest subsets remain substantially different
 (Figure~\ref{fig-lasomo-weights}).
 
-\begin{figure}[t]
-
-\centering{
-
-\pandocbounded{\includegraphics[keepaspectratio]{modelimportance_manuscript_files/figure-pdf/fig-lasomo-weights-1.pdf}}
-
-}
-
-\caption{\label{fig-lasomo-weights}Comparison of weights assigned to a
-subset. The plot shows the weights assigned to a subset as the number of
-models \(n\) increases from 2 to 10. The red line represents the weights
-under the equal weighting scheme, while the blue and green lines
-represent the minimum and maximum weights, respectively, under the
-permutation-based weighting scheme. The minimum weight occurs when the
-subset size is around \((n-1)/2\), and the maximum weight occurs when
-the subset size is \(n-1\). As the number of models increases, the
-weights assigned by the two schemes become increasingly similar for
-mid-sized subsets whereas substantial differences remain for
-extreme-sized subsets.}
-
-\end{figure}%
-
 \section{Main function}\label{sec:main-function}
 
 In this section, we describe the usage of the function
@@ -834,36 +851,6 @@ In this section, we describe the usage of the function
 customize the evaluation framework (Table~\ref{tbl-arguments1}).
 
 \subsection{model\_importance( )}\label{model_importance}
-
-\begin{table}
-
-\centering{
-
-\centering\begingroup\fontsize{10.5}{12.5}\selectfont
-
-\begin{tabular}{l>{\raggedright\arraybackslash}p{3.8cm}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.8cm}}
-\toprule
-Argument & Description & Possible Values & Default\\
-\midrule
-\cellcolor{gray!10}{\texttt{forecast\_data}} & \cellcolor{gray!10}{Forecasts} & \cellcolor{gray!10}{Must be the model output format} & \cellcolor{gray!10}{N/A}\\
-\texttt{oracle\_output\_data} & Ground truth data & Must be the oracle output format & N/A\\
-\cellcolor{gray!10}{\texttt{ensemble\_fun}} & \cellcolor{gray!10}{Ensemble method} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}, \texttt{"linear\_pool"}} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}}\\
-\texttt{importance\_algorithm} & Algorithm to calculate importance & \texttt{"lomo", "lasomo"} & \texttt{"lomo"}\\
-\cellcolor{gray!10}{\texttt{subset\_wt}} & \cellcolor{gray!10}{Method for assigning weight to subsets when using LASOMO algorithm} & \cellcolor{gray!10}{\texttt{"equal", "perm\_based"}} & \cellcolor{gray!10}{\texttt{"equal"}}\\
-\addlinespace
-\texttt{min\_log\_score} & Minimum value to replace for log score & Non-positive numeric & -10\\
-\cellcolor{gray!10}{\texttt{...}} & \cellcolor{gray!10}{Optional arguments for \texttt{"simple\_ensemble"}} & \cellcolor{gray!10}{Varies} & \cellcolor{gray!10}{\texttt{agg\_fun="mean"}}\\
-\bottomrule
-\end{tabular}
-\endgroup{}
-
-}
-
-\caption{\label{tbl-arguments1}Description of the arguments for the
-\texttt{model\_importance()} function, including their purpose, possible
-values, and default settings.}
-
-\end{table}%
 
 The \texttt{model\_importance()} function calculates the importance
 scores of ensemble component models based on their contributions to
@@ -929,6 +916,36 @@ calculating the importance metric based on the log score. The default
 value is set to -10, following the CDC FluSight thresholding convention
 \citep{brooks2018nonmechanistic, reich_accuracy_2019}. Users may choose
 a different value based on their practical needs.
+
+\begin{table}
+
+\centering{
+
+\centering\begingroup\fontsize{10.5}{12.5}\selectfont
+
+\begin{tabular}{l>{\raggedright\arraybackslash}p{3.8cm}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.8cm}}
+\toprule
+Argument & Description & Possible Values & Default\\
+\midrule
+\cellcolor{gray!10}{\texttt{forecast\_data}} & \cellcolor{gray!10}{Forecasts} & \cellcolor{gray!10}{Must be the model output format} & \cellcolor{gray!10}{N/A}\\
+\texttt{oracle\_output\_data} & Ground truth data & Must be the oracle output format & N/A\\
+\cellcolor{gray!10}{\texttt{ensemble\_fun}} & \cellcolor{gray!10}{Ensemble method} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}, \texttt{"linear\_pool"}} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}}\\
+\texttt{importance\_algorithm} & Algorithm to calculate importance & \texttt{"lomo", "lasomo"} & \texttt{"lomo"}\\
+\cellcolor{gray!10}{\texttt{subset\_wt}} & \cellcolor{gray!10}{Method for assigning weight to subsets when using LASOMO algorithm} & \cellcolor{gray!10}{\texttt{"equal", "perm\_based"}} & \cellcolor{gray!10}{\texttt{"equal"}}\\
+\addlinespace
+\texttt{min\_log\_score} & Minimum value to replace for log score & Non-positive numeric & -10\\
+\cellcolor{gray!10}{\texttt{...}} & \cellcolor{gray!10}{Optional arguments for \texttt{"simple\_ensemble"}} & \cellcolor{gray!10}{Varies} & \cellcolor{gray!10}{\texttt{agg\_fun="mean"}}\\
+\bottomrule
+\end{tabular}
+\endgroup{}
+
+}
+
+\caption{\label{tbl-arguments1}Description of the arguments for the
+\texttt{model\_importance()} function, including their purpose, possible
+values, and default settings.}
+
+\end{table}%
 
 The \texttt{model\_importance()} function returns an object of S3 class
 \texttt{model\_imp\_tbl}, with columns \texttt{model\_id},
@@ -1092,41 +1109,42 @@ MOBS-GLEAM\_FLUH's forecast for Massachusetts on November 26, 2022, and
 PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 
 \begin{verbatim}
-> forecast_data
+> forecast_data |>
+  knitr::kable(format = "latex", booktabs = TRUE) |>
+  kable_styling(latex_options = c("scale_down", "hold_position"))
 \end{verbatim}
 
 \small
 
-\begin{verbatim}
-# A tibble: 10 x 9
-   model_id          reference_date target          horizon location
-   <chr>             <date>         <chr>             <int> <chr>   
- 1 Flusight-baseline 2022-11-19     wk inc flu hosp       1 25      
- 2 Flusight-baseline 2022-11-19     wk inc flu hosp       3 25      
- 3 Flusight-baseline 2022-11-19     wk inc flu hosp       1 48      
- 4 Flusight-baseline 2022-11-19     wk inc flu hosp       3 48      
- 5 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 25      
- 6 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       1 48      
- 7 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 48      
- 8 PSI-DICE          2022-11-19     wk inc flu hosp       1 25      
- 9 PSI-DICE          2022-11-19     wk inc flu hosp       3 25      
-10 PSI-DICE          2022-11-19     wk inc flu hosp       1 48      
-   target_end_date output_type output_type_id value
-   <date>          <chr>       <chr>          <dbl>
- 1 2022-11-26      median      <NA>              51
- 2 2022-12-10      median      <NA>              51
- 3 2022-11-26      median      <NA>            1052
- 4 2022-12-10      median      <NA>            1052
- 5 2022-12-10      median      <NA>              43
- 6 2022-11-26      median      <NA>            1072
- 7 2022-12-10      median      <NA>             688
- 8 2022-11-26      median      <NA>              90
- 9 2022-12-10      median      <NA>             159
-10 2022-11-26      median      <NA>            1226
-\end{verbatim}
+\begin{table}[!h]
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}{lllrllllr}
+\toprule
+model\_id & reference\_date & target & horizon & location & target\_end\_date & output\_type & output\_type\_id & value\\
+\midrule
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 1 & 25 & 2022-11-26 & median & NA & 51\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 3 & 25 & 2022-12-10 & median & NA & 51\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 1 & 48 & 2022-11-26 & median & NA & 1052\\
+Flusight-baseline & 2022-11-19 & wk inc flu hosp & 3 & 48 & 2022-12-10 & median & NA & 1052\\
+MOBS-GLEAM\_FLUH & 2022-11-19 & wk inc flu hosp & 3 & 25 & 2022-12-10 & median & NA & 43\\
+\addlinespace
+MOBS-GLEAM\_FLUH & 2022-11-19 & wk inc flu hosp & 1 & 48 & 2022-11-26 & median & NA & 1072\\
+MOBS-GLEAM\_FLUH & 2022-11-19 & wk inc flu hosp & 3 & 48 & 2022-12-10 & median & NA & 688\\
+PSI-DICE & 2022-11-19 & wk inc flu hosp & 1 & 25 & 2022-11-26 & median & NA & 90\\
+PSI-DICE & 2022-11-19 & wk inc flu hosp & 3 & 25 & 2022-12-10 & median & NA & 159\\
+PSI-DICE & 2022-11-19 & wk inc flu hosp & 1 & 48 & 2022-11-26 & median & NA & 1226\\
+\bottomrule
+\end{tabular}}
+\end{table}
 
 \vspace{0.35cm} 
 \normalsize
+
+The \texttt{forecast\_data} output was rendered using the \pkg{knitr}
+\citep{Rpackage-knitr} package and styled with \pkg{kableExtra}
+\citep{Rpackage-kableExtra} to improve readability, including automatic
+scaling to fit within page width.
 
 The corresponding target data contains the observed hospitalization
 counts for these dates and locations.
@@ -1594,11 +1612,11 @@ implemented using the \pkg{future} (\texttt{multisession} backend) with
 \caption{\label{fig-feasibility-comparison}Runtime to compute model
 importance scores by number of ensemble component models (ranging from 2
 to 10) and number of prediction tasks (10, 20, 50, and 100) under
-sequential and parallel execution modes (multisession backend) for LOMO
-and LASOMO algorithms. The elapsed time is represented in seconds. The
-computing mode is indicated by color: \emph{coral} for sequential and
-\emph{steelblue} for parallel. The scale of the y-axis is different
-between two alorithms.}
+sequential and parallel execution modes (multisession backend, with 4
+workers) for LOMO and LASOMO algorithms. The elapsed time is represented
+in seconds. The computing mode is indicated by color: \emph{coral} for
+sequential and \emph{steelblue} for parallel. The scale of the y-axis is
+different between two alorithms.}
 
 \end{figure}%
 
