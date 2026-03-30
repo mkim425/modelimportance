@@ -440,7 +440,7 @@ data.frame(n = 2:10) |>
 
 In this section, we describe the usage of the function `model_importance()`, where multiple options are available to customize the evaluation framework (@tbl-arguments1).
 
-### model_importance( )
+### model_importance( ) <!-- Do we need to make a subsection here when there is only a single main function (and thus only one subsection) discussed in the parent section "Main function"?--->
 
 ```{r}
 #| echo: false
@@ -464,8 +464,8 @@ tbl_argument1 <- data.frame(
     "Optional arguments for \\texttt{\"simple\\_ensemble\"}"
   ),
   "Possible Values" = c(
-    "Must be the model output format",
-    "Must be the oracle output format",
+    "Table of model output",
+    "Table of oracle output",
     "\\texttt{\"simple\\_ensemble\"}, \\texttt{\"linear\\_pool\"}",
     "\\texttt{\"lomo\", \"lasomo\"}",
     "\\texttt{\"equal\", \"perm\\_based\"}",
@@ -501,31 +501,30 @@ task, an `NA` value will be assigned for that task.
 ```{r code-model_importance}
 #| eval: false
 > model_importance(forecast_data, oracle_output_data, ensemble_fun, 
-                    importance_algorithm, subset_wt, min_log_score, 
-                    ...)
+                   importance_algorithm, subset_wt, min_log_score, 
+                   ...)
 ```
 
 
-The `forecast_data` is a data frame containing predictions and should be or can be coerced to a `model_out_tbl` format, which is the standard S3 class model output format defined by the hubverse convention. If it fails to be coerced to a `model_out_tbl` format, an error message will be returned from [hubUtils]{.pkg}, which provides the function `as_model_out_tbl()` for this purpose. Users may need to manually transform their data to meet the hubverse standards. 
+The `forecast_data` parameter is a data frame containing predictions that is automatically coerced to a `model_out_tbl` object (if it is not one already). If coercion fails, users may need to manually convert their data using the `as_model_out_tbl()` function from [hubUtils]{.pkg}.
 
-The `oracle_output_data` is a data frame containing the actual observed values of the variables used to specify modeling targets. Details are provided in \hyperref[subsec:oracle_output_data]{Section~\ref{subsec:oracle_output_data}}.
+The `oracle_output_data` is a data frame containing the actual observed values of the variables used to specify modeling targets. Further details on formatting and purpose are provided in \hyperref[subsec:oracle_output_data]{Section~\ref{subsec:oracle_output_data}}.
 
-The `ensemble_fun` argument specifies the ensemble method to be used for evaluating model importance, which relies on implementations in the \pkg{hubEnsembles} package (@Rpackage-hubEnsembles).
-The currently supported methods are `"simple_ensemble"` and `"linear_pool"`. 
+The `ensemble_fun` argument specifies the ensemble method to use when evaluating model importance, which relies on implementations in the \pkg{hubEnsembles} package (@Rpackage-hubEnsembles).
+The two supported methods are `"simple_ensemble"` and `"linear_pool"`. 
 The `"simple_ensemble"` method returns the average of the predicted values from 
 all component models per prediction task defined by task IDs, `output_type`, and `output_type_id` columns. 
 The default aggregation function for this method is `"mean"`, but it can be 
 customized by specifying additional arguments through `...`, such as 
 `agg_fun="median"`.
-When `"linear_pool"` is specified, ensemble model outputs are created as a 
-linear pool of component model outputs. This method supports only an 
-`output_type` of `"mean"`, `"quantile"`, or `"pmf"`.
+When `"linear_pool"` is selected, the ensemble is a linear opinion pool of its component models. 
+This method supports forecasts only with an `output_type` of `"mean"`, `"quantile"`, or `"pmf"`.
 
 The `importance_algorithm` argument specifies the algorithm for model importance calculation, which can be either `"lomo"` (leave one model out) and `"lasomo"` 
 (leave all subsets of models out). The `subset_wt` argument is employed only for
 the `"lasomo"` algorithm. This argument has two options: `"equal"` assigns equal
 weight to all subsets and `"perm_based"` assigns weight averaged over all 
-possible permutations as in the formula of Shapley values (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}). The default values of `importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`, respectively.
+possible permutations, as in the formula of Shapley values (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}). The default values of `importance_algorithm` and `subset_wt` are `"lomo"` and `"equal"`, respectively.
 
 The `min_log_score` argument is relevant only for the `output_type` of `"pmf"`, 
 which uses Log Score as a scoring rule. It sets a minimum threshold for log 
@@ -536,7 +535,7 @@ before calculating the importance metric based on the log score.
 The default value is set to -10, following the CDC FluSight thresholding convention [@brooks2018nonmechanistic; @reich_accuracy_2019].
 Users may choose a different value based on their practical needs. 
 
-The `model_importance()` function returns an object of S3 class `model_imp_tbl`, with columns 
+The `model_importance()` function returns an object of S3 class `model_imp_tbl` of model important scores, with columns 
 `model_id`, `reference_date`, `output_type`, and `importance`, along with any task ID columns (e.g., `location`, `horizon`, and `target_end_date`) present in the input `forecast_data`. 
 Regardless of the original column name for the forecast generation date in the `forecast_data`, it is standardized to `reference_date` in the output. The `importance` column contains the calculated importance scores for each model and specific task, which are derived from the specified algorithm and ensemble method. 
 
@@ -561,11 +560,13 @@ identify the most important model in each task.
 
 ### Plot method
 
+<!-- This section is pretty sparse. Could you describe the types of plots that are made using this function?--->
 `plot()` visualizes the importance scores across models faceted by task IDs. Thus, users can compare importance scores across models and tasks. Additional modifications to the plot can be applied using standard `ggplot2` functions. 
 For example, to rotate the x-axis labels, users can add
 `+ theme(axis.text.x = element_text(angle = 90))`.
 
 ### Aggregate method
+
 `aggregate()` allows users to obtain an overall importance score for each model by aggregating its importance scores across all evaluated tasks. 
 This `model_imp_tbl` class-specific method provides arguments that users can specify to customize the aggregation process, including the handling of `NA` values and the choice of summary function (@tbl-arguments2). 
 
@@ -612,15 +613,14 @@ tbl_argument2 |>
   kable_styling(latex_options = c("striped", "t"), font_size = 10.5)
 ```
 
-The `by` argument specifies the grouping variable(s) for summarization. 
-The default is `"model_id"` to summarize importance scores for each model. 
-Users can also specify other columns present in the `importance_scores` data 
-frame as needed.
+The `by` argument specifies the grouping variable(s) for summarization.
+Its default is `"model_id"`, in which the `aggregate()` method summarizes importance scores for each model.
+Valid values for `by` include any combination of columns present in the `importance_scores` data frame.
 
-The `na_action` argument allows for specifying how to handle `NA` values 
-generated during importance score calculation for each task, occurring when a 
-model did not contribute to the ensemble prediction for a given task by missing 
-its forecast submission.
+The `na_action` argument allows for specification of how to handle `NA` values 
+generated during importance score calculation for each task; these values occur 
+when a model did not contribute to the ensemble prediction for a given task by 
+missing its forecast submission.
 Three options are available: `"worst"`, `"average"`, and `"drop"`. 
 In each specific prediction task, if a model has any missing predictions, the 
 `"worst"` option replaces the `NA` values with the smallest value among other 
@@ -630,13 +630,13 @@ The `"drop"` option removes the `NA` values, which results in the exclusion of
 the model from the evaluation for that task.
 
 The `fun` argument specifies a function used to summarize importance scores. 
-`fun = mean` is a default choice, but other summary functions are also 
-applicable (e.g., `fun = median`).
-Additional arguments can be passed to the summary function `fun` through `...`
+An arithmetic mean (`fun = mean`) is the default, but other summary functions 
+(e.g., `fun = median`) may also be used.
+Additional arguments for the summary function `fun` can also be passed via `...`
 if needed (e.g., `fun = quantile, probs = 0.25` for a quartile summary).
 
-The output returned by this function is a data frame with columns 
-`model_id` and `importance_score_<fun>`, where `<fun>` is the name of the summary function used (e.g., `importance_score_mean` when `fun = mean`). The output is sorted in descending order of the summarized importance scores, `importance_score_<fun>`.
+The output returned by `aggregate()` is a data frame with columns `model_id` and 
+`importance_score_<fun>`, where `<fun>` is the name of the summary function used (e.g., `importance_score_mean` when `fun = mean`). The output is sorted in descending order of the summarized importance scores, `importance_score_<fun>`.
 
 ## Examples {#sec:examples}
 
