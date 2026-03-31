@@ -1091,7 +1091,7 @@ This section describes the computational complexity of LOMO and LASOMO algorithm
 We conducted a computational experiment with simulated data. The execution time was measured for both algorithms across varying numbers of models and tasks. We also compared the execution times between sequential and multisession computing environments to demonstrate the efficiency of parallelization in handling computationally intensive tasks. 
 
 We performed all experiments on a machine running macOS 15 with an Apple M4 chip and 16 GB RAM under R version 4.4.3.
-Parallel computations were implemented using the [future]{.pkg} (`multisession` backend) with 4 worker processes. 
+Parallel computations were implemented using the [future]{.pkg} (`multisession` backend) with four worker processes. 
 The execution times were recorded in seconds.
 
 ```{r, fig.pos="t"}
@@ -1103,7 +1103,7 @@ The execution times were recorded in seconds.
 knitr::include_graphics("runtime_comparison.pdf")
 ```
 
-@fig-feasibility-comparison illustrates the computational runtime for 4 different numbers of prediction tasks (10, 20, 50, and 100) and varying numbers of models (ranging from 2 to 10) for both the LOMO and LASOMO algorithms under sequential and parallel execution modes, indicated by color. The scale of the $y$-axis approximately ranges from 0 to 12 seconds for LOMO and from 0 to 1110 seconds for LASOMO.
+@fig-feasibility-comparison illustrates the computational runtime for four different numbers of prediction tasks (10, 20, 50, and 100) and varying numbers of models (ranging from 2 to 10) for both the LOMO and LASOMO algorithms under sequential and parallel execution modes, indicated by color. The scale of the $y$-axis approximately ranges from 0 to 12 seconds for LOMO and from 0 to 1110 seconds for LASOMO.
 Overall, the time needed to compute model importance scores increases with the number of models and tasks for both algorithms.
 Specifically, when the number of tasks is 10 or 20, the difference in computation time between sequential and parallel executions is not significant. However, as the number of prediction tasks rises to 50, the difference becomes more noticeable.
 The efficiency of parallel execution is more pronounced for LASOMO than for LOMO. 
@@ -1123,12 +1123,12 @@ knitr::include_graphics("runtime_parallel.pdf")
 We further explored computational feasibility, focusing on the parallel execution mode (@fig-feasibility-parallel).
 We observe that, in LOMO, the elapsed time increases linearly with the number of models and the rate of increase depends on the number of tasks, with a steeper increase as the number of tasks grows. 
 In contrast, in LASOMO, the elapsed time increases much more rapidly as the ensemble size grows. In particular, when the number of models exceeds 12, it takes more than 20 minutes to compute the importance scores, even with fixed 5 prediction tasks. 
-It is because the number of subsets of models that need to be evaluated in LASOMO grows exponentially with the number of models, leading to a rapidly rising computational intensity.
-This highlights the trade-off between the comprehensiveness of the LASOMO algorithm and its computational challenges in practice, particularly with a large number of models.
+This is because the number of subsets of models that need to be evaluated in LASOMO grows exponentially with the number of models, leading to a rapidly rising computational intensity.
+This <!-- Say explicitly what you mean by "this"---> highlights the trade-off between the comprehensiveness of the LASOMO algorithm and its computational challenges in practice, particularly with a large number of models.
 
 ## Implementation and availability {#sec:implementation-and-availability}
 
-This package is implemented in [R]{.proglang} and distributed via CRAN and GitHhub (\url{https://github.com/mkim425/modelimportance}). 
+The [modelimportance] {.pkg} is implemented in [R]{.proglang} and distributed via CRAN and GitHub (\url{https://github.com/mkim425/modelimportance}). 
 We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to ensure that all functions work correctly as expected,  including those used internally. We also performed continuous integration testing using GitHub Actions to maintain functionality across platforms, including Windows, macOS, and Linux. Integrated GitHub Action, we employed the [lintr]{.pkg} package to maintain code quality and detect potential issues, and the Air formatter to ensure consistent code style across the codebase.
 All code changes were systematically reviewed by fellow team members, and this enhanced reliability. 
 
@@ -1136,16 +1136,16 @@ All code changes were systematically reviewed by fellow team members, and this e
 
 Multi-model ensemble forecasts often provide better accuracy and robustness than single models, and are widely used in decision-making and policy planning across various domains. The contribution of each component model to the accuracy of the ensemble depends on its own unique characteristics. The [modelimportance]{.pkg} package enables the quantification of the value that each component model adds to the ensemble performance in different evaluation contexts. 
 
-The primary function of the package is `model_importance()`, which returns a data frame with component models and their importance metrics. Users can choose the various ensemble methods to apply and the model importance algorithm between LOMO and LASOMO. Additionally, customizable options are available for handling missing values. These features enable the package to serve as a versatile tool to aid collaborative efforts to construct an effective ensemble model across a wide range of forecasting tasks. 
+The primary `model_importance()` function returns a data frame with component models and their importance metrics. Users are given a choice of ensemble methods, model importance algorithms (either LOMO or LASOMO), and options to handle missing values. These features enable the package to serve as a versatile tool to aid collaborative efforts to construct an effective ensemble model across a wide range of forecasting tasks. 
 We note that unit testing with continuous integration ensures the reliability of all functions and the overall quality of code across multiple platforms. 
 
-There is room to enhance the current version of this package. Although this package supports four different output types ('mean', 'median', 'quantile, and 'pmf'), other output types are widely used in practice. For example, the 'sample' output type is commonly used in the US Flu Scenario Modeling Hub [@FluSMH]. This format includes multiple simulated values (samples) from the forecast distribution. The `output_type_id` is specified for each sample, which typically indexes the samples or indicates their source, depending on the context. The package can be extended to support this output type, which is under consideration for future releases. 
-These extensions would aim to broaden the scope of applications in real-world forecasting tasks.
+<!-- Note that in this section I removed the description of the output_type_id for sample forecasts, which doesn't feel relevant enough to include.--->
+The [modelimportance]{.pkg} package still has several areas in which it may be enhanced. Namely, although the package currently supports four different output types ('mean', 'median', 'quantile, and 'pmf'), other output types are widely used in practice. For example, the 'sample' output type is commonly used in the US Flu Scenario Modeling Hub [@FluSMH]. This format includes multiple simulated values (samples) from the forecast distribution. Support for the 'sample' output type is under consideration for future releases, and, in general, extensions to support more output types would aim to broaden the scope of applications in real-world forecasting tasks.
 
 
 ## Acknowledgements {.unnumbered}
 
-We acknowledge Zhian N. Kamvar for debugging and resolving coding issues while developing the package. We are also grateful to Mattew Cornell for his advice on unit testing, which greatly helped us improve the structure and testing our code with a solid understanding of unit testing practices. 
+We thank Zhian N. Kamvar for debugging and resolving coding issues while developing the package. We are also grateful to Matthew Cornell for his advice on unit testing, which greatly helped us improve the structure and testing our code with a solid understanding of unit testing practices. 
 
 
 ## Appendix {.unnumbered}
