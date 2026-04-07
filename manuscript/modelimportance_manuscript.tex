@@ -176,7 +176,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, breakable, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, sharp corners, enhanced, interior hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, borderline west={3pt}{0pt}{shadecolor}, interior hidden, breakable, boxrule=0pt, frame hidden, enhanced]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -201,7 +201,7 @@ value, R},
 Massachusetts Amherst \And Li
 Shandross~\orcidlink{0009-0008-1348-1954}\\University of Massachusetts
 Amherst \AND Evan L. Ray~\orcidlink{0000-0003-4035-0243}\\University of
-Massachusetts Amherst \\ CVS Health \And Nicholas G.
+Massachusetts Amherst \And Nicholas G.
 Reich~\orcidlink{0000-0003-3503-9899}\\University of Massachusetts
 Amherst}
 \Plainauthor{Minsu Kim, Li Shandross, Evan L. Ray, Nicholas G.
@@ -1597,72 +1597,106 @@ companion methodological paper \citep{kim2026beyond}.
 This section describes the computational complexity of LOMO and LASOMO
 algorithms implemented in the package, depending on the numbers of
 ensemble component models and prediction tasks. We conducted a
-computational experiment with simulated data. The execution time was
-measured for both algorithms across varying numbers of models and tasks.
-We also compared the execution times between sequential and multisession
-computing environments to demonstrate the efficiency of parallelization
-in handling computationally intensive tasks.
+computational experiment using simulated data with a point forecast
+(`mean'). The execution time was measured for both algorithms across
+varying numbers of models and tasks. We also compared the execution
+times between sequential and multisession computing environments to
+demonstrate the efficiency of parallelization in handling
+computationally intensive tasks.
 
 We performed all experiments on a machine running macOS 15 with an Apple
 M4 chip and 16 GB RAM under R version 4.4.3. Parallel computations were
 implemented using the \pkg{future} (\texttt{multisession} backend) with
-4 worker processes. The execution times were recorded in seconds.
+four worker processes. The execution times were recorded in seconds.
 
 \begin{figure}[t]
 
 \centering{
 
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{runtime_comparison.pdf}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{runtime_comparison-fitted.pdf}
 
 }
 
 \caption{\label{fig-feasibility-comparison}Runtime to compute model
-importance scores by number of ensemble component models (ranging from 2
-to 10) and number of prediction tasks (10, 20, 50, and 100) under
-sequential and parallel execution modes (multisession backend, with 4
-workers) for LOMO and LASOMO algorithms. The elapsed time is represented
-in seconds. The computing mode is indicated by color: \emph{coral} for
-sequential and \emph{steelblue} for parallel. The scale of the y-axis is
-different between two alorithms.}
+importance scores for point predictions by number of ensemble component
+models (ranging from 2 to 10) and number of prediction tasks (10, 20,
+50, and 100) under sequential and parallel execution modes (multisession
+backend, with four workers) for LOMO and LASOMO algorithms. Each point
+represents the elapsed time (in seconds) for a given number of models,
+while curves and lines (solid/dashed) show the overall trend fitted to
+the observations. The scale of the \(y\)-axis is different between the
+two alorithms.}
 
 \end{figure}%
 
 Figure~\ref{fig-feasibility-comparison} illustrates the computational
-runtime for 4 different numbers of prediction tasks (10, 20, 50, and
+runtime for four different numbers of prediction tasks (10, 20, 50, and
 100) and varying numbers of models (ranging from 2 to 10) for both the
 LOMO and LASOMO algorithms under sequential and parallel execution
-modes, indicated by color. The scale of the \(y\)-axis approximately
-ranges from 0 to 12 seconds for LOMO and from 0 to 1110 seconds for
-LASOMO. Overall, the time needed to compute model importance scores
-increases with the number of models and tasks for both algorithms.
-Specifically, when the number of tasks is 10 or 20, the difference in
-computation time between sequential and parallel executions is not
-significant. However, as the number of prediction tasks rises to 50, the
-difference becomes more noticeable. The efficiency of parallel execution
-is more pronounced for LASOMO than for LOMO. In particular, for a high
-volume of prediction tasks, it results in a substantial improvement when
-8 or more models are involved in the ensemble construction.
+modes. The scale of the \(y\)-axis approximately ranges from 0 to 12
+seconds for LOMO and from 0 to 1110 seconds for LASOMO. Overall, the
+time needed to compute model importance scores increases with the number
+of models and tasks for both algorithms. Specifically, when the number
+of tasks is 10 or 20, the difference in computation time between
+sequential and parallel executions is not significant. However, as the
+number of prediction tasks rises to 50, the difference becomes more
+noticeable. The speedup from parallel execution relative to sequential
+execution is approximately 4-fold for LOMO in these settings of 10, 20,
+50, and 100 tasks, which is consistent with the use of four worker
+processes. Similarly, for LASOMO, a speedup of approximately 3-fold is
+observed across these settings, which is less than the 4-fold speedup
+observed with LOMO due to the heavier computational intensity of LASOMO.
+Nevertheless, the efficiency of parallel execution is more pronounced
+for LASOMO than for LOMO, particularly when 8 or more models are
+involved in the ensemble construction and the number of prediction tasks
+is large.
 
 \begin{figure}[t]
 
 \centering{
 
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{runtime_parallel.pdf}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{runtime_parallel-fitted.pdf}
 
 }
 
 \caption{\label{fig-feasibility-parallel}Runtime to compute model
-importance scores by number of ensemble component models and prediction
-tasks during parallel execution via multisession backend. The elapsed
-time is represented in seconds. For LOMO, the number of models evaluated
-varies from 2 to 100 for each 5, 20, 50, and 100 prediction tasks. For
-LASOMO, the number of models evaluated varies from 2 to 14 while fixing
-5 prediction tasks due to exponentially growing computational intensity
-with the number of models. The exact elapsed time is shown for LASOMO,
-which captures the steep increase in runtime as the number of models
-grows, even before the high jump occurs with models over 12.}
+importance scores for point predictions by number of ensemble component
+models and prediction tasks during parallel execution via multisession
+backend. Each dot represents the elapsed time (in seconds) for a given
+number of models. For LOMO, the number of models evaluated varies from 2
+to 100 for each 5, 20, 50, and 100 prediction tasks. The fitted lines
+illustrate the trend of the observations. For LASOMO, the number of
+models evaluated varies from 2 to 14 while fixing 5 prediction tasks due
+to exponentially growing computational intensity with the number of
+models. The exact elapsed time is shown for LASOMO, which captures the
+steep increase in runtime as the number of models grows, even before the
+high jump occurs with models over 12.}
 
 \end{figure}%
+
+Theoretically, the computational complexity of LOMO and LASOMO
+algorithms is \(O(t \cdot n)\) and \(O(t\cdot 2^n)\), respectively,
+where \(n\) is the number of models and \(t\) is the number of tasks.
+However, the observations from our computational experiment in the
+sequential execution mode, where the number of models ranges from 2 to
+10 and the number of tasks ranges from 10 to 100, show slight
+discrepancies from these theoretical complexities. While the observed
+runtimes show linear growth with respect to the number of tasks for both
+algorithms, consistent with the theoretical complexities, the growth
+with respect to the number of models is sublinear for LOMO and slower
+than the expected exponential for LASOMO. This deviation from the
+theoretical patterns is likely due to the practical efficiency of the
+implementations, including shared computation. Specifically, once the
+ensemble predictions are computed, the importance scores are derived
+from these predictions without needing to recompute the ensemble for
+each model. We note that the scaling increment and ratio between
+adjacent values of \(n\) in LOMO and LASOMO, respectively, is gradually
+increasing, which implies the empirical complexity is approaching the
+theoretical complexity as the number of models increases. However, the
+execution time scales much more rapidly with the number of models than
+the theoretical complexities, notably in LASOMO, as larger sub-ensembles
+require more expensive evaluation and scoring operations across all
+prediction tasks as well as larger intermediate objects.
 
 We further explored computational feasibility, focusing on the parallel
 execution mode (Figure~\ref{fig-feasibility-parallel}). We observe that,
@@ -1674,16 +1708,16 @@ particular, when the number of models exceeds 12, it takes more than 20
 minutes to compute the importance scores, even with fixed 5 prediction
 tasks. It is because the number of subsets of models that need to be
 evaluated in LASOMO grows exponentially with the number of models,
-leading to a rapidly rising computational intensity. This highlights the
-trade-off between the comprehensiveness of the LASOMO algorithm and its
-computational challenges in practice, particularly with a large number
-of models.
+leading to a rapidly rising computational intensity. This observation
+highlights the trade-off between the comprehensiveness of the LASOMO
+algorithm and its computational challenges in practice, particularly
+with a large number of models.
 
 \section{Implementation and
 availability}\label{sec:implementation-and-availability}
 
-This package is implemented in \proglang{R} and distributed via CRAN and
-GitHub, under the MIT license
+The {[}modelimportance{]} \{.pkg\} is implemented in \proglang{R} and
+distributed via CRAN and GitHub, under the MIT license
 (\url{https://github.com/mkim425/modelimportance}). We conducted unit
 tests using the \pkg{testthat} package \citep{Rpackage-testthat} to to
 verify that all inputs and outputs are properly formatted and ensure
@@ -1707,29 +1741,27 @@ unique characteristics. The \pkg{modelimportance} package enables the
 quantification of the value that each component model adds to the
 ensemble performance in different evaluation contexts.
 
-The primary function of the package is \texttt{model\_importance()},
-which returns an S3 class object of class, represented as a data frame
-with component models and their importance metrics. Users can choose the
-various ensemble methods to apply and the model importance algorithm
-between LOMO and LASOMO. Additionally, customizable options are
-available for handling missing values. These features enable the package
+The primary \texttt{model\_importance()} function returns an S3 object
+of class \texttt{model\_imp\_tbl} tabular data containing component
+models and their importance metrics. Users are given a choice of
+ensemble methods, model importance algorithms (either LOMO or LASOMO),
+and options to handle missing values. These features enable the package
 to serve as a versatile tool to aid collaborative efforts to construct
 an effective ensemble model across a wide range of forecasting tasks. We
 note that unit testing with continuous integration ensures the
 reliability of all functions and the overall quality of code across
 multiple platforms.
 
-There is room to enhance the current version of this package. Although
-this package supports four different output types (`mean', `median',
-`quantile, and 'pmf'), other output types are widely used in practice.
-For example, the `sample' output type is commonly used in the US Flu
-Scenario Modeling Hub \citep{FluSMH}. This format includes multiple
-simulated values (samples) from the forecast distribution. The
-\texttt{output\_type\_id} is specified for each sample, which typically
-indexes the samples or indicates their source, depending on the context.
-The package can be extended to support this output type, which is under
-consideration for future releases. These extensions would aim to broaden
-the scope of applications in real-world forecasting tasks.
+The \pkg{modelimportance} package still has several areas in which it
+may be enhanced. Namely, although the package currently supports four
+different output types (`mean', `median', `quantile, and 'pmf'), other
+output types are widely used in practice. For example, the `sample'
+output type is commonly used in the US Flu Scenario Modeling Hub
+\citep{FluSMH}. This format includes multiple simulated values (samples)
+from the forecast distribution. Support for the `sample' output type is
+under consideration for future releases, and, in general, extensions to
+support more output types would aim to broaden the scope of applications
+in real-world forecasting tasks.
 
 \section*{Acknowledgements}\label{acknowledgements}
 \addcontentsline{toc}{section}{Acknowledgements}
