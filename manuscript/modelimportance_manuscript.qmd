@@ -7,6 +7,8 @@ format:
         - \usepackage{algorithm, algcompatible, setspace, amsmath, hyperref, cleveref}
         - \renewcommand{\algorithmicrequire}{\textbf{Input:}}
         - \renewcommand{\algorithmicensure}{\textbf{Output:}}
+        - \usepackage{subcaption}
+        - \captionsetup[subfigure]{position=top, justification=raggedright, singlelinecheck=false}
     journal:
       type: article
       cite-shortnames: true
@@ -371,10 +373,10 @@ For example, using the earlier setup of three forecast models, LASOMO considers 
 
 
 The [modelimportance]{.pkg} package offers two weighting options for subsets: one assigns equal (uniform) weights to all subsets, and the other assigns weights based on their size, similar to the definition of Shapley values, where a player’s average contribution is aggregated over all possible coalitions (or, equivalently, over all permutations of players) (@Shapley1953). Users can choose one to evaluate the contribution of each model in a manner suited to their preferred framework. 
-Uniform weighting may be preferred when each subset size is of equal analytical interest, regardless of how many such subsets there are, while size-based weighting may be preferred when users want to maintain the original Shapley value interpretation, preventing numerous medium-sized subsets from dominating the importance scores.  
+Uniform weighting may be preferred when each subset size is of equal analytical interest, regardless of how many such subsets there are, while size-based weighting may be preferred when users want to maintain the original Shapley value interpretation, preventing numerous medium-sized subsets from dominating the importance scores. A detailed discussion of the differences between the two weighting schemes follows in the next section.  
 
 
-### Comparison of weighting schemes in LASOMO
+### Comparison of weighting schemes in LASOMO {#sec:comparison-weighting-schemes}
 
 ```{r, fig.pos="t"}
 #| echo: false
@@ -1083,7 +1085,7 @@ In this example, there are only three models ($n = 3$), and the weights do not
 differ significantly between the two weighting schemes. 
 Therefore, the resulting outputs show little difference. 
 However, in general, with a larger number of models, the two weighting schemes 
-may yield quite different importance scores for each model.
+may yield quite different importance scores for each model, as discussed in \hyperref[sec:comparison-weighting-schemes]{Section~\ref{sec:comparison-weighting-schemes}}.
 
 In this section, we explored each component model's contribution to the ensemble
 accuracy with only three models. An extensive application in more complex 
@@ -1111,28 +1113,47 @@ knitr::include_graphics("runtime_comparison-fitted.pdf")
 @fig-feasibility-comparison illustrates the computational runtime for four different numbers of prediction tasks (10, 20, 50, and 100) and varying numbers of models (ranging from 2 to 10) for both the LOMO and LASOMO algorithms under sequential and parallel execution modes. The scale of the $y$-axis approximately ranges from 0 to 12 seconds for LOMO and from 0 to 1110 seconds for LASOMO.
 Overall, the time needed to compute model importance scores increases with the number of models and tasks for both algorithms.
 Specifically, when the number of tasks is 10 or 20, the difference in computation time between sequential and parallel executions is not significant. However, as the number of prediction tasks rises to 50, the difference becomes more noticeable.
-The speedup from parallel execution relative to sequential execution is approximately 4-fold for LOMO in these settings of 10, 20, 50, and 100 tasks, which is consistent with the use of four worker processes. 
+The speedup from parallel execution relative to sequential execution is approximately 4-fold for LOMO in these settings of 10, 20, 50, and 100 prediction tasks, which is consistent with the use of four worker processes. 
 Similarly, for LASOMO, a speedup of approximately 3-fold is observed across these settings, which is less than the 4-fold speedup observed with LOMO due to the heavier computational intensity of LASOMO. Nevertheless, the efficiency of parallel execution is more pronounced for LASOMO than for LOMO, particularly when 8 or more models are involved in the ensemble construction and the number of prediction tasks is large.
 
-```{r, fig.pos="t"}
+```{r, fig.pos="t", eval=FALSE}
 #| echo: false
-#| label: fig-feasibility-parallel
+#| label: fig-feasibility-parallel-all_in_one
 #| fig-cap: "Runtime to compute model importance scores for point predictions by number of ensemble component models and prediction tasks during parallel execution via multisession backend. Each dot represents the elapsed time (in seconds) for a given number of models. For LOMO, the number of models evaluated varies from 2 to 100 for each 5, 20, 50, and 100 prediction tasks. The fitted lines illustrate the trend of the observations. For LASOMO, the number of models evaluated varies from 2 to 14 while fixing 5 prediction tasks due to exponentially growing computational intensity with the number of models. The exact elapsed time is shown for LASOMO, which captures the steep increase in runtime as the number of models grows, even before the high jump occurs with models over 12."
 #| out.width: "100%"
 #| fig-align: "center"
 knitr::include_graphics("runtime_parallel-fitted.pdf")
 ```
 
-Theoretically, the computational complexity of LOMO and LASOMO algorithms is $O(t \cdot n)$ and $O(t\cdot 2^n)$, respectively, where $n$ is the number of models and $t$ is the number of tasks. 
-However, the observations from our computational experiment in the sequential execution mode, where the number of models ranges from 2 to 10 and the number of tasks ranges from 10 to 100,
-show slight discrepancies from these theoretical complexities.
-While the observed runtimes show linear growth with respect to the number of tasks for both algorithms, consistent with the theoretical complexities, the growth with respect to the number of models is sublinear for LOMO and slower than the expected exponential for LASOMO. 
-This deviation from the theoretical patterns is likely due to the practical efficiency of the implementations, including shared computation. Specifically, once the ensemble predictions are computed, the importance scores are derived from these predictions without needing to recompute the ensemble for each model. 
-We note that the scaling increment and ratio between adjacent values of $n$ in LOMO and LASOMO, respectively, is gradually increasing, which implies the empirical complexity is approaching the theoretical complexity as the number of models increases. 
-However, the execution time scales much more rapidly with the number of models than the theoretical complexities, notably in LASOMO, as larger sub-ensembles require more expensive evaluation and scoring operations across all prediction tasks as well as larger intermediate objects. 
-<!--  This phenomenon is also observed even in the parallel execution setting (@fig-feasibility-parallel(B)).--->    
 
-We further explored computational feasibility, focusing on the parallel execution mode (@fig-feasibility-parallel).
+```{=latex}
+\begin{figure}[t]
+\begin{minipage}{0.5\linewidth}
+\subcaption{LOMO}\label{fig-feasibility-parallel-lomo}
+\vspace{-8pt}
+\includegraphics[width=\linewidth]{runtime_parallel-lomo.pdf}
+\end{minipage}%
+\hspace{0.01\linewidth}%
+\begin{minipage}{0.5\linewidth}
+\subcaption{LASOMO}\label{fig-feasibility-parallel-lasomo}
+\vspace{-8pt}
+\includegraphics[width=\linewidth]{runtime_parallel-lasomo.pdf}
+\end{minipage}%
+\caption{Runtime to compute model importance scores for point predictions by number of ensemble component models and prediction tasks during parallel execution via multisession backend. Each dot represents the elapsed time (in seconds) for a given number of models. For LOMO, the number of models evaluated varies from 2 to 100 for each 5, 20, 50, and 100 prediction tasks. The fitted lines illustrate the trend of the observations. For LASOMO, the number of models evaluated varies from 2 to 14 while fixing 5 prediction tasks due to exponentially growing computational intensity with the number of models. The exact elapsed time is shown for LASOMO, which captures the steep increase in runtime as the number of models grows, even before the high jump occurs with models over 12.}
+\label{fig-feasibility-parallel}
+\end{figure}
+```
+
+
+Theoretically, the computational complexity of LOMO and LASOMO algorithms is $O(t \cdot n)$ and $O(t\cdot 2^n)$, respectively, where $n$ is the number of models and $t$ is the number of prediction tasks. 
+However, the observations from our computational experiment in the sequential execution mode exhibited slight discrepancies from these theoretical complexities, under a limited setting involving between 2 and 10 models and 10, 20, 50, and 100 prediction tasks.
+While the observed runtimes showed linear growth with respect to the number of tasks for both algorithms, consistent with the theoretical complexities, the growth with respect to the number of models is sublinear for LOMO and slower than the expected exponential for LASOMO. 
+This deviation from the theoretical patterns is likely due to the practical efficiency of the implementations, including shared computation. Specifically, once the ensemble predictions are computed, the importance scores are derived from these predictions without needing to recompute the ensemble for each model. 
+We note that the scaling increment and ratio between adjacent values of $n$ in LOMO and LASOMO, respectively, is gradually increasing, which implies the empirical complexity is approaching the theoretical complexity with the number of models. 
+However, the execution time scales much more rapidly with the number of models than the theoretical complexities, notably in LASOMO, as larger sub-ensembles require more expensive evaluation and scoring operations across all prediction tasks as well as larger intermediate objects. 
+This phenomenon is also observed even in the parallel execution setting (Figure \ref{fig-feasibility-parallel-lasomo}).    
+
+We further explored computational feasibility, focusing on the parallel execution mode (Figure \ref{fig-feasibility-parallel}).
 We observe that, in LOMO, the elapsed time increases linearly with the number of models and the rate of increase depends on the number of tasks, with a steeper increase as the number of tasks grows. 
 In contrast, in LASOMO, the elapsed time increases much more rapidly as the ensemble size grows. In particular, when the number of models exceeds 12, it takes more than 20 minutes to compute the importance scores, even with fixed 5 prediction tasks. 
 It is because the number of subsets of models that need to be evaluated in LASOMO grows exponentially with the number of models, leading to a rapidly rising computational intensity.
@@ -1140,7 +1161,7 @@ This observation highlights the trade-off between the comprehensiveness of the L
 
 ## Implementation and availability {#sec:implementation-and-availability}
 
-The [modelimportance] {.pkg} is implemented in [R]{.proglang} and distributed via CRAN and GitHub, under the MIT license (\url{https://github.com/mkim425/modelimportance}). 
+The [modelimportance]{.pkg} is implemented in [R]{.proglang} and distributed via CRAN and GitHub, under the MIT license (\url{https://github.com/mkim425/modelimportance}). 
 We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to to verify that all inputs and outputs are properly formatted and ensure that all functions work correctly as expected, including those used internally. 
 We also performed continuous integration testing using GitHub Actions to maintain functionality across platforms, including Windows, macOS, and Linux. Integrated GitHub Action, we employed the [lintr]{.pkg} package [@Rpackage-lintr] to maintain code quality and detect potential issues, and the Air formatter [@air_formatter] to ensure consistent code style across the codebase.
 All code changes were systematically reviewed by fellow team members, and this enhanced reliability. 
