@@ -33,8 +33,8 @@ test_that("filter_valid_tasks() works as expected", {
   modified_tbl_some_invalid <- valid_tbl |>
     filter(.data$model_id != "PSI-DICE") |>
     filter(
-      !(.data$model_id == "MOBS-GLEAM_FLUH" &
-        .data$target_end_date == "2022-12-24")
+      .data$model_id != "MOBS-GLEAM_FLUH" |
+        .data$target_end_date != "2022-12-24"
     )
   modified_df_list_some_invalid <- split_data_by_task(modified_tbl_some_invalid)
   result_some_invalid <- filter_valid_tasks(
