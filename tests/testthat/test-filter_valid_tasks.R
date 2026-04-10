@@ -2,7 +2,7 @@ library(dplyr)
 
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
-    .data$output_type %in% c("quantile"),
+    .data$output_type == "quantile",
     .data$location == "25",
     .data$horizon == 1
   )
