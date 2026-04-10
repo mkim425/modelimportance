@@ -113,7 +113,7 @@ Ensembling predictions from multiple models relies on [hubEnsembles]{.pkg}, whic
 Calculation of forecast accuracy using various metrics is based on [hubEvals]{.pkg}, which internally leverages [scoringutils]{.pkg}.
 We use the example datasets from [hubExamples]{.pkg} for testing and demonstration purposes (see \hyperref[sec:examples]{Section~\ref{sec:examples}}). 
 
-For visualization of model importance scores, standard [ggplot2]{.pkg} [@Rpackage-ggplot2] functions can be applied for further customization. 
+For visualization of model importance scores, standard [ggplot2]{.pkg} [@Rpackage-ggplot2] functions can be applied. 
 Parallel computing is supported by the [furrr]{.pkg} [@Rpackage-furrr] and [future]{.pkg} [@Rpackage-future] packages, which allow users to specify the number of cores to use for parallel processing when calculating model importance scores across many tasks.
 
 
@@ -535,7 +535,7 @@ The `importance` column contains the calculated importance scores for each model
 
 ## S3 class and methods {#sec:s3-infrastructure}
 
-We have defined a custom S3 class, `model_imp_tbl` that represents the output of the `model_importance()` function, which extends the base `data.frame` class. Objects of this class enable dispatch for class-specific methods for printing, summarizing, plotting the model importance scores, and aggregating them across tasks.
+We have defined a custom S3 class, `model_imp_tbl` that represents the output of the `model_importance()` function, which extends the base `data.frame` class. Objects of this class enable dispatch for class-specific methods for printing, summarizing, and aggregating them across tasks.
 
 ### Print method
 
@@ -550,12 +550,6 @@ Additional summary details are available by specifying individual elements of th
 - `.$all_tasks` lists all the unique tasks evaluated, which are defined by the combinations of task ID columns present in the input `forecast_data`. This allows users to identify the scope of the evaluation.
 - `.$model_summary` provides each model's performance summary across tasks (e.g., the number of tasks each model submitted its forecast for, and the range of scores it achieved). This helps users understand the consistency and variability of each model's importance across different tasks.
 - `.$task_winners` identifies which model is the best for each task based on the highest importance score across the full set of tasks. From this information, users can quickly identify the most important model in each task.
-
-### Plot method
-
-`plot()` visualizes the importance scores as bar plots across models, with panels faceted by combinations of task ID values. Thus, users can compare importance scores across models and tasks. Additional modifications to the plot can be applied using standard `ggplot2` functions. 
-For example, to rotate the x-axis labels, users can add
-`+ theme(axis.text.x = element_text(angle = 90))`.
 
 ### Aggregate method
 `aggregate()` allows users to obtain an overall importance score for each model by aggregating its importance scores across all evaluated tasks. 
@@ -907,16 +901,21 @@ s$task_winners
 
 Models with the highest importance scores for each task are identified in the `top_model` column with their importance score in the `max_score` column. 'PSI-DICE' is the best model for three out of the four tasks, while 'Flusight-baseline' is the best for the remaining task.
 
-We visualize the importance scores across models and tasks using the `plot()` method, which allows for further modification with `ggplot2` functions. Since `plot()` flips the axes by default, we reformatted the model IDs (originally appearing on the $x$-axis) via `scale_x_discrete()`, which replaces hyphens and underscores with line breaks to save horizontal space and improve readability. 
-We further applied `theme()` to rotate the $x$-axis labels and adjust panel spacing, preventing label overlap. 
-
+Visualization can be performed using functions from [ggplot2]{.pkg}. 
+The following example shows a bar plot of importance scores across models and tasks, with panels faceted by combinations of task ID values.    
 
 ```{r}
 #| eval: false
-> plot(scores_lomo) + 
-    scale_x_discrete(labels = function(x) gsub("[-_]", "-\n", x)) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-          panel.spacing.x = unit(0.5, "lines")) 
+> ggplot(scores_lomo, aes(x = model_id, y = importance, fill = model_id)) +
+  geom_col() +
+  coord_flip() +
+  geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
+  facet_grid(cols = vars(target, horizon, location, target_end_date), 
+             scales = "free_x") +
+  labs(x = "Model ID", y = "Importance Score", title = "Model Importance by Task") +
+  scale_x_discrete(labels = function(x) gsub("[-_]", "-\n", x)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+        panel.spacing.x = unit(0.5, "lines"), legend.position = "none")
 ```
 
 
@@ -927,10 +926,27 @@ We further applied `theme()` to rotate the $x$-axis labels and adjust panel spac
 #| fig-width: 6
 #| fig-height: 4
 
-plot(scores_lomo) + 
-    scale_x_discrete(labels = function(x) gsub("[-_]", "-\n", x)) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-          panel.spacing.x = unit(0.5, "lines")) 
+# plot(scores_lomo) + 
+#     scale_x_discrete(labels = function(x) gsub("[-_]", "-\n", x)) +
+#     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+#           panel.spacing.x = unit(0.5, "lines")) 
+
+ggplot(scores_lomo, aes(x = model_id, y = importance, fill = model_id)) +
+  geom_col() +
+  coord_flip() +
+  geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
+  facet_grid(cols = vars(target, horizon, location, target_end_date), 
+             scales = "free_x") +
+  labs(
+    x = "Model ID", y = "Importance Score",
+    title = "Model Importance by Task"
+  ) +
+  scale_x_discrete(labels = function(x) gsub("[-_]", "-\n", x)) +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    panel.spacing.x = unit(0.5, "lines"),
+    legend.position = "none"
+  )
 ```
 
 \vspace{0.35cm} 
@@ -1149,7 +1165,7 @@ Theoretically, the computational complexity of LOMO and LASOMO algorithms is $O(
 However, the observations from our computational experiment in the sequential execution mode exhibited slight discrepancies from these theoretical complexities, under a limited setting involving between 2 and 10 models and 10, 20, 50, and 100 prediction tasks.
 While the observed runtimes showed linear growth with respect to the number of tasks for both algorithms, consistent with the theoretical complexities, the growth with respect to the number of models is sublinear for LOMO and slower than the expected exponential for LASOMO. 
 This deviation from the theoretical patterns is likely due to the practical efficiency of the implementations, including shared computation. Specifically, once the ensemble predictions are computed, the importance scores are derived from these predictions without needing to recompute the ensemble for each model. 
-We note that the scaling increment and ratio between adjacent values of $n$ in LOMO and LASOMO, respectively, is gradually increasing, which implies the empirical complexity is approaching the theoretical complexity with the number of models. 
+It should be noted that the scaling increment and ratio between adjacent values of $n$ in LOMO and LASOMO, respectively, is gradually increasing, which implies the empirical complexity is approaching the theoretical complexity with the number of models. 
 However, the execution time scales much more rapidly with the number of models than the theoretical complexities, notably in LASOMO, as larger sub-ensembles require more expensive evaluation and scoring operations across all prediction tasks as well as larger intermediate objects. 
 This phenomenon is also observed even in the parallel execution setting (Figure \ref{fig-feasibility-parallel-lasomo}).    
 

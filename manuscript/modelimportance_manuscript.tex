@@ -178,7 +178,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, boxrule=0pt, interior hidden, enhanced, sharp corners, breakable, borderline west={3pt}{0pt}{shadecolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, frame hidden, interior hidden, sharp corners, boxrule=0pt, breakable, enhanced]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -453,12 +453,11 @@ demonstration purposes (see
 \hyperref[sec:examples]{Section~\ref{sec:examples}}).
 
 For visualization of model importance scores, standard \pkg{ggplot2}
-\citep{Rpackage-ggplot2} functions can be applied for further
-customization. Parallel computing is supported by the \pkg{furrr}
-\citep{Rpackage-furrr} and \pkg{future} \citep{Rpackage-future}
-packages, which allow users to specify the number of cores to use for
-parallel processing when calculating model importance scores across many
-tasks.
+\citep{Rpackage-ggplot2} functions can be applied. Parallel computing is
+supported by the \pkg{furrr} \citep{Rpackage-furrr} and \pkg{future}
+\citep{Rpackage-future} packages, which allow users to specify the
+number of cores to use for parallel processing when calculating model
+importance scores across many tasks.
 
 \subsection{Model output format}\label{subsec:model_output_format}
 
@@ -971,7 +970,7 @@ We have defined a custom S3 class, \texttt{model\_imp\_tbl} that
 represents the output of the \texttt{model\_importance()} function,
 which extends the base \texttt{data.frame} class. Objects of this class
 enable dispatch for class-specific methods for printing, summarizing,
-plotting the model importance scores, and aggregating them across tasks.
+and aggregating them across tasks.
 
 \subsection{Print method}\label{print-method}
 
@@ -1008,15 +1007,6 @@ elements of the summary object as follows:
   tasks. From this information, users can quickly identify the most
   important model in each task.
 \end{itemize}
-
-\subsection{Plot method}\label{plot-method}
-
-\texttt{plot()} visualizes the importance scores as bar plots across
-models, with panels faceted by combinations of task ID values. Thus,
-users can compare importance scores across models and tasks. Additional
-modifications to the plot can be applied using standard \texttt{ggplot2}
-functions. For example, to rotate the x-axis labels, users can add
-\texttt{+\ theme(axis.text.x\ =\ element\_text(angle\ =\ 90))}.
 
 \subsection{Aggregate method}\label{aggregate-method}
 
@@ -1386,20 +1376,21 @@ in the \texttt{top\_model} column with their importance score in the
 of the four tasks, while `Flusight-baseline' is the best for the
 remaining task.
 
-We visualize the importance scores across models and tasks using the
-\texttt{plot()} method, which allows for further modification with
-\texttt{ggplot2} functions. Since \texttt{plot()} flips the axes by
-default, we reformatted the model IDs (originally appearing on the
-\(x\)-axis) via \texttt{scale\_x\_discrete()}, which replaces hyphens
-and underscores with line breaks to save horizontal space and improve
-readability. We further applied \texttt{theme()} to rotate the
-\(x\)-axis labels and adjust panel spacing, preventing label overlap.
+Visualization can be performed using functions from \pkg{ggplot2}. The
+following example shows a bar plot of importance scores across models
+and tasks, with panels faceted by combinations of task ID values.
 
 \begin{verbatim}
-> plot(scores_lomo) + 
-    scale_x_discrete(labels = function(x) gsub("[-_]", "-\n", x)) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-          panel.spacing.x = unit(0.5, "lines")) 
+> ggplot(scores_lomo, aes(x = model_id, y = importance, fill = model_id)) +
+  geom_col() +
+  coord_flip() +
+  geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
+  facet_grid(cols = vars(target, horizon, location, target_end_date), 
+             scales = "free_x") +
+  labs(x = "Model ID", y = "Importance Score", title = "Model Importance by Task") +
+  scale_x_discrete(labels = function(x) gsub("[-_]", "-\n", x)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+        panel.spacing.x = unit(0.5, "lines"), legend.position = "none")
 \end{verbatim}
 
 \begin{center}
@@ -1687,16 +1678,17 @@ for LASOMO. This deviation from the theoretical patterns is likely due
 to the practical efficiency of the implementations, including shared
 computation. Specifically, once the ensemble predictions are computed,
 the importance scores are derived from these predictions without needing
-to recompute the ensemble for each model. We note that the scaling
-increment and ratio between adjacent values of \(n\) in LOMO and LASOMO,
-respectively, is gradually increasing, which implies the empirical
-complexity is approaching the theoretical complexity with the number of
-models. However, the execution time scales much more rapidly with the
-number of models than the theoretical complexities, notably in LASOMO,
-as larger sub-ensembles require more expensive evaluation and scoring
-operations across all prediction tasks as well as larger intermediate
-objects. This phenomenon is also observed even in the parallel execution
-setting (Figure \ref{fig-feasibility-parallel-lasomo}).
+to recompute the ensemble for each model. It should be noted that the
+scaling increment and ratio between adjacent values of \(n\) in LOMO and
+LASOMO, respectively, is gradually increasing, which implies the
+empirical complexity is approaching the theoretical complexity with the
+number of models. However, the execution time scales much more rapidly
+with the number of models than the theoretical complexities, notably in
+LASOMO, as larger sub-ensembles require more expensive evaluation and
+scoring operations across all prediction tasks as well as larger
+intermediate objects. This phenomenon is also observed even in the
+parallel execution setting (Figure
+\ref{fig-feasibility-parallel-lasomo}).
 
 We further explored computational feasibility, focusing on the parallel
 execution mode (Figure \ref{fig-feasibility-parallel}). We observe that,
