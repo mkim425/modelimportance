@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
   fig.height = 4,
   warning = FALSE,
   message = FALSE,
-  eval= FALSE
+  eval = FALSE
 )
 options(width = 200)
 library(dplyr)
