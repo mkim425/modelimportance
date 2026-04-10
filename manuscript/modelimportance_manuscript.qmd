@@ -266,9 +266,9 @@ This positively oriented scoring rule facilitates the interpretation of importan
 
 data.frame(
   "Output Type" = c("mean", "median", "quantile", "pmf"),
-  "Scoring Rule" = c("RSE", "AE", "WIS", "Log Score"),
+  "Scoring Rule" = c("SE", "AE", "WIS", "Log Score"),
   Description = c(
-    "Root squared error (RSE): the root squared difference between the predicted value and the observed value",
+    "Squared error (SE): the squared difference between the predicted value and the observed value",
     "Absolute error (AE): the absolute difference between the predicted value and the observed value",
     "Weighted interval score (WIS): a quantile-based approximation of the continuous ranked probability score (CRPS) for evaluating quantile forecasts",
     "Logarithm of the probability assigned to the true outcome (LogScore)"
@@ -608,7 +608,7 @@ In each specific prediction task, if a model has any missing predictions, the `"
 The `"drop"` option removes the `NA` values, which results in the exclusion of the model from the evaluation for that task.
 
 The `fun` argument specifies a function used to summarize importance scores. 
-An arithmetic mean (`fun = mean`) is the default, but other summary functions (e.g., `fun = median`) may also be used.
+An arithmetic mean (`fun = mean`) is the default, but other summary functions (e.g., `fun = median`) or user-defined functions may also be used.
 Additional arguments for the summary function `fun` can also be passed via `...` if needed (e.g., `fun = quantile, probs = 0.25` for a quartile summary).
 
 The output returned by `aggregate()` is a data frame with columns `model_id` and `importance_score_<fun>`, where `<fun>` is the name of the summary function used (e.g., `importance_score_mean` when `fun = mean`). The output is sorted in descending order of the summarized importance scores, `importance_score_<fun>`.
@@ -1110,7 +1110,7 @@ scenarios with larger ensembles is presented in our companion methodological pap
 ## Computational complexity {#sec:computational-complexity}
 
 This section describes the computational complexity of LOMO and LASOMO algorithms implemented in the package, depending on the numbers of ensemble component models and prediction tasks.
-We conducted a computational experiment using simulated data with a point forecast ('mean'). 
+We conducted a computational experiment using simulated data with a point forecast ('median'). 
 The execution time was measured for both algorithms across varying numbers of models and tasks. We also compared the execution times between sequential and multisession computing environments to demonstrate the efficiency of parallelization in handling computationally intensive tasks. 
 
 We performed all experiments on a machine running macOS 15 with an Apple M4 chip and 16 GB RAM under R version 4.4.3.
