@@ -42,7 +42,7 @@ summary.model_imp_tbl <- function(object, ...) {
     ) |>
     dplyr::ungroup() |>
     as.data.frame() |>
-    dplyr::mutate(max_score = round(max_score, 2))
+    dplyr::mutate(max_score = round(.data$max_score, 2))
 
   # create summary list
   summary_list <- list(
@@ -121,7 +121,7 @@ print.summary.model_imp_tbl <- function(x, ...) {
 #' This method extends `stats::aggregate` for objects of class `model_imp_tbl`.
 #' @importFrom checkmate assert_data_frame assert_subset assert_function
 #' @importFrom stats aggregate
-#' @importFrom dplyr desc ungroup
+#' @importFrom dplyr desc ungroup where
 #' @importFrom rlang .data sym syms
 #' @rdname aggregate.model_imp_tbl
 #' @export
