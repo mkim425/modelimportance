@@ -1,5 +1,4 @@
-## Generate expected importance scores for the untrained ensemble models
-## with mean output in LASOMO
+## Generate expected importance scores with mean output in LASOMO
 ## Case 3: no missing data and 'simple_ensemble' using agg_fun = median
 # ----------------------------------------------------------------------------
 # load the package to make its internal functions available
@@ -46,8 +45,6 @@ score_ens_all <- score_model_out(
   target_data_mean,
   metrics = "se_point"
 ) |>
-  mutate(rse_point = sqrt(se_point)) |>
-  select(-se_point) |>
   left_join(dat_all_ens, by = "model_id")
 
 # calculate importance scores

@@ -96,9 +96,9 @@ wtd_marginal_cntrbt_mean <- function(k, j, score_ens_all, subsets, col) {
   # index in 'subsets' list that include elements of set_k except for j
   k1 <- which(sapply(subsets, setequal, set_k[set_k != j]))
   # rse_point for the ensemble forecast including jth model
-  score_incl_j <- score_ens_all$rse_point[k]
+  score_incl_j <- score_ens_all$se_point[k]
   # rse_point for the ensemble forecast not including jth model
-  score_not_incl_j <- score_ens_all$rse_point[k1]
+  score_not_incl_j <- score_ens_all$se_point[k1]
   # get the subset weight for the current subset
   subset_weight <- score_ens_all[[col]][k1]
   # jth model's marginal contribution multiplied by the subset weight

@@ -1,5 +1,4 @@
-## Generate expected importance scores for the untrained ensemble models
-## with mean output in LOMO
+## Generate expected importance scores mean output in LOMO
 
 # load the package to make its internal functions available
 devtools::load_all()
@@ -30,10 +29,8 @@ ensemble_scores <- score_model_out(
   target_data_mean,
   metrics = "se_point"
 ) |>
-  mutate(rse_point = sqrt(se_point)) |>
-  select(-se_point) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = rse_point - rse_point[1]) |>
+  mutate(importance = se_point - se_point[1]) |>
   filter(model_id != "ens_all")
 
 # get dataframe including model_id and each model's importance score
@@ -73,10 +70,8 @@ ensemble_scores <- score_model_out(
   target_data_mean,
   metrics = "se_point"
 ) |>
-  mutate(rse_point = sqrt(se_point)) |>
-  select(-se_point) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = rse_point - rse_point[1]) |>
+  mutate(importance = se_point - se_point[1]) |>
   filter(model_id != "ens_all")
 
 # get dataframe including model_id and each model's importance score
@@ -116,10 +111,8 @@ ensemble_scores <- score_model_out(
   target_data_mean,
   metrics = "se_point"
 ) |>
-  mutate(rse_point = sqrt(se_point)) |>
-  select(-se_point) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = rse_point - rse_point[1]) |>
+  mutate(importance = se_point - se_point[1]) |>
   filter(model_id != "ens_all")
 
 # get dataframe including model_id and each model's importance score
@@ -156,10 +149,8 @@ ensemble_scores <- score_model_out(
   target_data_mean,
   metrics = "se_point"
 ) |>
-  mutate(rse_point = sqrt(se_point)) |>
-  select(-se_point) |>
   # calculate importance scores: subtract the error of the ensemble-all
-  mutate(importance = rse_point - rse_point[1]) |>
+  mutate(importance = se_point - se_point[1]) |>
   filter(model_id != "ens_all")
 
 # get dataframe including model_id and each model's importance score
