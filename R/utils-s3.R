@@ -183,7 +183,7 @@ aggregate.model_imp_tbl <- function(
     # unquote symbol !!sym(colname) handles the dynamically created column name
     dplyr::arrange(desc(!!sym(colname))) |>
     dplyr::mutate(
-      dplyr::across(where(is.numeric), round, 2)
+      dplyr::across(where(is.numeric), function(x) round(x, 2))
     )
 
   cat("Overall model importance across tasks\n")
