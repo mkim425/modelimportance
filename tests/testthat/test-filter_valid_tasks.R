@@ -2,14 +2,14 @@ library(dplyr)
 
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
-    output_type %in% c("quantile"),
-    location == "25",
-    horizon == 1
+    .data$output_type %in% c("quantile"),
+    .data$location == "25",
+    .data$horizon == 1
   )
 target_data <- hubExamples::forecast_target_ts |>
   dplyr::filter(
-    target_end_date %in% unique(forecast_data$target_end_date),
-    location == "25"
+    .data$target_end_date %in% unique(forecast_data$target_end_date),
+    .data$location == "25"
   ) |>
   # Rename columns to match the oracle output format
   rename(
@@ -31,8 +31,11 @@ test_that("filter_valid_tasks() works as expected", {
   # Case 2: Some tasks invalid
   # Create a modified df_list_by_task with one task having only one model
   modified_tbl_some_invalid <- valid_tbl |>
-    filter(model_id != "PSI-DICE") |>
-    filter(!(model_id == "MOBS-GLEAM_FLUH" & target_end_date == "2022-12-24"))
+    filter(.data$model_id != "PSI-DICE") |>
+    filter(
+      !(.data$model_id == "MOBS-GLEAM_FLUH" &
+        .data$target_end_date == "2022-12-24")
+    )
   modified_df_list_some_invalid <- split_data_by_task(modified_tbl_some_invalid)
   result_some_invalid <- filter_valid_tasks(
     modified_df_list_some_invalid,
@@ -52,7 +55,7 @@ test_that("filter_valid_tasks() works as expected", {
     target_end_date = as.Date(c("2022-12-24", "2022-11-26"))
   )
   modified_tbl_all_invalid <- valid_tbl |>
-    filter(model_id != "PSI-DICE") |>
+    filter(.data$model_id != "PSI-DICE") |>
     anti_join(forecast_to_remove, by = c("model_id", "target_end_date"))
 
   modified_df_list_all_invalid <- split_data_by_task(modified_tbl_all_invalid)
