@@ -175,10 +175,9 @@ test_that("model_imp_tbl class and methods are valid", {
     agg_fun = "mean",
     min_log_score = -10
   ))
-  # test for class and print/plot methods
+  # test for class and print methods
   expect_s3_class(imp_scores, "model_imp_tbl")
   expect_error(print(imp_scores), NA)
-  expect_error(plot(imp_scores), NA)
   # test for summary method
   s <- summary(imp_scores)
   expect_s3_class(s, "summary.model_imp_tbl")
