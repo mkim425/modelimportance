@@ -13,7 +13,7 @@ tested.
   * four top-level scripts matching the pattern `exp_imp_*_lomo.R`
   * scripts under `exp_imp_*_lasomo/` directories
   * a helper script, `helper-exp_imp.R`
-* Test data for the `model_performance()` function is generated from: 
+* Test data for the `model_importance()` function is generated from: 
   * `forecast-target-datasets.R`
-  * `exp_overall_imp.R`
-  * a helper script, `helper-exp_overall_imp.R`
+  * `exp_all_imp_scores.R`
+  * a helper script, `helper-exp_all_imp_scores.R`
