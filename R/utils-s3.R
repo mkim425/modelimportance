@@ -90,46 +90,6 @@ print.summary.model_imp_tbl <- function(x, ...) {
   invisible(x)
 }
 
-#' Plot method for model importance score table
-#'
-#' @param x An object of class `model_imp_tbl`.
-#' @param ... Additional arguments passed to the plot method.
-#' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_hline facet_grid
-#' @importFrom ggplot2 labs theme vars label_wrap_gen
-#' @importFrom rlang sym syms
-#' @export
-plot.model_imp_tbl <- function(x, ...) {
-  # columns in the importance score table
-  task_id_cols <- get_task_id_cols(x)
-  # create ggplot object
-  ggplot(
-    x,
-    aes(
-      x = model_id,
-      y = importance,
-      fill = model_id
-    )
-  ) +
-    # create bar plot
-    geom_col() +
-    # flip coordinates
-    coord_flip() +
-    # add a line at y = 0 to indicate baseline
-    geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
-    # plot by task
-    facet_grid(
-      cols = vars(!!!syms(task_id_cols)),
-      scales = "free_x",
-      labeller = label_wrap_gen(width = 12)
-    ) +
-    labs(
-      title = "Model Importance by Task",
-      x = "Model ID",
-      y = "Importance"
-    ) +
-    theme(legend.position = "none")
-}
-
 
 #' Aggregate model importance scores across tasks to compute overall importance
 #' for each model
