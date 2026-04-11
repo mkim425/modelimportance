@@ -1,19 +1,24 @@
 library(dplyr)
 
-forecast_data <- hubExamples::forecast_outputs |>
+forecast_data <- readRDS(
+  testthat::test_path(
+    "testdata/for-split_data_by_task/flu_example_qntl_model_output.rds"
+  )
+) |>
   dplyr::filter(
     .data$output_type == "quantile",
     .data$location == "25",
     .data$horizon == 1
   )
-target_data <- hubExamples::forecast_target_ts |>
+
+target_data <- readRDS(
+  testthat::test_path(
+    "testdata/for-split_data_by_task/flu_example_target_data.rds"
+  )
+) |>
   dplyr::filter(
     .data$target_end_date %in% unique(forecast_data$target_end_date),
     .data$location == "25"
-  ) |>
-  # Rename columns to match the oracle output format
-  rename(
-    oracle_value = observation
   )
 
 valid_tbl <- validate_input_data(forecast_data, target_data)
@@ -43,7 +48,7 @@ test_that("filter_valid_tasks() works as expected", {
   )
   expect_equal(
     length(result_some_invalid),
-    length(modified_df_list_some_invalid) - 1
+    length(modified_df_list_some_invalid) - 2
   )
 
   # Case 3: All tasks invalid
@@ -51,8 +56,8 @@ test_that("filter_valid_tasks() works as expected", {
   # remove forecasts for MOBS-GLEAM_FLUH on 2022-12-24 and
   # Flusight-baseline on 2022-11-26
   forecast_to_remove <- tibble(
-    model_id = c("MOBS-GLEAM_FLUH", "Flusight-baseline"),
-    target_end_date = as.Date(c("2022-12-24", "2022-11-26"))
+    model_id = c("MOBS-GLEAM_FLUH", "Flusight-baseline", "Flusight-baseline"),
+    target_end_date = as.Date(c("2022-12-24", "2022-11-26", "2023-01-21"))
   )
   modified_tbl_all_invalid <- valid_tbl |>
     filter(.data$model_id != "PSI-DICE") |>
