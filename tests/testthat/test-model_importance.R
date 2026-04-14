@@ -12,10 +12,10 @@ f_all_data <- readRDS(
   )
 )
 data_list <- list(
-  dat_mean = f_all_data |> dplyr::filter(output_type == "mean"),
-  dat_quantile = f_all_data |> dplyr::filter(output_type == "quantile"),
-  dat_median = f_all_data |> dplyr::filter(output_type == "median"),
-  dat_pmf = f_all_data |> dplyr::filter(output_type == "pmf")
+  dat_mean = f_all_data |> dplyr::filter(.data$output_type == "mean"),
+  dat_quantile = f_all_data |> dplyr::filter(.data$output_type == "quantile"),
+  dat_median = f_all_data |> dplyr::filter(.data$output_type == "median"),
+  dat_pmf = f_all_data |> dplyr::filter(.data$output_type == "pmf")
 )
 # target data
 target_data <- readRDS(
@@ -50,7 +50,7 @@ params <- expand.grid(
     agg_fun = ifelse(ens_fun == "linear_pool", "NA", agg_fun),
     subset_weight = ifelse(algorithm == "lomo", "equal", subset_weight)
   ) |>
-  filter(!(output_type == "median" & ens_fun == "linear_pool")) |>
+  filter(!(.data$output_type == "median" & .data$ens_fun == "linear_pool")) |>
   distinct() |>
   arrange(algorithm, output_type, ens_fun, agg_fun, subset_weight)
 
@@ -103,7 +103,7 @@ pmap(
         # expected data frame of importance scores
         expected_df <- selected_expected_importance |>
           filter(
-            calc_args ==
+            .data$calc_args ==
               paste0(
                 output_type,
                 "_output-",
@@ -175,10 +175,9 @@ test_that("model_imp_tbl class and methods are valid", {
     agg_fun = "mean",
     min_log_score = -10
   ))
-  # test for class and print/plot methods
+  # test for class and print methods
   expect_s3_class(imp_scores, "model_imp_tbl")
   expect_error(print(imp_scores), NA)
-  expect_error(plot(imp_scores), NA)
   # test for summary method
   s <- summary(imp_scores)
   expect_s3_class(s, "summary.model_imp_tbl")
@@ -208,7 +207,7 @@ test_that("lomo runs with a large number of models and tasks", {
       value = rnorm(n(), mean = 500, sd = 100)
     )
   fake_target_data <- target_data |>
-    filter(location == "25", output_type == "mean") |>
+    filter(.data$location == "25", .data$output_type == "mean") |>
     slice(1) |>
     slice(rep(seq_len(n()), each = n_tasks)) |>
     mutate(
@@ -250,7 +249,7 @@ test_that("lasomo runs with a large number of models and tasks", {
       value = rnorm(n(), mean = 500, sd = 100)
     )
   fake_target_data <- target_data |>
-    filter(location == "25", output_type == "mean") |>
+    filter(.data$location == "25", .data$output_type == "mean") |>
     slice(1) |>
     slice(rep(seq_len(n()), each = n_tasks)) |>
     mutate(

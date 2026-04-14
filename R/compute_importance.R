@@ -16,9 +16,6 @@
 #' @param metric A character string specifying the metric to be used for scoring
 #' the model output. The metric is determined by the `output_type` and must be
 #' one of the following: `se_point`, `ae_point`, `wis`, or `log_score`.
-#' Note that for the `mean` output type, `se_point` is used by default,
-#' but we convert it to `rse_point` to ensure consistency in the units of
-#' importance score.
 #'
 #' @returns A data.frame with columns
 #' `task_id`, `output_type`, `model_id`, (task level) `importance`.
@@ -81,7 +78,7 @@ compute_importance <- function(
       # rename the calculated metric column to a common name
       rename(
         calculated_metric = any_of(
-          c("ae_point", "rse_point", "wis", "log_score")
+          c("ae_point", "se_point", "wis", "log_score")
         )
       ) |>
       left_join(ensemble_data, by = "model_id") |>
@@ -150,7 +147,7 @@ compute_importance <- function(
       # rename the calculated metric column to a common name
       rename(
         calculated_metric = any_of(
-          c("ae_point", "rse_point", "wis", "log_score")
+          c("ae_point", "se_point", "wis", "log_score")
         )
       ) |>
       left_join(

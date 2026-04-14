@@ -1,5 +1,4 @@
-## Generate expected importance scores for the untrained ensemble models
-## with mean output in LASOMO
+## Generate expected importance scores with mean output in LASOMO
 ## Case 1: no missing data and 'linear pool' ensemble
 # ----------------------------------------------------------------------------
 # load the package to make its internal functions available
@@ -39,8 +38,6 @@ score_ens_all <- score_model_out(
   target_data_mean,
   metrics = "se_point"
 ) |>
-  mutate(rse_point = sqrt(se_point)) |>
-  select(-se_point) |>
   left_join(dat_all_ens, by = "model_id")
 
 # calculate importance scores

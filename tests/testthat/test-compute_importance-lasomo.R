@@ -68,7 +68,7 @@ params <- expand.grid(
       output_type == "pmf" ~ "log_score"
     )
   ) |>
-  filter(!(output_type == "median" & ens_fun == "linear_pool")) |>
+  filter(!(.data$output_type == "median" & .data$ens_fun == "linear_pool")) |>
   arrange(output_type, ens_fun, agg_fun, subset_weight)
 
 ## Test: compute_importance function works properly when ensemble function is
@@ -133,9 +133,9 @@ pmap(
         # expected values
         expected_value <- selected_expected_importance |>
           filter(
-            ens_mthd == paste0(ens_fun, "-", agg_fun),
-            subset_wt == subset_weight,
-            test_purp == "properly assigned"
+            .data$ens_mthd == paste0(ens_fun, "-", agg_fun),
+            .data$subset_wt == subset_weight,
+            .data$test_purp == "properly assigned"
           ) |>
           dplyr::select(model_id, importance) |>
           as.data.frame()
@@ -187,9 +187,11 @@ pmap(reduced_params, function(output_type, subset_weight, metric) {
       model_id_list <- unique(selected_data$model_id)
       # obtain a subset of the data as if there are missing values.
       if (output_type %in% c("mean", "median")) {
-        sub_dat <- selected_data |> filter(model_id %in% model_id_list[1:3])
+        sub_dat <- selected_data |>
+          filter(.data$model_id %in% model_id_list[1:3])
       } else {
-        sub_dat <- selected_data |> filter(model_id %in% model_id_list[c(1, 3)])
+        sub_dat <- selected_data |>
+          filter(.data$model_id %in% model_id_list[c(1, 3)])
       }
       # calculate importance scores with mean output and simple mean ensemble
       calculated <- compute_importance(
@@ -208,9 +210,9 @@ pmap(reduced_params, function(output_type, subset_weight, metric) {
       # expected values
       expected_value <- selected_expected_importance |>
         filter(
-          ens_mthd == "simple_ensemble-mean",
-          subset_wt == subset_weight,
-          test_purp == "missing data"
+          .data$ens_mthd == "simple_ensemble-mean",
+          .data$subset_wt == subset_weight,
+          .data$test_purp == "missing data"
         ) |>
         dplyr::select(model_id, importance) |>
         arrange(model_id) |>

@@ -1,18 +1,3 @@
-# test with mean output type
-test_that("adjust_metric converts se_point to rse_point", {
-  input_df_mean <- data.frame(
-    model_id = c("model_1", "model_2", "model_3"),
-    se_point = c(4, 9, 16)
-  )
-
-  expected_df_mean <- data.frame(
-    model_id = c("model_1", "model_2", "model_3"),
-    rse_point = c(2, 3, 4)
-  )
-  adjusted_df <- adjust_metric(input_df_mean)
-  expect_equal(adjusted_df, expected_df_mean)
-})
-
 # test with pmf output type
 input_df_pmf <- data.frame(
   model_id = c("model_1", "model_2", "model_3"),

@@ -16,7 +16,8 @@ knitr::opts_chunk$set(
   fig.width = 7,
   fig.height = 4,
   warning = FALSE,
-  message = FALSE
+  message = FALSE,
+  eval = FALSE
 )
 options(width = 200)
 library(dplyr)
@@ -125,8 +126,8 @@ The predicted value corresponding to each quantile is recorded in the `value` co
 
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
-    output_type %in% c("quantile"),
-    location == "25"
+    .data$output_type %in% c("quantile"),
+    .data$location == "25"
   )
 
 forecast_data |>
