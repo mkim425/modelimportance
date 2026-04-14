@@ -62,7 +62,7 @@ params <- expand.grid(
       output_type == "pmf" ~ "log_score"
     )
   ) |>
-  filter(!(output_type == "median" & ens_fun == "linear_pool")) |>
+  filter(!(.data$output_type == "median" & .data$ens_fun == "linear_pool")) |>
   arrange(output_type, ens_fun)
 
 ## Test: compute_importance function works properly when ensemble function is
@@ -125,8 +125,8 @@ pmap(
         # expected values
         expected_value <- selected_expected_importance |>
           filter(
-            ens_mthd == paste0(ens_fun, "-", agg_fun),
-            test_purp == "properly assigned"
+            .data$ens_mthd == paste0(ens_fun, "-", agg_fun),
+            .data$test_purp == "properly assigned"
           ) |>
           dplyr::select(model_id, importance) |>
           as.data.frame()
@@ -174,7 +174,8 @@ pmap(reduced_params, function(output_type, metric) {
         "_lomo"
       )]]
       model_id_list <- unique(selected_data$model_id)
-      sub_dat <- selected_data |> filter(model_id %in% model_id_list[c(1, 3)])
+      sub_dat <- selected_data |>
+        filter(.data$model_id %in% model_id_list[c(1, 3)])
       # calculate importance scores with mean output and simple mean ensemble
       calculated <- compute_importance(
         single_task_data = sub_dat,
@@ -191,8 +192,8 @@ pmap(reduced_params, function(output_type, metric) {
       # expected values
       expected_value <- selected_expected_importance |>
         filter(
-          ens_mthd == "simple_mean",
-          test_purp == "missing data"
+          .data$ens_mthd == "simple_mean",
+          .data$test_purp == "missing data"
         ) |>
         dplyr::select(model_id, importance) |>
         as.data.frame()

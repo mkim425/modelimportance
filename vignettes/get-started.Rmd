@@ -8,14 +8,15 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.width = 7,
   fig.height = 4,
   warning = FALSE,
-  message = FALSE
+  message = FALSE,
+  eval = FALSE
 )
 options(width = 200)
 library(dplyr)
@@ -67,8 +68,8 @@ and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
 # Load the forecast data from hubExamples
 forecast_data_raw <- hubExamples::forecast_outputs |>
   dplyr::filter(
-    output_type %in% c("median"),
-    target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
+    .data$output_type %in% c("median"),
+    .data$target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
   )
 
 # Specify forecasts to remove: MOBS-GLEAM_FLUH for location 25 on 2022-11-26,

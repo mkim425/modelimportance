@@ -89,7 +89,7 @@ the importance is as follows.
 \tabular{lll}{
 \strong{Output Type} \tab \strong{Scoring Rule} \tab \strong{Description}
 \cr
-mean \tab rse_point \tab evaluate using the root squared error \cr
+mean \tab se_point \tab evaluate using the squared error \cr
 median \tab ae_point\tab evaluate using the absolute error \cr
 quantile \tab wis \tab evaluate using the weighted interval score\cr
 pmf \tab log_score \tab

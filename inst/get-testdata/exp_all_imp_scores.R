@@ -1,5 +1,5 @@
-## Generate expected importance scores and summaries, which will be used in
-## tests for model_importance() and model_importance_summary().
+## Generate expected importance scores, which will be used in
+## tests for model_importance().
 ## output type: mean, quantile, median
 #  =============================================================================
 # load the package to make its internal functions available
