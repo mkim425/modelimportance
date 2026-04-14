@@ -591,7 +591,6 @@ tbl_argument2 <- data.frame(
   check.names = FALSE
 )
 
-
 tbl_argument2 |>
   knitr::kable(format = "latex", booktabs = TRUE, escape = FALSE) |>
   column_spec(c(2, 3, 4), width = c("4cm", "3.7cm", "2cm")) |>
@@ -638,12 +637,13 @@ Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, an
 ```{r forecast_data, tidy = FALSE}
 #| echo: false
 # Load the forecast data from hubExamples
-forecast_data_raw <- hubExamples::forecast_outputs |>
-  dplyr::filter(
-    output_type %in% c("median"),
-    target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
-  )
-
+# forecast_data_raw <- hubExamples::forecast_outputs |>
+#   dplyr::filter(
+#     output_type %in% c("median"),
+#     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
+#   )
+# saveRDS(forecast_data_raw, file = "vignette-example-forecast_data_raw.rds")
+forecast_data_raw <- readRDS("vignette-example-forecast_data_raw.rds")
 # Specify forecasts to remove: MOBS-GLEAM_FLUH for location 25 on 2022-11-26,
 # PSI-DICE for location 48 on 2022-12-10
 forecast_to_remove <- data.frame(
