@@ -332,8 +332,6 @@ Model $i$'s importance score using LOMO is calculated as the difference in accur
 For example, when evaluating model 1 within an ensemble of three models ($n=3$), LOMO creates an ensemble forecast $F^{\{2,3\}}$ using only $F^2$ and $F^3$. The performance of this reduced ensemble is then compared to the full ensemble forecast $F^{\{1,2,3\}}$, which incorporates all three models. 
 We note that a model can make an ensemble better or worse, and thus the importance score for model 1 can be positive or negative accordingly.
 
-On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays the role of ${\mathcal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}).
-For example, using the earlier setup of three forecast models, LASOMO considers three subsets, which we denote by $S_1=\{2\}$, $S_2=\{3\}$, and $S_3=\{2, 3\}$, to calculate the importance score of model 1 (excluding all subsets that include model 1). The ensemble forecasts $F^{\{2\}}, F^{\{3\}}$, and $F^{\{2,3\}}$ are then compared to $F^{\{1,2\}}, F^{\{1,3\}}$, and $F^{\{1,2,3\}}$, respectively. The performance differences attributable to model 1's inclusion are aggregated, which results in the importance score for model 1. We note that the subsets (e.g., $S_1, S_2,$ and $S_3$) may have different weights during the aggregation process. 
 
 
 \begin{algorithm}[t!]
@@ -370,6 +368,8 @@ For example, using the earlier setup of three forecast models, LASOMO considers 
 \end{algorithm}
 
 
+On the other hand, LASOMO involves ensemble constructions from all possible subsets of models. For each subset $S$ that does not contain the model $i$, $S \cup \{i\}$ plays the role of ${\mathcal A}$ in the LOMO; the score associated with the subset $S$ is the difference of measures between $F^S$ and $F^{S \cup \{i\}}$. Then, all scores are aggregated across all possible subsets that the model $i$ does not belong to (\hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}).
+For example, using the earlier setup of three forecast models, LASOMO considers three subsets, which we denote by $S_1=\{2\}$, $S_2=\{3\}$, and $S_3=\{2, 3\}$, to calculate the importance score of model 1 (excluding all subsets that include model 1). The ensemble forecasts $F^{\{2\}}, F^{\{3\}}$, and $F^{\{2,3\}}$ are then compared to $F^{\{1,2\}}, F^{\{1,3\}}$, and $F^{\{1,2,3\}}$, respectively. The performance differences attributable to model 1's inclusion are aggregated, which results in the importance score for model 1. We note that the subsets (e.g., $S_1, S_2,$ and $S_3$) may have different weights during the aggregation process. 
 
 
 The [modelimportance]{.pkg} package offers two weighting options for subsets: one assigns equal (uniform) weights to all subsets, and the other assigns weights based on their size, similar to the definition of Shapley values, where a player’s average contribution is aggregated over all possible coalitions (or, equivalently, over all permutations of players) (@Shapley1953). Users can choose one to evaluate the contribution of each model in a manner suited to their preferred framework. 
@@ -377,6 +377,18 @@ Uniform weighting may be preferred when each subset size is of equal analytical 
 
 
 ### Comparison of weighting schemes in LASOMO {#sec:comparison-weighting-schemes}
+
+
+The differences in how the two weighting schemes influence the importance scores become more pronounced as the number of models increases.
+As described in \hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}, the formulas for their subset weights are 
+$$\frac{1}{2^{n-1}-1} \quad\text{and}\quad \frac{1}{(n-1)\binom{n-1}{k}},$$ 
+where $k$ is the size of each subset and $n$ is the total number of models.
+The equal scheme (left formula) treats all subsets equally, so medium-sized subsets have considerable influence in the final result, as there are many such subsets. In contrast, the permutation-based scheme (right formula) adjusts the weights according to the subset size, giving the greatest weight to both the smallest and largest subsets while assigning small weights to the mid-sized subsets. 
+Moreover, the weights assigned to the mid-sized subsets under the permutation-based approach decrease much faster with $n$ than those under the equal weighting scheme (see 
+\hyperref[sec:appendix]{Appendix~\ref{sec:appendix}} for details). Consequently, when $n$ is large, middle-sized subsets play a dominant role in determining the importance scores under the equal weighting scheme, whereas extreme-sized subsets primarily drive the scores under the permutation-based weighting approach.
+
+Overall, the difference between the two weighting schemes is likely to arise mainly from the the extreme-sized subsets when $n$ is large.
+This is because the weights given to the mid-sized subsets become increasingly similar, which are very small  values on the order of $10^{-3}$ even when $n=8$, while the weights assigned to the smallest and largest subsets remain substantially different (@fig-lasomo-weights).
 
 ```{r, fig.pos="t"}
 #| echo: false
@@ -427,18 +439,6 @@ data.frame(n = 2:10) |>
     legend.key.width = unit(1, "cm")
   )
 ```
-
-The differences in how the two weighting schemes influence the importance scores become more pronounced as the number of models increases.
-As described in \hyperref[alg:lasomo]{Algorithm~\ref{alg:lasomo}}, the formulas for their subset weights are 
-$$\frac{1}{2^{n-1}-1} \quad\text{and}\quad \frac{1}{(n-1)\binom{n-1}{k}},$$ 
-where $k$ is the size of each subset and $n$ is the total number of models.
-The equal scheme (left formula) treats all subsets equally, so medium-sized subsets have considerable influence in the final result, as there are many such subsets. In contrast, the permutation-based scheme (right formula) adjusts the weights according to the subset size, giving the greatest weight to both the smallest and largest subsets while assigning small weights to the mid-sized subsets. 
-Moreover, the weights assigned to the mid-sized subsets under the permutation-based approach decrease much faster with $n$ than those under the equal weighting scheme (see 
-\hyperref[sec:appendix]{Appendix~\ref{sec:appendix}} for details). Consequently, when $n$ is large, middle-sized subsets play a dominant role in determining the importance scores under the equal weighting scheme, whereas extreme-sized subsets primarily drive the scores under the permutation-based weighting approach.
-
-Overall, the difference between the two weighting schemes is likely to arise mainly from the the extreme-sized subsets when $n$ is large.
-This is because the weights given to the mid-sized subsets become increasingly similar, which are very small  values on the order of $10^{-3}$ even when $n=8$, while the weights assigned to the smallest and largest subsets remain substantially different (@fig-lasomo-weights).
-
 
 ## Evaluating models with the model_importance() function{#sec:main-function}
 
@@ -856,7 +856,9 @@ Calling `summary()` shows that three models were used and four tasks were evalua
 ```{r}
 #| label: summary_scores_lomo
 #| echo: false
-summary(scores_lomo)
+out <- capture.output(summary(scores_lomo))
+cat(paste(strwrap(out, width = 100), collapse = "\n"))
+# summary(scores_lomo)
 ```
 \normalsize
 As indicated in the output, more details about the summary are available through the summary object's elements as follows.
