@@ -45,3 +45,9 @@ Learn more about this package and how to use it in the
 [vignette](https://mkim425.github.io/modelimportance/articles/get-started.html).
 The vignette provides detailed examples and theoretical background on
 the algorithms implemented in the package.
+
+## Code of Conduct
+
+Please note that this project is released with a [Code of
+Conduct](https://mkim425.github.io/modelimportance/CODE_OF_CONDUCT.md).
+By participating in this project, you agree to abide by its terms.
