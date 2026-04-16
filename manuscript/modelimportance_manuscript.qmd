@@ -82,15 +82,15 @@ These packages have been valuable to evaluate individual models as independent e
 Building on our prior methodological study [@kim2026beyond], we emphasize that strong standalone model performance does not automatically imply a large positive contribution once the model is used within an ensemble.
 The [modelimportance]{.pkg} package operationalizes this idea in software, providing tools to evaluate the role of each model as an ensemble member within an ensemble model, rather than focusing on the individual predictive performance per se. 
 
-In ensemble forecasting, certain models contribute more significantly to the overall predictions than others. Assessing the impact of each component model on ensemble predictions is methodologically similar to determining variable importance in traditional regression and machine learning models, where variable importance measures evaluate how much individual variables improve of accuracy of the model's predictive performance or reduce the average loss. [R]{.proglang} packages such as [randomForest]{.pkg} [@Rpackage-randomForest], [caret]{.pkg} [@Rpackage-caret], [xgboost]{.pkg} [@Rpackage-xgboost], and [gbm]{.pkg} [@Rpackage-gbm] implement these functions for different types of models: random forest models, general machine learning models, extreme gradient boosting models, and generalized boosted regression models, respectively.
-These packages focus on feature-level importance within a single model and do not measure the contribution of individual models within an ensemble. In contrast, the tools in the [modelimportance]{.pkg} quantify how each component model helps enhance the ensemble model's predictive performance. They assign numerical scores to each model using a forecast accuracy metric selected based on the forecast type.
+In ensemble forecasting, certain models contribute more significantly to the overall predictions than others. Assessing the impact of each component model on ensemble predictions is methodologically similar to determining variable importance in traditional regression and machine learning models, where variable importance measures evaluate how much individual variables improve the accuracy of the model's predictive performance or reduce the average loss. [R]{.proglang} packages such as [randomForest]{.pkg} [@Rpackage-randomForest], [caret]{.pkg} [@Rpackage-caret], [xgboost]{.pkg} [@Rpackage-xgboost], and [gbm]{.pkg} [@Rpackage-gbm] implement these functions for different types of models: random forest models, general machine learning models, extreme gradient boosting models, and generalized boosted regression models, respectively.
+These packages focus on feature-level importance within a single model and do not measure the contribution of individual models within an ensemble. In contrast, the tools in [modelimportance]{.pkg} quantify how each component model helps enhance the ensemble model's predictive performance. They assign numerical scores to each model using a forecast accuracy metric selected based on the forecast type.
 
 Our methods are based on the concept of Shapley values in cooperative game theory, which measure a player’s average contribution to the game's overall outcome (@Shapley1953). There are several approaches that utilize Shapley values in black-box machine learning models to understand how each feature affects the model’s predictive power (@lundberg2017unified; @lundberg2020local; @covert2020understanding).
 Related work by @lipiecki2024postprocessing used Shapley-based attribution to study contributions of component models in a combined ensemble after postprocessing point forecasts into probabilistic forecasts. That methodology was later implemented in [PostForecasts.jl]{.pkg} [@Jlpackage-lipiecki2025postforecast]. [PostForecasts.jl]{.pkg} is conceptually aligned with our work in that both approaches leverage Shapley values to evaluate component forecasters. 
 However, while [PostForecasts.jl]{.pkg} was developed for [Julia]{.proglang} users originally focusing on energy economics, our [R]{.proglang} package focuses on epidemiological forecasts and offers a broader range of capabilities, such as handling missing forecasts, compatibility with the hubverse forecasting ecosystem, and rich tools for summarizing and visualizing importance scores across tasks. 
 
 These capabilities are particularly useful for hub organizers, who oversee collaborative forecasting systems that combine submissions from many teams into a single ensemble forecast [@shandross2026multi]. Examples include efforts coordinated by the US CDC and the European Centre for Disease Prevention and Control. 
-By quantifying each component model's contribution, [modelimportance]{.pkg} can support evidence-based decisions about ensemble design and maintenance. The package follows 'hubverse' conventions, a community-maintained ecosystem of open software and data standards for collaborative forecasting hubs [@hubverse_docs; @kerr2025coordinating]. Using these shared data structures allows our package to be seamlessly integrated with existing hub pipelines and deployed across multiple active hubs. We note that there are 31 hubs as of March 2026, including model development and training hubs.
+By quantifying each component model's contribution, [modelimportance]{.pkg} can support evidence-based decisions about ensemble design and maintenance. The package follows conventions defined by the 'hubverse', a community-maintained ecosystem of open software and data standards for collaborative forecasting hubs [@hubverse_docs; @kerr2025coordinating]. Using these shared data structures allows our package to be seamlessly integrated with existing hub pipelines and deployed across multiple active hubs. We note that there are 31 hubs as of March 2026, including model development and training hubs.
 
 We highlight some development practices we employed, such as unit testing of individual functions, object-oriented programming using S3 classes, continuous integration testing on different operating systems, and independent code review by peer developers. This emphasis on quality control is a key strength of this work.
 
@@ -100,7 +100,7 @@ The paper proceeds as follows.
 \hyperref[sec:main-function]{Section~\ref{sec:main-function}} demonstrates the various functionalities \pkg{modelimportance} supports. 
 \hyperref[sec:s3-infrastructure]{Section~\ref{sec:s3-infrastructure}} describes the S3 class structure and related methods implemented in the package, followed by examples of their usage in \hyperref[sec:examples]{Section~\ref{sec:examples}}.
 \hyperref[sec:computational-complexity]{Section~\ref{sec:computational-complexity}} discusses computational complexity and strategies for efficient computation.
-\hyperref[sec:implementation-and-availability]{Section~\ref{sec:implementation-and-availability}} highlights our quality assurance measures and its open access, and then we close this paper with a summary and a discussion of possible extensions.
+\hyperref[sec:implementation-and-availability]{Section~\ref{sec:implementation-and-availability}} highlights our quality assurance measures and the code's availability, and then we close this paper with a summary and a discussion of possible extensions.
  
 
 ## Data {#sec:data}
@@ -120,7 +120,7 @@ Parallel computing is supported by the [furrr]{.pkg} [@Rpackage-furrr] and [futu
 ### Model output format {#subsec:model_output_format}
 
 Model outputs are structured in a tabular format designed specifically for predictions, which is a formal S3 object called `model_out_tbl`.
-In the hubverse standard, each row represents an individual prediction or a component of a prediction for a single task, and its details are described in multiple columns through which one can identify the unique label assigned to each forecasting model, task characteristics, prediction representation type, and predicted values [@shandross2026multi]. 
+In the hubverse standard, each row represents an individual prediction or a component of a prediction for a single task. More details about that prediction or prediction component are described in multiple columns through which one can identify the unique label assigned to each forecasting model, task characteristics, prediction representation type, and predicted values [@shandross2026multi]. 
 To elaborate on the task characteristics, each prediction task corresponds to a specific forecasting problem and it can be described by a set of task ID variables. Examples of such variables include a date on which forecasts are generated, the target to predict (e.g., flu-related incident deaths, cases, or hospitalizations), and the prediction horizon, which is the length of time into the future from the point when a model generate its forecast, for a specific location on a certain target date.
 @tbl-example-model_output illustrates short-term forecasts of weekly incident influenza hospitalizations in the US for Massachusetts, generated by the model 'Flusight-baseline' on December 17, 2022, in the `model_out_tbl` format.
 The `model_id` column lists a uniquely identified model name. 
@@ -242,7 +242,7 @@ forecast_data |>
 
 
 @fig-example-model_output visualizes the information on the prediction task provided by @tbl-example-model_output for three models. 
-For each model, the quantile-based forecasts are shown for the target end dates of December 24, 2022 (horizon 1), December 31, 2022 (horizon 2), and January 07, 2023 (horizon 3), which were made on December 17, 2022 based on the historical data available as of that date. The prediction intervals defined by the lowest and highest quantiles (0.05 and 0.95) represent the uncertainty of the predictions. To give a brief interpretation, the Flusight-baseline model under-predicted the outcomes for the first two target dates (horizon 1 and 2), but it over-predicted the outcome for the last target date (horizon 3). Its prediction intervals are narrow compared to the other two models, which indicates that it is more confident about its predictions. However, two of three prediction intervals (horizons 1 and 2) failed to cover the eventually observed values, implying that the model was apparently overconfident and/or biased. 
+For each model, the quantile-based forecasts are shown for the target end dates of December 24, 2022 (horizon 1), December 31, 2022 (horizon 2), and January 07, 2023 (horizon 3), which were made on December 17, 2022 based on the historical data available as of that date. The prediction intervals defined by the lowest and highest quantiles (0.05 and 0.95) represent the uncertainty of the predictions. To give a brief interpretation, the Flusight-baseline model under-predicted the outcomes for the first two target dates (horizon 1 and 2), but it over-predicted the outcome for the last target date (horizon 3). Its prediction intervals are narrow compared to the other two models, which indicates that it is more confident about its predictions. However, two of three prediction intervals (horizons 1 and 2) failed to cover the eventually observed values, implying that the model was overconfident and/or biased. 
 
 ### Forecast data representation {#subsec:model_output}
 
@@ -251,8 +251,8 @@ For a specific prediction task, point forecasts, represented by a single predict
 Probabilistic forecasts, on the other hand, provide a probability distribution over possible future values, which inherently involves uncertainty. They are represented in various ways, such as probability mass functions (pmf), cumulative distribution functions (cdf), samples, or probability quantiles (or intervals). Note that there might be other ways, such as named distributions (e.g. Normal(1,2)) that are not currently supported by hubverse.
 
 The `output_type` and `output_type_id` columns in the hubverse model output format specify the forecast structure. 
-In the [modelimportance]{.pkg} package, model outputs may only contain one `output_type` of the types 'mean', 'median', 'quantile', or 'pmf': 'mean' or 'median' for point forecasts and 'quantile' or 'pmf' for probabilistic forecasts.  
-As aforementioned, `output_type_id` column  identifies addtional detailed information, such as specific quantile levels (e.g., "0.1", "0.25", "0.5", "0.75", and "0.9") for the 'quantile' output type and categorical values (e.g., "low", "moderate", "high", and "very high") for the 'pmf' output type. The predicted values for `pmf` are constrained to be between 0 and 1, indicating the probability at each categorical level, while they are unbounded numeric otherwise.
+In the [modelimportance]{.pkg} package, model outputs may only contain one `output_type` of 'mean', 'median', 'quantile', or 'pmf': 'mean' or 'median' for point forecasts and 'quantile' or 'pmf' for probabilistic forecasts.  
+As aforementioned, `output_type_id` column  identifies additional detailed information, such as specific quantile levels (e.g., "0.1", "0.25", "0.5", "0.75", and "0.9") for the 'quantile' output type and categorical values (e.g., "low", "moderate", "high", and "very high") for the 'pmf' output type. The predicted values for `pmf` are constrained to be between 0 and 1, indicating the probability at each categorical level, while they are unbounded numeric otherwise.
 Different output types correspond to different scoring rules for evaluating a model's prediction performance.
 @tbl-pair-output-scoringrule presents the output types and their associated scoring rules supported by the [modelimportance]{.pkg} package. 
 We note that while the scoring rules are listed in the table using their conventional names, the package uses their negative values for evaluation (e.g., $-\text{RSE}, -\text{WIS}$) so that higher scores indicate better performance. 
@@ -281,8 +281,8 @@ data.frame(
 
 ### Oracle output data {#subsec:oracle_output_data}
 
-The `oracle_output_data` is a data frame that contains the ground truth values for the variables used to define modeling targets [@hubverse_docs; @kerr2025coordinating]. It is referred to as "oracle" because it is formatted as if an oracle made a perfect point prediction equal to the truth.
-This data must follow the oracle output format defined in the hubverse standard, which includes independent task ID columns (e.g., `location`, `target_date`), the `output_type` column specifying the output type of the predictions and an `oracle_value` column for the observed values. 
+The `oracle_output_data` is a data frame that contains the ground truth values for the variables used to define modeling targets [@hubverse_docs; @kerr2025coordinating]. Its name originates from the concept of an oracle making a perfect prediction formatted similarly to model output.
+This type of data must follow the oracle output format defined in the hubverse standard, which includes independent task ID columns (e.g., `location`, `target_date`), the `output_type` column specifying the output type of the predictions and an `oracle_value` column for the observed values. 
 As in the forecast data, if the `output_type` is either `"quantile"` or `"pmf"`, the `output_type_id` column is often required to provide further identifying information. 
 
 The `model_out_tbl` and `oracle_output_data` must have the same task ID columns and `output_type`, including `output_type_id` if necessary, as the `oracle_output_data` is joined with the `model_out_tbl` based on these fields in order to score the forecast performance.
@@ -445,7 +445,7 @@ data.frame(n = 2:10) |>
 In this section, we describe the usage of the function `model_importance()`, where multiple options are available to customize the evaluation framework (@tbl-arguments1).
 
 The `model_importance()` function calculates the importance scores of ensemble component models based on their contributions to improving ensemble prediction accuracy for each prediction task. 
-It requires a minimum of two models per task, as with only one model, the importance score is not defined.
+The function requires a minimum of two models per task, as with only one model, the importance score is not defined.
 The output of the function is a single data frame of importance scores combined across all tasks. If a model missed predictions for a specific task, an `NA` value will be assigned for that task. 
 
 ```{r code-model_importance}
@@ -453,11 +453,11 @@ The output of the function is a single data frame of importance scores combined 
 > model_importance(
         forecast_data, oracle_output_data, ensemble_fun, 
         importance_algorithm, subset_wt, min_log_score, ...
-        )
+)
 ```
 
 
-The `forecast_data` parameter is a data frame containing predictions that is automatically coerced to a `model_out_tbl` format (if it is not one already), which is the standard S3 class model output format defined by the hubverse convention. 
+The `forecast_data` parameter is a data frame of predictions that is automatically coerced to a `model_out_tbl` format (if it is not one already), which is the standard S3 class model output format defined by the hubverse convention. 
 If coercion fails, users may need to manually convert their data using the `as_model_out_tbl()` function from [hubUtils]{.pkg}.
 
 The `oracle_output_data` is a data frame containing the actual observed values of the variables used to specify modeling targets. Further details on formatting and purpose are provided in \hyperref[subsec:oracle_output_data]{Section~\ref{subsec:oracle_output_data}}.
@@ -628,8 +628,8 @@ Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, an
 ```{r code-forecast_data}
 #| eval: false
 > forecast_data |>
-  knitr::kable(format = "latex", booktabs = TRUE) |>
-  kable_styling(latex_options = c("scale_down", "hold_position"))
+        knitr::kable(format = "latex", booktabs = TRUE) |>
+        kable_styling(latex_options = c("scale_down", "hold_position"))
 ```
 
 
@@ -790,7 +790,7 @@ The following code evaluates the importance of each ensemble member in the simpl
 ```
 
 
-This call also generates informative messages that summarize the input data, including the number of dates on which forecasts were produced, the number of models with their ids, and whether the prediction tasks meet the minimum model requirement, alongside a note on how to use parallel processing to speed up the computation when there are many models and tasks. A print out of these messages is shown below.
+This call also generates informative messages that summarize the input data, including the number of dates on which forecasts were produced, the number of models and their ids, and whether the prediction tasks meet the minimum model requirement, alongside a note on how to use parallel processing to speed up the computation when there are many models and tasks. A print out of these messages is shown below.
 
 \small
 ```r
@@ -810,7 +810,7 @@ All tasks meet the minimum model requirement of 2 models.
 \vspace{0.35cm} 
 \normalsize
 
-The function output is a data frame containing model ids and their corresponding importance scores for each prediction task, along with task id columns. (Note that we rounded the importance scores to fewer digits and renamed the columns for better readability in the output below, but the original column names are retained in the actual output data frame.)
+The function output is a data frame containing model ids and their corresponding importance scores for each prediction task, along with task id columns. (Note that we rounded the importance scores and renamed the columns for better readability in the output below, but the original column names are retained in the actual output data frame.)
 
 ```{r}
 #| label: scores_lomo
@@ -875,7 +875,7 @@ s <- summary(scores_lomo)
 s$all_tasks
 ```
 \normalsize
-Each row represent a unique combination of task IDs, from which we verify that four different tasks were evaluated. 
+Each row represents a unique combination of task IDs, from which we verify that four different tasks were evaluated. 
 ```{r}
 #| eval: false
 > s$model_summary
@@ -887,7 +887,7 @@ Each row represent a unique combination of task IDs, from which we verify that f
 s$model_summary
 ```
 \normalsize
-We observe that 'Flusight-baseline' submitted forecasts for all four tasks (n_NA = 0), while 'MOBS-GLEAM_FLUH' and 'PSI-DICE' submitted forecasts for only three tasks due to one missing forecast (n_NA = 1). Each model's importance scores vary across tasks. 'Flusight-baseline' shows the largest range of scores that include a negative minimum value and a positive maximum value, while 'MOBS-GLEAM_FLUH' and 'PSI-DICE' have scores that are all positive or all negative across the three tasks they submitted forecasts for.
+We observe that 'Flusight-baseline' submitted forecasts for all four tasks (n_NA = 0), while 'MOBS-GLEAM_FLUH' and 'PSI-DICE' submitted forecasts for only three tasks due to one missing forecast (n_NA = 1). Each model's importance scores vary across tasks. 'Flusight-baseline' shows the largest range of scores that includes a negative minimum value and a positive maximum value, while 'MOBS-GLEAM_FLUH' and 'PSI-DICE' have scores that are all positive or all negative across the three tasks they submitted forecasts for.
 ```{r}
 #| eval: false
 > s$task_winners
@@ -909,15 +909,16 @@ The following example shows a bar plot of importance scores across models and ta
 ```{r}
 #| eval: false
 > ggplot(scores_lomo, aes(x = model_id, y = importance, fill = model_id)) +
-  geom_col() +
-  coord_flip() +
-  geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
-  facet_grid(cols = vars(target, horizon, location, target_end_date), 
-             scales = "free_x") +
-  labs(x = "Model ID", y = "Importance Score", title = "Model Importance by Task") +
-  scale_x_discrete(labels = function(x) gsub("[-_]", "-\n", x)) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-        panel.spacing.x = unit(0.5, "lines"), legend.position = "none")
+        geom_col() +
+        coord_flip() +
+        geom_hline(yintercept = 0, color = "black", linewidth = 0.25) +
+        facet_grid(cols = vars(target, horizon, location, target_end_date), 
+                   scales = "free_x") +
+        labs(x = "Model ID", y = "Importance Score", 
+             title = "Model Importance by Task") +
+        scale_x_discrete(labels = function(x) gsub("[-_]", "-\n", x)) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+              panel.spacing.x = unit(0.5, "lines"), legend.position = "none")
 ```
 
 
@@ -1122,7 +1123,7 @@ The execution times were recorded in seconds.
 ```{r, fig.pos="t"}
 #| echo: false
 #| label: fig-feasibility-comparison
-#| fig-cap: "Runtime to compute model importance scores for point predictions by number of ensemble component models (ranging from 2 to 10) and number of prediction tasks (10, 20, 50, and 100) under sequential and parallel execution modes (multisession backend, with four workers) for LOMO and LASOMO algorithms. Each point represents the elapsed time (in seconds) for a given number of models, while curves and lines (solid/dashed) show the overall trend fitted to the observations. The scale of the $y$-axis is different between the two alorithms."
+#| fig-cap: "Runtime to compute model importance scores for point predictions by number of ensemble component models (ranging from 2 to 10) and number of prediction tasks (10, 20, 50, and 100) under sequential and parallel execution modes (multisession backend, with four workers) for LOMO and LASOMO algorithms. Each point represents the elapsed time (in seconds) for a given number of models, while lines (solid/dashed) show the overall trend fitted to the observations. The scale of the $y$-axis is different between the two algorithms."
 #| out.width: "100%"
 #| fig-align: "center"
 knitr::include_graphics("runtime_comparison-fitted.pdf")
@@ -1132,7 +1133,7 @@ knitr::include_graphics("runtime_comparison-fitted.pdf")
 Overall, the time needed to compute model importance scores increases with the number of models and tasks for both algorithms.
 Specifically, when the number of tasks is 10 or 20, the difference in computation time between sequential and parallel executions is not significant. However, as the number of prediction tasks rises to 50, the difference becomes more noticeable.
 The speedup from parallel execution relative to sequential execution is approximately 4-fold for LOMO in these settings of 10, 20, 50, and 100 prediction tasks, which is consistent with the use of four worker processes. 
-Similarly, for LASOMO, a speedup of approximately 3-fold is observed across these settings, which is less than the 4-fold speedup observed with LOMO due to the heavier computational intensity of LASOMO. Nevertheless, the efficiency of parallel execution is more pronounced for LASOMO than for LOMO, particularly when 8 or more models are involved in the ensemble construction and the number of prediction tasks is large.
+Similarly, for LASOMO, a speedup of approximately 3-fold is observed across these settings, which is less than the 4-fold speedup observed with LOMO due to the heavier computational intensity of LASOMO. Nevertheless, the efficiency of parallel execution is more pronounced for LASOMO than for LOMO, particularly when eight or more models are involved in the ensemble construction and the number of prediction tasks is large.
 
 ```{r, fig.pos="t", eval=FALSE}
 #| echo: false
@@ -1179,8 +1180,8 @@ This observation highlights the trade-off between the comprehensiveness of the L
 
 ## Implementation and availability {#sec:implementation-and-availability}
 
-The [modelimportance]{.pkg} is implemented in [R]{.proglang} and distributed via CRAN and GitHub, under the MIT license (\url{https://github.com/mkim425/modelimportance}). 
-We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to to verify that all inputs and outputs are properly formatted and ensure that all functions work correctly as expected, including those used internally. 
+The [modelimportance]{.pkg} package is implemented in [R]{.proglang} and distributed via CRAN and GitHub, under the MIT license (\url{https://github.com/mkim425/modelimportance}). 
+We conducted unit tests using the [testthat]{.pkg} package [@Rpackage-testthat] to verify that all inputs and outputs are properly formatted and ensure that all functions work correctly as expected, including those used internally. 
 We also performed continuous integration testing using GitHub Actions to maintain functionality across platforms, including Windows, macOS, and Linux. Integrated GitHub Action, we employed the [lintr]{.pkg} package [@Rpackage-lintr] to maintain code quality and detect potential issues, and the Air formatter [@air_formatter] to ensure consistent code style across the codebase.
 All code changes were systematically reviewed by fellow team members, and this enhanced reliability. 
 
@@ -1188,7 +1189,7 @@ All code changes were systematically reviewed by fellow team members, and this e
 
 Multi-model ensemble forecasts often provide better accuracy and robustness than single models, and are widely used in decision-making and policy planning across various domains. The contribution of each component model to the accuracy of the ensemble depends on its own unique characteristics. The [modelimportance]{.pkg} package enables the quantification of the value that each component model adds to the ensemble performance in different evaluation contexts. 
 
-The primary `model_importance()` function returns an S3 object of class `model_imp_tbl` tabular data containing component models and their importance metrics. Users are given a choice of ensemble methods, model importance algorithms (either LOMO or LASOMO), and options to handle missing values. 
+The primary `model_importance()` function returns an S3 object of class `model_imp_tbl` of tabular data containing component models and their importance metrics. Users are given a choice of ensemble methods, model importance algorithms (either LOMO or LASOMO), and options to handle missing values. 
 These features enable the package to serve as a versatile tool to aid collaborative efforts to construct an effective ensemble model across a wide range of forecasting tasks. 
 We note that unit testing with continuous integration ensures the reliability of all functions and the overall quality of code across multiple platforms. 
 
