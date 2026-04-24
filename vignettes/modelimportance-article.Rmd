@@ -748,7 +748,6 @@ target_data |>
   ) +
   labs(
     y = "Weekly Hospitalization",
-    # title = "Forecasts of incident deaths in Massachusetts (25) on November 28, 2021",
     x = "Date"
   ) +
   theme(
