@@ -656,8 +656,6 @@ forecast_to_remove <- data.frame(
 forecast_data <- forecast_data_raw |>
   anti_join(forecast_to_remove, by = c("model_id", "location", "target_end_date"))
 
-# print(forecast_data, width = Inf) 
-
 forecast_data |>
   knitr::kable(format = "latex", booktabs = TRUE) |>
   kable_styling(latex_options = c("scale_down", "hold_position"))
@@ -749,7 +747,6 @@ target_data |>
   ) +
   labs(
     y = "Weekly Hospitalization",
-    # title = "Forecasts of incident deaths in Massachusetts (25) on November 28, 2021",
     x = "Date"
   ) +
   theme(
@@ -928,11 +925,6 @@ The following example shows a bar plot of importance scores across models and ta
 #| fig-align: "center"
 #| fig-width: 6
 #| fig-height: 4
-
-# plot(scores_lomo) + 
-#     scale_x_discrete(labels = function(x) gsub("[-_]", "-\n", x)) +
-#     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-#           panel.spacing.x = unit(0.5, "lines")) 
 
 ggplot(scores_lomo, aes(x = model_id, y = importance, fill = model_id)) +
   geom_col() +
