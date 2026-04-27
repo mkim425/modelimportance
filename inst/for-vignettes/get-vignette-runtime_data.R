@@ -4,6 +4,7 @@
 # then saves the results in a CSV file for further analysis and plotting.
 
 library(readr)
+library(dplyr)
 library(future)
 # Template for the fake data
 forecast_data <- hubExamples::forecast_outputs |>
