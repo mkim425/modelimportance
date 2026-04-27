@@ -61,7 +61,7 @@ Suggests:
 Config/testthat/edition: 3
 Remotes:
     hubverse-org/hubUtils,
-    hubverse-org/hubExamples,
+    hubverse-org/hubExamples@v1.0.0,
     hubverse-org/hubEvals,
     hubverse-org/hubEnsembles
 VignetteBuilder: knitr
