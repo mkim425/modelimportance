@@ -293,16 +293,16 @@ The `model_out_tbl` and `oracle_output_data` must have the same task ID columns 
 This section provides a brief description of the leave one model out (LOMO) and leave all subsets of models out (LASOMO) algorithms, which are used to compute the model importance score. The basic idea of measuring the importance of each component model is to evaluate the change in ensemble performance when that model is included or excluded in the ensemble construction. More specifically, we compare the performance of an ensemble with and without a specific model for a specific task, and consider the difference in performance as the importance of that model for that task (Figure 2). 
 We apply this idea across many tasks and then average the task-level values to obtain model-level summaries. The full theoretical development and additional experiments are provided in @kim2026beyond. 
 
-```{r, fig.pos="t"}
+```{r}
 #| echo: false
 #| label: fig-concept
-#| fig-cap:  >
+#| fig-cap: >
 #|   Figure 2: Conceptual illustration of measuring model importance in a three-model setting.
 #|   Each circle represents a forecasting model with component model(s) shown inside.
 #|   Stars indicate the performance score measured by a positively oriented scoring rule (e.g., $-$WIS),
 #|   with more stars indicating better accuracy. LOMO computes a single performance difference
 #|   by removing the target model 1 from the full ensemble. LASOMO leverages multiple performance
-#|   differences across all subsets containing the model 1 and aggregates them."
+#|   differences across all subsets containing the model 1 and aggregates them.
 #| out.width: "80%"
 #| fig-align: "center"
 knitr::include_graphics("figure-concept.png")
@@ -1115,7 +1115,7 @@ The speedup from parallel execution relative to sequential execution is approxim
 Similarly, for LASOMO, a speedup of approximately 3-fold is observed across these settings, which is less than the 4-fold speedup observed with LOMO due to the heavier computational intensity of LASOMO. Nevertheless, the efficiency of parallel execution is more pronounced for LASOMO than for LOMO, particularly when eight or more models are involved in the ensemble construction and the number of prediction tasks is large.
 
 
-```{r, fig.pos="t"}
+```{r}
 #| echo: false
 #| label: fig-feasibility-comparison
 #| fig.cap: >
@@ -1145,19 +1145,19 @@ In contrast, in LASOMO, the elapsed time increases much more rapidly as the ense
 It is because the number of subsets of models that need to be evaluated in LASOMO grows exponentially with the number of models, leading to a rapidly rising computational intensity.
 This observation highlights the trade-off between the comprehensiveness of the LASOMO algorithm and its computational challenges in practice, particularly with a large number of models.
 
-```{r, fig.pos="t"}
+```{r}
 #| echo: false
 #| label: fig-feasibility-parallel-all_in_one
 #| fig-cap: >
 #|   Figure 6: Runtime to compute model importance scores for point predictions by number of ensemble
-#|    component models and prediction tasks during parallel execution via multisession backend.
-#|    Each dot represents the elapsed time (in seconds) for a given number of models.
-#|    For LOMO, the number of models evaluated varies from 2 to 100 for each 5, 20, 50, and
-#|    100 prediction tasks. The fitted lines illustrate the trend of the observations.
-#|    For LASOMO, the number of models evaluated varies from 2 to 14 while fixing 5 prediction tasks
-#|    due to exponentially growing computational intensity with the number of models.
-#|    The exact elapsed time is shown for LASOMO, which captures the steep increase in runtime
-#|    as the number of models grows, even before the high jump occurs with models over 12."
+#|   component models and prediction tasks during parallel execution via multisession backend.
+#|   Each dot represents the elapsed time (in seconds) for a given number of models.
+#|   For LOMO, the number of models evaluated varies from 2 to 100 for each 5, 20, 50, and
+#|   100 prediction tasks. The fitted lines illustrate the trend of the observations.
+#|   For LASOMO, the number of models evaluated varies from 2 to 14 while fixing 5 prediction tasks
+#|   due to exponentially growing computational intensity with the number of models.
+#|   The exact elapsed time is shown for LASOMO, which captures the steep increase in runtime
+#|   as the number of models grows, even before the high jump occurs with models over 12.
 #| out.width: "100%"
 #| fig-align: "center"
 knitr::include_graphics("runtime_parallel-fitted.png")

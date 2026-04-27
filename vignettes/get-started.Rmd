@@ -29,7 +29,7 @@ evaluating how each component model contributes to ensemble accuracy.
 We provide simple working examples to help you get started with the package. 
 Detailed descriptions of the model importance metrics, algorithms, key 
 functions, and in-depth interpretations of the examples covered here are 
-available in the [accompanying article](https://mkim425.github.io/modelimportance/articles/modelimportance-article.html) titled '`modelimportance`: Evaluating 
+available in the [accompanying article](../articles/modelimportance-article.html) titled '`modelimportance`: Evaluating 
 model importance within a multi-model ensemble in R' under *Articles*.
 
 
