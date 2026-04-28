@@ -97,7 +97,7 @@ target_data
 
 We plot the point (median) forecasts and the observed values to visualize the difference in forecast errors.
 
-```{r fig-example-median-lomo}
+```{r fig-example-median-lomo, echo=FALSE}
 target_data |>
   mutate(model_id = "Observed") |>
   rename(value = oracle_value) |>
@@ -207,10 +207,9 @@ s$task_winners
 
 Models with the highest importance scores for each task are identified in the `top_model` column with their importance score in the `max_score` column. 'PSI-DICE' is the best model for three out of the four tasks, while 'Flusight-baseline' is the best for the remaining task.
 
-Visualization can be performed using functions from `ggplot2`. 
 The following example shows a bar plot of importance scores across models and tasks, with panels faceted by combinations of task ID values.    
 
-```{r}
+```{r echo=FALSE}
 ggplot(scores_lomo, aes(x = model_id, y = importance, fill = model_id)) +
   geom_col() +
   coord_flip() +
@@ -252,7 +251,7 @@ aggregate(scores_lomo, by = "model_id", na_action = "average", fun = mean)
 ## Evaluation using LASOMO algorithm
 
 We now demonstrate the use of the LASOMO algorithm for evaluating model importance. 
-Since we explored the difference of `na_action` options in the previous LOMO example [Section 6.2](#sec:example-lomo), we focus on options for `subset_wt`, which specifies how weights are assigned to subsets of models when calculating importance scores, with `na_action` fixed to `"drop"`.
+Since we explored the difference of `na_action` options in the previous LOMO example above, we focus on options for `subset_wt`, which specifies how weights are assigned to subsets of models when calculating importance scores, with `na_action` fixed to `"drop"`.
 
 The following code and corresponding outputs illustrate the evaluation using each weighting scheme.
 
