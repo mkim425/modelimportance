@@ -108,7 +108,7 @@ target_data <- hubExamples::forecast_target_ts |>
 tbl_style(target_data)
 ```
 
-We visualize the forecasts and the observed values.
+We plot the point (median) forecasts and the observed values to visualize the difference in forecast errors.
 
 ```{r fig-example-median-lomo}
 target_data |>
