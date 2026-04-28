@@ -43,19 +43,6 @@ library(dplyr)
 library(ggplot2)
 ```
 
-We also set up a table style for displaying the data in the following section.
-```{r tbl-style}
-library(kableExtra)
-tbl_style <- function(x, ...) {
-  knitr::kable(x, format = "html") |>
-    kableExtra::kable_styling(
-      font_size = 12,
-      bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-      full_width = TRUE
-    )
-}
-```
-
 We use some example forecast and target data from the `hubExamples` package, 
 which provides sample datasets for multiple modeling hubs in the hubverse format. 
 
@@ -90,7 +77,7 @@ forecast_data <- forecast_data_raw |>
   anti_join(forecast_to_remove, by = c("model_id", "location", "target_end_date"))
 
 # Display the forecast data
-tbl_style(forecast_data)
+forecast_data
 ```
 
 The corresponding target data contains the observed hospitalization counts for these dates and locations.
@@ -105,7 +92,7 @@ target_data <- hubExamples::forecast_target_ts |>
   # Rename columns to match the oracle output format
   rename(oracle_value = observation)
 
-tbl_style(target_data)
+target_data
 ```
 
 We plot the point (median) forecasts and the observed values to visualize the difference in forecast errors.
