@@ -212,7 +212,7 @@ Each row represents a unique combination of task IDs, from which we verify that 
 s$model_summary
 ```
 
-We observe that 'Flusight-baseline' submitted forecasts for all four tasks (n_NA = 0), while 'MOBS-GLEAM_FLUH' and 'PSI-DICE' submitted forecasts for only three tasks due to one missing forecast (n_NA = 1). Each model's importance scores vary across tasks. 'Flusight-baseline' shows the largest range of scores that includes a negative minimum value and a positive maximum value, while 'MOBS-GLEAM_FLUH' and 'PSI-DICE' have scores that are all positive or all negative across the three tasks they submitted forecasts for.
+We observe that 'Flusight-baseline' submitted forecasts for all four tasks (`n_NA` = 0), while 'MOBS-GLEAM_FLUH' and 'PSI-DICE' submitted forecasts for only three tasks due to one missing forecast (`n_NA` = 1). Each model's importance scores vary across tasks. 'Flusight-baseline' shows the largest range of scores that includes a negative minimum value and a positive maximum value, while 'MOBS-GLEAM_FLUH' and 'PSI-DICE' have scores that are all positive or all negative across the three tasks they submitted forecasts for.
 
 ```{r}
 s$task_winners
