@@ -178,7 +178,7 @@
 \makeatletter
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, boxrule=0pt, sharp corners, borderline west={3pt}{0pt}{shadecolor}, frame hidden, interior hidden, breakable]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, borderline west={3pt}{0pt}{shadecolor}, enhanced, interior hidden, breakable, frame hidden, sharp corners]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -276,10 +276,11 @@ Nicholas G. Reich\\
 \section{Introduction}\label{sec:intro}
 
 Ensemble forecasting is a method to produce a single, consolidated
-prediction by combining forecasts generated from different models. The
-strengths and weaknesses of individual models are both pronounced but
-tend to offset one another, leading to an ensemble forecast that is more
-robust and accurate
+prediction by combining forecasts generated from different models. While
+individual models' strengths and weaknesses are pronounced within
+ensembles, the combination of many models tend to offset each other and
+create an ensemble forecast that is more robust and accurate than any
+single component model
 \citep{gneiting2005weather, hastie01statisticallearning}. Specifically,
 ensembles effectively mitigate the bias and variance arising from the
 predictions of individual models by averaging them out, and aggregating
