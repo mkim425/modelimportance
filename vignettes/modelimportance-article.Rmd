@@ -1,6 +1,6 @@
 ---
 title: "`modelimportance`: Evaluating model importance within a multi-model ensemble in R"
-author: "Minsu Kim, Li Shandross, Evan L. Ray, and Nicholas Reich"
+author: "Minsu Kim, Li Shandross, Evan L. Ray, and Nicholas G. Reich"
 bibliography: references.bib
 output: rmarkdown::html_vignette
 vignette: >
