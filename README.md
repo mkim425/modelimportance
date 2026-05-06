@@ -36,7 +36,7 @@ library(modelimportance)
 
 The main function in the package is `model_importance()`, which calculates the importance score for each model in an ensemble for individual prediction tasks.
 The output of `model_importance()` is an S3 object of class `model_imp_tbl`. 
-This object can be further analyzed and visualized using various methods such as `print()`, `summary()`, `plot()`, and `aggregate()`, which offer different ways to visualize and interpret the importance scores.
+This object can be further analyzed using various methods such as `print()`, `summary()`, and `aggregate()`, which offer different ways to interpret the importance scores.
 
 ## Learn more
 

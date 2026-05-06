@@ -60,10 +60,8 @@ Suggests:
     progressr (>= 0.15.1)
 Config/testthat/edition: 3
 Remotes:
-    hubverse-org/hubUtils,
-    hubverse-org/hubExamples,
-    hubverse-org/hubEvals,
-    hubverse-org/hubEnsembles
+    hubverse-org/hubExamples@v1.0.0,
+    hubverse-org/hubEvals
 VignetteBuilder: knitr
 URL: https://mkim425.github.io/modelimportance/
 Config/Needs/website: rmarkdown
