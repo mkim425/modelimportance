@@ -17,12 +17,14 @@ You can install the development version of modelimportance from
 [GitHub](https://github.com/) with:
 
 ``` r
+
 remotes::install_github("mkim425/modelimportance")
 ```
 
 ## Getting started
 
 ``` r
+
 library(modelimportance)
 ```
 
@@ -32,12 +34,11 @@ which calculates the importance score for each model in an ensemble for
 individual prediction tasks. The output of
 [`model_importance()`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
 is an S3 object of class `model_imp_tbl`. This object can be further
-analyzed and visualized using various methods such as
+analyzed using various methods such as
 [`print()`](https://rdrr.io/r/base/print.html),
-[`summary()`](https://rdrr.io/r/base/summary.html),
-[`plot()`](https://rdrr.io/r/graphics/plot.default.html), and
+[`summary()`](https://rdrr.io/r/base/summary.html), and
 [`aggregate()`](https://rdrr.io/r/stats/aggregate.html), which offer
-different ways to visualize and interpret the importance scores.
+different ways to interpret the importance scores.
 
 ## Learn more
 

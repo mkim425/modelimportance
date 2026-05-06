@@ -11,13 +11,13 @@ that column be named one of `forecast_date`, `origin_date`, and
 For each `output_type`, the corresponding scoring rule applied to
 calculate the importance is as follows.
 
-|                 |                  |                                                                              |
-|-----------------|------------------|------------------------------------------------------------------------------|
-| **Output Type** | **Scoring Rule** | **Description**                                                              |
-| mean            | se_point         | evaluate using the squared error                                             |
-| median          | ae_point         | evaluate using the absolute error                                            |
-| quantile        | wis              | evaluate using the weighted interval score                                   |
-| pmf             | log_score        | evaluate using the logarithm of the probability assigned to the true outcome |
+|  |  |  |
+|----|----|----|
+| **Output Type** | **Scoring Rule** | **Description** |
+| mean | se_point | evaluate using the squared error |
+| median | ae_point | evaluate using the absolute error |
+| quantile | wis | evaluate using the weighted interval score |
+| pmf | log_score | evaluate using the logarithm of the probability assigned to the true outcome |
 
 ## Usage
 
@@ -144,6 +144,7 @@ Optional progress bars are displayed via the `progressr` package when it
 is installed and the session is interactive. If `progressr` is not
 installed, the function will run without progress bars. To enable
 progress bars,
+
 
     progressr::handlers(global = TRUE)
 
