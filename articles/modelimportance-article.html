@@ -32,7 +32,7 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../articles/get-started.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -646,7 +646,7 @@ confident about its predictions. However, two of three prediction
 intervals (horizons 1 and 2) failed to cover the eventually observed
 values, implying that the model was overconfident and/or biased.</p>
 <div class="figure">
-<img src="modelimportance-article_files/figure-html/fig-example-model_output-1.png" class="r-plt" alt="Figure 1: Example plot of three distributional forecasts corresponding to the model output for incident influenza hospitalizations shown in Table 1. Solid black dots indicate historically available data as of the forecast generation date, and open black circles indicate the eventually observed values. The blue dots represent predictive medians and the blue shaded area represents the corresponding 90% prediction interval defined by the 0.05 and 0.95 quantiles." width="672"><p class="caption">
+<img src="modelimportance-article_files/figure-html/fig-example-model_output-1.png" alt="Figure 1: Example plot of three distributional forecasts corresponding to the model output for incident influenza hospitalizations shown in Table 1. Solid black dots indicate historically available data as of the forecast generation date, and open black circles indicate the eventually observed values. The blue dots represent predictive medians and the blue shaded area represents the corresponding 90% prediction interval defined by the 0.05 and 0.95 quantiles." width="672"><p class="caption">
 Figure 1: Example plot of three distributional forecasts corresponding
 to the model output for incident influenza hospitalizations shown in
 Table 1. Solid black dots indicate historically available data as of the
@@ -807,7 +807,7 @@ model-level summaries. The full theoretical development and additional
 experiments are provided in <span class="citation">Kim et al.
 (2026)</span>.</p>
 <div class="figure" style="text-align: center">
-<img src="figure-concept.png" class="r-plt" alt="Figure 2: Conceptual illustration of measuring model importance in a three-model setting. Each circle represents a forecasting model with component model(s) shown inside. Stars indicate the performance score measured by a positively oriented scoring rule (e.g., $-$WIS), with more stars indicating better accuracy. LOMO computes a single performance difference by removing the target model 1 from the full ensemble. LASOMO leverages multiple performance differences across all subsets containing the model 1 and aggregates them.
+<img src="figure-concept.png" alt="Figure 2: Conceptual illustration of measuring model importance in a three-model setting. Each circle represents a forecasting model with component model(s) shown inside. Stars indicate the performance score measured by a positively oriented scoring rule (e.g., $-$WIS), with more stars indicating better accuracy. LOMO computes a single performance difference by removing the target model 1 from the full ensemble. LASOMO leverages multiple performance differences across all subsets containing the model 1 and aggregates them.
 " width="80%"><p class="caption">
 Figure 2: Conceptual illustration of measuring model importance in a
 three-model setting. Each circle represents a forecasting model with
@@ -860,7 +860,7 @@ which incorporates all three models. We note that a model can make an
 ensemble better or worse, and thus the importance score for model 1 can
 be positive or negative accordingly.</p>
 <div class="figure">
-<img src="algorithm-lomo.jpg" class="r-plt" alt="Algorithm 1: Leave one model out (LOMO)" width="90%"><p class="caption">
+<img src="algorithm-lomo.jpg" alt="Algorithm 1: Leave one model out (LOMO)" width="90%"><p class="caption">
 Algorithm 1: Leave one model out (LOMO)
 </p>
 </div>
@@ -905,7 +905,7 @@ and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>S</mi><mn>3</mn></msub><annotation encoding="application/x-tex">S_3</annotation></semantics></math>)
 may have different weights during the aggregation process.</p>
 <div class="figure">
-<img src="algorithm-lasomo.jpg" class="r-plt" alt="Algorithm 2: Leave all subsets of models out (LASOMO)" width="90%"><p class="caption">
+<img src="algorithm-lasomo.jpg" alt="Algorithm 2: Leave all subsets of models out (LASOMO)" width="90%"><p class="caption">
 Algorithm 2: Leave all subsets of models out (LASOMO)
 </p>
 </div>
@@ -961,7 +961,7 @@ even when
 while the weights assigned to the smallest and largest subsets remain
 substantially different (Figure 3).</p>
 <div class="figure">
-<img src="modelimportance-article_files/figure-html/fig-lasomo-weights-1.png" class="r-plt" alt="Figure 3: Comparison of weights assigned to a subset. The plot shows the weights assigned to a subset as the number of models $n$ increases from 2 to 10. The red line represents the weights under the equal weighting scheme , while the blue and green lines represent the minimum and maximum weights, respectively, under the permutation-based weighting scheme. The minimum weight occurs when the subset size is around $(n-1)/2$, and the maximum weight occurs when the subset size is $n-1$. As the number of models increases, the weights assigned by the two schemes become increasingly similar for mid-sized subsets whereas substantial differences remain for extreme-sized subsets." width="672"><p class="caption">
+<img src="modelimportance-article_files/figure-html/fig-lasomo-weights-1.png" alt="Figure 3: Comparison of weights assigned to a subset. The plot shows the weights assigned to a subset as the number of models $n$ increases from 2 to 10. The red line represents the weights under the equal weighting scheme , while the blue and green lines represent the minimum and maximum weights, respectively, under the permutation-based weighting scheme. The minimum weight occurs when the subset size is around $(n-1)/2$, and the maximum weight occurs when the subset size is $n-1$. As the number of models increases, the weights assigned by the two schemes become increasingly similar for mid-sized subsets whereas substantial differences remain for extreme-sized subsets." width="672"><p class="caption">
 Figure 3: Comparison of weights assigned to a subset. The plot shows the
 weights assigned to a subset as the number of models
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
@@ -1808,7 +1808,7 @@ uncertainty. Additionally, the forecasts for Massachusetts are
 relatively more accurate compared to those for Texas, which tend to have
 higher errors (Figure 4).</p>
 <div class="figure">
-<img src="modelimportance-article_files/figure-html/fig-example-median-lomo-1.png" class="r-plt" alt="Figure 4: Plot of three point forecasts (median) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing." width="672"><p class="caption">
+<img src="modelimportance-article_files/figure-html/fig-example-median-lomo-1.png" alt="Figure 4: Plot of three point forecasts (median) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing." width="672"><p class="caption">
 Figure 4: Plot of three point forecasts (median) and the eventually
 observed values from the <code>forecast_data</code> and
 <code>target_data</code> for weekly incident influenza hospitalizations
@@ -1960,7 +1960,7 @@ combinations of task ID values.</p>
 <span>    axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">90</span>, hjust <span class="op">=</span> <span class="fl">1</span>, vjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>    panel.spacing.x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="st">"lines"</span><span class="op">)</span>, legend.position <span class="op">=</span> <span class="st">"none"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="modelimportance-article_files/figure-html/plot_scores_lomo-1.png" class="r-plt" alt="" width="576" style="display: block; margin: auto;"></p>
+<p><img src="modelimportance-article_files/figure-html/plot_scores_lomo-1.png" alt="" width="576" style="display: block; margin: auto;"></p>
 <p>We aggregate the importance scores for each model by averaging across
 all tasks. <code>NA</code> values are removed during the averaging
 process by setting the <code>na_action</code> argument to
@@ -2140,7 +2140,7 @@ for LASOMO than for LOMO, particularly when eight or more models are
 involved in the ensemble construction and the number of prediction tasks
 is large.</p>
 <div class="figure" style="text-align: center">
-<img src="runtime_comparison-fitted.png" class="r-plt" alt="Figure 5: Runtime to compute model importance scores for point predictions by number of ensemble component models (ranging from 2 to 10) and number of prediction tasks (10, 20, 50, and 100) under sequential and parallel execution modes (multisession backend, with four workers) for LOMO and LASOMO algorithms. Each point represents the elapsed time (in seconds) for a given number of models, while lines (solid/dashed) show the overall trend fitted to the observations. The scale of the $y$-axis is different between the two algorithms.
+<img src="runtime_comparison-fitted.png" alt="Figure 5: Runtime to compute model importance scores for point predictions by number of ensemble component models (ranging from 2 to 10) and number of prediction tasks (10, 20, 50, and 100) under sequential and parallel execution modes (multisession backend, with four workers) for LOMO and LASOMO algorithms. Each point represents the elapsed time (in seconds) for a given number of models, while lines (solid/dashed) show the overall trend fitted to the observations. The scale of the $y$-axis is different between the two algorithms.
 " width="100%"><p class="caption">
 Figure 5: Runtime to compute model importance scores for point
 predictions by number of ensemble component models (ranging from 2 to
@@ -2203,7 +2203,7 @@ trade-off between the comprehensiveness of the LASOMO algorithm and its
 computational challenges in practice, particularly with a large number
 of models.</p>
 <div class="figure" style="text-align: center">
-<img src="runtime_parallel-fitted.png" class="r-plt" alt="Figure 6: Runtime to compute model importance scores for point predictions by number of ensemble component models and prediction tasks during parallel execution via multisession backend. Each dot represents the elapsed time (in seconds) for a given number of models. For LOMO, the number of models evaluated varies from 2 to 100 for each 5, 20, 50, and 100 prediction tasks. The fitted lines illustrate the trend of the observations. For LASOMO, the number of models evaluated varies from 2 to 14 while fixing 5 prediction tasks due to exponentially growing computational intensity with the number of models. The exact elapsed time is shown for LASOMO, which captures the steep increase in runtime as the number of models grows, even before the high jump occurs with models over 12.
+<img src="runtime_parallel-fitted.png" alt="Figure 6: Runtime to compute model importance scores for point predictions by number of ensemble component models and prediction tasks during parallel execution via multisession backend. Each dot represents the elapsed time (in seconds) for a given number of models. For LOMO, the number of models evaluated varies from 2 to 100 for each 5, 20, 50, and 100 prediction tasks. The fitted lines illustrate the trend of the observations. For LASOMO, the number of models evaluated varies from 2 to 14 while fixing 5 prediction tasks due to exponentially growing computational intensity with the number of models. The exact elapsed time is shown for LASOMO, which captures the steep increase in runtime as the number of models grows, even before the high jump occurs with models over 12.
 " width="100%"><p class="caption">
 Figure 6: Runtime to compute model importance scores for point
 predictions by number of ensemble component models and prediction tasks
@@ -2560,7 +2560,7 @@ Metrics</span></em>. <a href="https://CRAN.R-project.org/package=MLmetrics" clas
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
