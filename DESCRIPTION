@@ -63,5 +63,6 @@ Remotes:
     hubverse-org/hubExamples@v1.0.0,
     hubverse-org/hubEvals
 VignetteBuilder: knitr
-URL: https://mkim425.github.io/modelimportance/
+URL: https://github.com/mkim425/modelimportance
 Config/Needs/website: rmarkdown
+BugReports: https://github.com/mkim425/modelimportance/issues
