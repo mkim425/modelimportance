@@ -77,7 +77,7 @@
 #' @details
 #' The `oracle_output_data` is a data frame that contains the ground truth
 #' values for the variables used to define modeling targets. It is referred to
-#' as “oracle” because it is formatted as if an oracle made a perfect point
+#' as "oracle" because it is formatted as if an oracle made a perfect point
 #' prediction equal to the truth. This data must follow the oracle output format
 #' defined in the hubverse standard, which includes independent task ID columns
 #' (e.g., `location`, `target_date`), the `output_type` column specifying the
