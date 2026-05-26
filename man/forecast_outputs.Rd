@@ -5,7 +5,7 @@
 \alias{forecast_outputs}
 \title{Forecast outputs from a US flu forecasting hub}
 \format{
-A data frame (model_out_tbl) with 10,224 rows and 9 columns:
+A data frame (model_out_tbl) with 216 rows and 9 columns:
 \describe{
 \item{model_id}{Character. Unique model identifier.}
 \item{reference_date}{Date. Date the forecast was generated.}

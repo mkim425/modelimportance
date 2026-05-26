@@ -5,7 +5,7 @@
 \alias{forecast_oracle_output}
 \title{Oracle (target) output for the US flu forecasting hub}
 \format{
-A data frame with 200,340 rows and 6 columns:
+A data frame with 432 rows and 6 columns:
 \describe{
 \item{location}{Character. FIPS code for the US location.}
 \item{target_end_date}{Date. Date of the observation.}

@@ -5,7 +5,7 @@
 \alias{forecast_target_ts}
 \title{Target time series for the US flu forecasting hub}
 \format{
-A data frame with 20,510 rows and 4 columns:
+A data frame with 16 rows and 4 columns:
 \describe{
 \item{target_end_date}{Date. Date of the observation.}
 \item{target}{Character. Target name (e.g., "wk inc flu hosp").}
