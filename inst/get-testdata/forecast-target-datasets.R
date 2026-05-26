@@ -6,7 +6,7 @@ devtools::load_all()
 # forecast data with
 # 4 prediction tasks in total: 2 locations (MA, TX), 2 target end dates
 # two missing forecasts
-forecast_data_raw <- hubExamples::forecast_outputs |>
+forecast_data_raw <- forecast_outputs |>
   dplyr::filter(
     output_type %in% c("median"),
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
@@ -28,7 +28,7 @@ forecast_data <- forecast_data_raw |>
   )
 
 # target data with matching locations and target end dates
-target_data <- hubExamples::forecast_oracle_output |>
+target_data <- forecast_oracle_output |>
   dplyr::filter(
     target_end_date %in% unique(forecast_data$target_end_date),
     location %in% unique(forecast_data$location)

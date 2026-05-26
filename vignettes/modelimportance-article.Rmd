@@ -77,11 +77,14 @@ The paper proceeds as follows.
 
 ### 2.1 Dependencies and related software {#subsec:dependences}
 
-The `modelimportance` package is designed to work with the hubverse framework and, accordingly, depends on several packages in the hubverse ecosystem, such as `hubUtils` (@Rpackage-hubUtils), `hubEnsembles` (@Rpackage-hubEnsembles), `hubEvals` (@Rpackage-hubEvals), and `hubExamples` (@Rpackage-hubExamples). 
+The `modelimportance` package is designed to work with the hubverse framework and, accordingly, depends on several packages in the hubverse ecosystem, such as `hubUtils` (@Rpackage-hubUtils), `hubEnsembles` (@Rpackage-hubEnsembles), and `hubEvals` (@Rpackage-hubEvals).
 `modelimportance` uses a `model_out_tbl` S3 class as the model output format defined in `hubUtils`, which consists of utility functions to standardize prediction files and data formats (details in [Section 2.2](#subsec:model_output_format)).
 Ensembling predictions from multiple models relies on `hubEnsembles`, which offers a broadly applicable framework to construct multi-model ensembles using various ensemble methods.
 Calculation of forecast accuracy using various metrics is based on `hubEvals`, which internally leverages `scoringutils`.
-We use the example datasets from `hubExamples` for testing and demonstration purposes (see [Section 6](#sec:examples)). 
+
+
+We derived example datasets used for testing and demonstration purposes (see [Section 6](#sec:examples)) from the `hubExamples` (@Rpackage-hubExamples) package, which provides example datasets in the hubverse format.
+The dataset were locally stored for reproducibility within the package distribution, instead of requiring the `hubExamples` package as a dependency.
 
 For visualization of model importance scores, standard `ggplot2` [@Rpackage-ggplot2] functions can be applied. 
 Parallel computing is supported by the `furrr` [@Rpackage-furrr] and `future` [@Rpackage-future] packages, which allow users to specify the number of cores to use for parallel processing when calculating model importance scores across many tasks.
@@ -107,9 +110,9 @@ The predicted value corresponding to each quantile is recorded in the `value` co
 #| label: tbl-example-model_output
 #| tbl-cap: "Example of the model output for incident influenza
 #| hospitalizations (top 10 rows) extracted from `forecast_outputs` data in the
-#| [hubExamples]{.pkg} package."
+#| `modelimportance` package, which is originally from `hubExamples` package."
 
-forecast_data <- hubExamples::forecast_outputs |>
+forecast_data <- forecast_outputs |>
   dplyr::filter(
     .data$output_type %in% c("quantile"),
     .data$location == "25"
@@ -123,9 +126,10 @@ forecast_data |>
   head(10) |>
   knitr::kable(
                format = "html",
-               caption = "Table 1: Example of the model output for incident 
-               influenza hospitalizations (top 10 rows) extracted from 
-               `forecast_outputs` data in the `hubExamples` package.") |>
+               caption = "Table 1: Example of the model output for incident
+               influenza hospitalizations (top 10 rows) extracted from
+               `forecast_outputs` bundled in the `modelimportance` package, 
+               which is originally from `hubExamples` package.") |>
   kableExtra::kable_styling(
     font_size = 12,
     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
@@ -149,7 +153,7 @@ For each model, the quantile-based forecasts are shown for the target end dates 
 #|   represents the corresponding 90% prediction interval defined by the 0.05
 #|   and 0.95 quantiles.
 
-target_data <- hubExamples::forecast_target_ts |>
+target_data <- forecast_target_ts |>
   dplyr::filter(
     target_end_date %in% unique(forecast_data$target_end_date),
     location %in% unique(forecast_data$location),
@@ -626,7 +630,7 @@ The output returned by `aggregate()` is a data frame with columns `model_id` and
 
 ## 6. Examples {#sec:examples}
 
-In this section, we illustrate how to use the `model_importance()` function to evaluate the importance of component models within an ensemble. The examples show various combinations of the arguments described in [Section 4](#sec:main-function). Example forecast and target data is sourced from the 'hubExamples' package, which provides sample datasets for multiple modeling hubs in the hubverse format. 
+In this section, we illustrate how to use the `model_importance()` function to evaluate the importance of component models within an ensemble. The examples show various combinations of the arguments described in [Section 4](#sec:main-function). Example forecast and target data are originally sourced from `hubExamples` package, which provides sample datasets for multiple modeling hubs in the hubverse format.
 
 ### 6.1 Example data {#sec:example-data}
 

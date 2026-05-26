@@ -1,9 +1,8 @@
 # This script is used to get the forecast data for the vignette example.
 
-library(hubExamples)
+library(modelimportance)
 library(dplyr)
-# Load the forecast data from hubExamples
-forecast_data_raw <- hubExamples::forecast_outputs |>
+forecast_data_raw <- forecast_outputs |>
   dplyr::filter(
     output_type %in% c("median"),
     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
@@ -26,7 +25,7 @@ forecast_data <- forecast_data_raw |>
 
 # saveRDS(forecast_data, file = "./inst/for-vignettes/vignette-example-forecast_data.rds")
 
-target_data <- hubExamples::forecast_target_ts |>
+target_data <- forecast_target_ts |>
   dplyr::filter(
     target_end_date %in% unique(forecast_data$target_end_date),
     location %in% unique(forecast_data$location),

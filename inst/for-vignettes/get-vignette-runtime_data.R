@@ -7,7 +7,7 @@ library(readr)
 library(dplyr)
 library(future)
 # Template for the fake data
-forecast_data <- hubExamples::forecast_outputs |>
+forecast_data <- forecast_outputs |>
   dplyr::filter(
     output_type %in% c("median"),
     location == "25",
@@ -18,7 +18,7 @@ forecast_data <- hubExamples::forecast_outputs |>
   slice(1) |>
   select(-model_id, -value)
 
-target_data <- hubExamples::forecast_target_ts |>
+target_data <- forecast_target_ts |>
   dplyr::filter(
     target_end_date %in% unique(forecast_data$target_end_date),
     location == "25",
