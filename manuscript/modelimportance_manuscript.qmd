@@ -107,11 +107,12 @@ The paper proceeds as follows.
 
 ### Dependencies and related software {#subsec:dependences}
 
-The [modelimportance]{.pkg} package is designed to work with the hubverse framework and, accordingly, depends on several packages in the hubverse ecosystem, such as [hubUtils]{.pkg} (@Rpackage-hubUtils), [hubEnsembles]{.pkg} (@Rpackage-hubEnsembles), [hubEvals]{.pkg} (@Rpackage-hubEvals), and [hubExamples]{.pkg} (@Rpackage-hubExamples). 
+The [modelimportance]{.pkg} package is designed to work with the hubverse framework and, accordingly, depends on several packages in the hubverse ecosystem, such as [hubUtils]{.pkg} (@Rpackage-hubUtils), [hubEnsembles]{.pkg} (@Rpackage-hubEnsembles), and [hubEvals]{.pkg} (@Rpackage-hubEvals).
 [modelimportance]{.pkg} uses a `model_out_tbl` S3 class as the model output format defined in [hubUtils]{.pkg}, which consists of utility functions to standardize prediction files and data formats (details in \hyperref[subsec:model_output_format]{Section~\ref{subsec:model_output_format}}).
 Ensembling predictions from multiple models relies on [hubEnsembles]{.pkg}, which offers a broadly applicable framework to construct multi-model ensembles using various ensemble methods.
 Calculation of forecast accuracy using various metrics is based on [hubEvals]{.pkg}, which internally leverages [scoringutils]{.pkg}.
-We use the example datasets from [hubExamples]{.pkg} for testing and demonstration purposes (see \hyperref[sec:examples]{Section~\ref{sec:examples}}). 
+We derived example datasets used for testing and demonstration purposes (see [Section 6](#sec:examples)) from the `hubExamples` (@Rpackage-hubExamples) package, which provides example datasets in the hubverse format.
+The dataset were locally stored for reproducibility within the package distribution, instead of requiring the `hubExamples` package as a dependency.
 
 For visualization of model importance scores, standard [ggplot2]{.pkg} [@Rpackage-ggplot2] functions can be applied. 
 Parallel computing is supported by the [furrr]{.pkg} [@Rpackage-furrr] and [future]{.pkg} [@Rpackage-future] packages, which allow users to specify the number of cores to use for parallel processing when calculating model importance scores across many tasks.
@@ -134,8 +135,9 @@ The predicted value corresponding to each quantile is recorded in the `value` co
 #| echo: false
 #| label: tbl-example-model_output
 #| tbl-cap: "Example of the model output for incident influenza
-#| hospitalizations (top 10 rows) extracted from `forecast_outputs` data in the
-#| [hubExamples]{.pkg} package."
+#| hospitalizations (top 10 rows) extracted from the `forecast_outputs` data 
+#| bundled in the `modelimportance` package, which is originally sourced from 
+#| the `hubExamples` package."
 
 forecast_data <- hubExamples::forecast_outputs |>
   dplyr::filter(
@@ -614,7 +616,8 @@ The output returned by `aggregate()` is a data frame with columns `model_id` and
 
 ## Examples {#sec:examples}
 
-In this section, we illustrate how to use the `model_importance()` function to evaluate the importance of component models within an ensemble. The examples show various combinations of the arguments described in \hyperref[sec:main-function]{Section~\ref{sec:main-function}}. Example forecast and target data is sourced from the [hubExamples]{.pkg} package, which provides sample datasets for multiple modeling hubs in the hubverse format. 
+In this section, we illustrate how to use the `model_importance()` function to evaluate the importance of component models within an ensemble. The examples show various combinations of the arguments described in \hyperref[sec:main-function]{Section~\ref{sec:main-function}}. 
+Example forecast and target data are originally sourced from the [hubExamples]{.pkg} package, which provides sample datasets for multiple modeling hubs in the hubverse format. 
 
 ### Example data {#sec:example-data}
 
@@ -643,7 +646,7 @@ Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, an
 #     target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
 #   )
 # saveRDS(forecast_data_raw, file = "vignette-example-forecast_data_raw.rds")
-forecast_data_raw <- readRDS("vignette-example-forecast_data_raw.rds")
+forecast_data_raw <- readRDS("/Users/minsukim/Documents/rpkgs/modelimportance/manuscript/vignette-example-forecast_data.rds")
 # Specify forecasts to remove: MOBS-GLEAM_FLUH for location 25 on 2022-11-26,
 # PSI-DICE for location 48 on 2022-12-10
 forecast_to_remove <- data.frame(
@@ -675,16 +678,12 @@ The corresponding target data contains the observed hospitalization counts for t
 \small
 ```{r target_data}
 #| echo: false
-target_data <- hubExamples::forecast_target_ts |>
+target_data <- readRDS("vignette-example-oracle_data.rds") |>
   dplyr::filter(
     target_end_date %in% unique(forecast_data$target_end_date),
     location %in% unique(forecast_data$location),
     target == "wk inc flu hosp"
-  ) |>
-  # Rename columns to match the oracle output format
-  rename(
-    oracle_value = observation
-  )
+  ) 
 
 print(target_data, width = Inf)
 ```
