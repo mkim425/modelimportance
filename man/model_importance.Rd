@@ -150,18 +150,16 @@ See \code{\link[=aggregate.model_imp_tbl]{aggregate.model_imp_tbl()}} for more d
 \examples{
 \dontrun{
 library(dplyr)
-forecast_data <- forecast_outputs |>
+forecast_data <- forecast_data_raw |>
   dplyr::filter(
-    output_type \%in\% c("quantile"),
     location == "25",
     horizon == 1
   )
-target_data <- forecast_target_ts |>
+target_data <- target_data_raw |>
   dplyr::filter(
     target_end_date \%in\% unique(forecast_data$target_end_date),
     location == "25"
-  ) |>
-  rename(oracle_value = observation)
+  )
 # Example with the default arguments.
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,

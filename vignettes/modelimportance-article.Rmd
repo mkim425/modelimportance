@@ -109,16 +109,10 @@ The predicted value corresponding to each quantile is recorded in the `value` co
 #| echo: false
 #| label: tbl-example-model_output
 #| tbl-cap: "Example of the model output for incident influenza
-#| hospitalizations (top 10 rows) extracted from `forecast_outputs` data in the
+#| hospitalizations (top 10 rows) extracted from `forecast_data_example` data in the
 #| `modelimportance` package, which is originally from `hubExamples` package."
 
-forecast_data <- forecast_outputs |>
-  dplyr::filter(
-    .data$output_type %in% c("quantile"),
-    .data$location == "25"
-  )
-
-forecast_data |>
+forecast_data_example |>
   dplyr::filter(
     .data$reference_date == "2022-12-17",
     .data$horizon != 0
@@ -128,7 +122,7 @@ forecast_data |>
                format = "html",
                caption = "Table 1: Example of the model output for incident
                influenza hospitalizations (top 10 rows) extracted from
-               `forecast_outputs` bundled in the `modelimportance` package, 
+               `forecast_data_example` bundled in the `modelimportance` package, 
                which is originally from `hubExamples` package.") |>
   kableExtra::kable_styling(
     font_size = 12,
@@ -153,14 +147,7 @@ For each model, the quantile-based forecasts are shown for the target end dates 
 #|   represents the corresponding 90% prediction interval defined by the 0.05
 #|   and 0.95 quantiles.
 
-target_data <- forecast_target_ts |>
-  dplyr::filter(
-    target_end_date %in% unique(forecast_data$target_end_date),
-    location %in% unique(forecast_data$location),
-    target == "wk inc flu hosp"
-  )
-
-forecast_data |>
+forecast_data_example |>
   filter(
     reference_date == "2022-12-17",
     horizon != 0,
@@ -180,25 +167,25 @@ forecast_data |>
     alpha = 0.5
   ) +
   geom_point(
-    data = target_data |> filter(target_end_date <= "2022-12-17"),
+    data = target_data_example |> filter(target_end_date <= "2022-12-17"),
     aes(y = observation, group = 1, color = "obs")
   ) +
   geom_line(
-    data = target_data |> filter(target_end_date <= "2022-12-17"),
+    data = target_data_example |> filter(target_end_date <= "2022-12-17"),
     aes(y = observation, group = 1, color = "obs")
   ) +
   geom_point(
-    data = target_data |> filter(target_end_date > "2022-12-17"),
+    data = target_data_example |> filter(target_end_date > "2022-12-17"),
     aes(y = observation, group = 1, color = "truth"),
     shape = 1, alpha = 1
   ) +
   geom_line(
-    data = target_data |> filter(target_end_date > "2022-12-17"),
+    data = target_data_example |> filter(target_end_date > "2022-12-17"),
     aes(y = observation, group = 1, color = "truth"),
     alpha = 0.75
   ) +
   # coord_cartesian(ylim = c(0, 500)) +
-  scale_x_date(breaks = target_data$target_end_date, date_labels = "%Y-%m-%d") +
+  scale_x_date(breaks = target_data_example$target_end_date, date_labels = "%Y-%m-%d") +
   labs(
     y = "Weekly Hospitalization",
     x = "Date"

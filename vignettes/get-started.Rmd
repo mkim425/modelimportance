@@ -55,12 +55,6 @@ Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, an
 
 
 ```{r forecast_data}
-forecast_data_raw <- forecast_outputs |>
-  dplyr::filter(
-    .data$output_type %in% c("median"),
-    .data$target_end_date %in% as.Date(c("2022-11-26", "2022-12-10"))
-  )
-
 # Specify forecasts to remove: MOBS-GLEAM_FLUH for location 25 on 2022-11-26,
 # PSI-DICE for location 48 on 2022-12-10
 forecast_to_remove <- tibble(
@@ -80,14 +74,12 @@ forecast_data
 The corresponding target data contains the observed hospitalization counts for these dates and locations.
 
 ```{r target_data}
-target_data <- forecast_target_ts |>
+target_data <- target_data_raw |>
   dplyr::filter(
     target_end_date %in% unique(forecast_data$target_end_date),
     location %in% unique(forecast_data$location),
     target == "wk inc flu hosp"
-  ) |>
-  # Rename columns to match the oracle output format
-  rename(oracle_value = observation)
+  )
 
 target_data
 ```
