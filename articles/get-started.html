@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Simple working examples • modelimportance</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Simple working examples">
@@ -30,7 +30,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../articles/get-started.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/get-started.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
       </ul>
@@ -73,12 +73,12 @@ a multi-model ensemble in R’ under <em>Articles</em>.</p>
 </h2>
 <p>We first load the necessary packages.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hubverse-org/hubExamples" class="external-link">hubExamples</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mkim425.github.io/modelimportance/">modelimportance</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mkim425.github.io/modelimportance/">modelimportance</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
-<p>We use some example forecast and target data from the
-<code>hubExamples</code> package, which provides sample datasets for
+<p>We use example forecast and target data bundled in the
+<code>modelimportance</code> package, originally from the
+<code>hubExamples</code> package that provides sample datasets for
 multiple modeling hubs in the hubverse format.</p>
 </div>
 <div class="section level2">
@@ -97,14 +97,7 @@ some forecasts to demonstrate the handling of missing values. Therefore,
 MOBS-GLEAM_FLUH’s forecast for Massachusetts on November 26, 2022, and
 PSI-DICE’s forecast for Texas on December 10, 2022, are missing.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Load the forecast data from hubExamples</span></span>
-<span><span class="va">forecast_data_raw</span> <span class="op">&lt;-</span> <span class="fu">hubExamples</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/hubExamples/man/forecast_data.html" class="external-link">forecast_outputs</a></span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
-<span>    <span class="va">.data</span><span class="op">$</span><span class="va">output_type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"median"</span><span class="op">)</span>,</span>
-<span>    <span class="va">.data</span><span class="op">$</span><span class="va">target_end_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2022-11-26"</span>, <span class="st">"2022-12-10"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Specify forecasts to remove: MOBS-GLEAM_FLUH for location 25 on 2022-11-26,</span></span>
+<code class="sourceCode R"><span><span class="co"># Specify forecasts to remove: MOBS-GLEAM_FLUH for location 25 on 2022-11-26,</span></span>
 <span><span class="co"># PSI-DICE for location 48 on 2022-12-10</span></span>
 <span><span class="va">forecast_to_remove</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  model_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MOBS-GLEAM_FLUH"</span>, <span class="st">"PSI-DICE"</span><span class="op">)</span>,</span>
@@ -134,14 +127,12 @@ PSI-DICE’s forecast for Texas on December 10, 2022, are missing.</p>
 <p>The corresponding target data contains the observed hospitalization
 counts for these dates and locations.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">target_data</span> <span class="op">&lt;-</span> <span class="fu">hubExamples</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/hubExamples/man/forecast_data.html" class="external-link">forecast_target_ts</a></span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">target_data</span> <span class="op">&lt;-</span> <span class="va">target_data_raw</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
 <span>    <span class="va">target_end_date</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">forecast_data</span><span class="op">$</span><span class="va">target_end_date</span><span class="op">)</span>,</span>
 <span>    <span class="va">location</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">forecast_data</span><span class="op">$</span><span class="va">location</span><span class="op">)</span>,</span>
 <span>    <span class="va">target</span> <span class="op">==</span> <span class="st">"wk inc flu hosp"</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># Rename columns to match the oracle output format</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>oracle_value <span class="op">=</span> <span class="va">observation</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="va">target_data</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 4</span></span></span>
@@ -153,7 +144,7 @@ counts for these dates and locations.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2022-12-10      wk inc flu hosp 48               <span style="text-decoration: underline;">1</span>781</span></span></code></pre></div>
 <p>We plot the point (median) forecasts and the observed values to
 visualize the difference in forecast errors.</p>
-<p><img src="get-started_files/figure-html/fig-example-median-lomo-1.png" alt="" width="672"></p>
+<p><img src="get-started_files/figure-html/fig-example-median-lomo-1.png" class="r-plt" alt="" width="672"></p>
 <p>When comparing the ground truth data and model predictions, we can
 see that forecasts for December 10, 2022 show larger deviations from the
 observed values compared to those for November 26, 2022. Thus, as we
@@ -252,7 +243,7 @@ for the remaining task.</p>
 <p>The following example shows a bar plot of importance scores across
 models and tasks, with panels faceted by combinations of task ID
 values.</p>
-<p><img src="get-started_files/figure-html/unnamed-chunk-6-1.png" alt="" width="672"></p>
+<p><img src="get-started_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
 <p>We aggregate the importance scores for each model by averaging across
 all tasks. <code>NA</code> values are removed during the averaging
 process by setting the <code>na_action</code> argument to
@@ -393,7 +384,7 @@ https://doi.org/<a href="https://doi.org/10.1016/j.ijforecast.2025.12.006" class
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
