@@ -104,7 +104,6 @@ The prediction representation is specified as 'quantile' in the `output_type` co
 The predicted value corresponding to each quantile is recorded in the `value` column.
 
 
-
 ```{r, results='asis'}
 #| echo: false
 #| label: tbl-example-model_output
@@ -626,6 +625,7 @@ These forecasts are made for two target end dates, November 26, 2022 (horizon 1)
 The output type is `median` and the `output_type_id` column has `NA`s as no further specification is required for this output type. 
 We have modified the example data slightly by removing some forecasts to demonstrate the handling of missing values. 
 Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
+We emphasize that this modification is made randomly and artificially to illustrate the impact of different handling approaches for missing forecasts and is not intended to provide a formal evaluation of model quality or performance.
 
 
 ```{r code-forecast_data}
@@ -681,7 +681,8 @@ Additionally, the forecasts for Massachusetts are relatively more accurate compa
 #|   Colored dots indicate the forecasts by three models, generated on November 19, 2022.
 #|   Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast
 #|   for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on
-#|   December 10, 2022, are missing.
+#|   December 10, 2022, are not shown. These forecasts were manually excluded from the
+#|   original example dataset for demonstration purposes.
 
 
 target_data |>
@@ -1086,6 +1087,8 @@ In this section, we explored each component model's contribution to the ensemble
 accuracy with only three models. An extensive application in more complex 
 scenarios with larger ensembles is presented in our companion methodological paper [@kim2026beyond].
 
+It should be noted that the example presented here is designed for illustration purposes to demonstrate the use of the proposed software, and the results should not be interpreted as an authoritative evaluation of model performance. A comprehensive analysis in our prior methodological study [@kim2026beyond] shows that many models, including the 'MOBS-GLEAM_FLUH' model, are assessed as more important than the baseline model.
+
 
 ## 7. Computational complexity {#sec:computational-complexity}
 
@@ -1164,6 +1167,8 @@ All code changes were systematically reviewed by fellow team members, and this e
 ## Summary and discussion {#sec:discussion}
 
 Multi-model ensemble forecasts often provide better accuracy and robustness than single models, and are widely used in decision-making and policy planning across various domains. The contribution of each component model to the accuracy of the ensemble depends on its own unique characteristics. The `modelimportance` package enables the quantification of the value that each component model adds to the ensemble performance in different evaluation contexts. 
+
+In the example analysis, we showed the package workflow using a simple example dataset specifically designed solely to demonstrate our package's capabilities; thus the results should not be taken as a definitive assessment of the models. A more complete model importance analysis is provided in our companion methodological paper [@kim2026beyond].
 
 The primary `model_importance()` function returns an S3 object of class `model_imp_tbl` of tabular data containing component models and their importance metrics. Users are given a choice of ensemble methods, model importance algorithms (either LOMO or LASOMO), and options to handle missing values. 
 These features enable the package to serve as a versatile tool to aid collaborative efforts to construct an effective ensemble model across a wide range of forecasting tasks. 
