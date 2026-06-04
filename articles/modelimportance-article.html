@@ -1403,7 +1403,11 @@ column has <code>NA</code>s as no further specification is required for
 this output type. We have modified the example data slightly by removing
 some forecasts to demonstrate the handling of missing values. Therefore,
 MOBS-GLEAM_FLUH’s forecast for Massachusetts on November 26, 2022, and
-PSI-DICE’s forecast for Texas on December 10, 2022, are missing.</p>
+PSI-DICE’s forecast for Texas on December 10, 2022, are missing. We
+emphasize that this modification is made randomly and artificially to
+illustrate the impact of different handling approaches for missing
+forecasts and is not intended to provide a formal evaluation of model
+quality or performance.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">forecast_data</span></span></code></pre></div>
 <table class="table table table-striped table-hover table-condensed table-responsive" style="font-size: 12px; margin-left: auto; margin-right: auto;">
@@ -1815,7 +1819,7 @@ uncertainty. Additionally, the forecasts for Massachusetts are
 relatively more accurate compared to those for Texas, which tend to have
 higher errors (Figure 4).</p>
 <div class="figure">
-<img src="modelimportance-article_files/figure-html/fig-example-median-lomo-1.png" class="r-plt" alt="Figure 4: Plot of three point forecasts (median) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing." width="672"><p class="caption">
+<img src="modelimportance-article_files/figure-html/fig-example-median-lomo-1.png" class="r-plt" alt="Figure 4: Plot of three point forecasts (median) and the eventually observed values from the `forecast_data` and `target_data`  for weekly incident influenza hospitalizations in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots indicate the forecasts by three models, generated on November 19, 2022. Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are not shown. These forecasts were manually excluded from the original example dataset for demonstration purposes." width="672"><p class="caption">
 Figure 4: Plot of three point forecasts (median) and the eventually
 observed values from the <code>forecast_data</code> and
 <code>target_data</code> for weekly incident influenza hospitalizations
@@ -1823,7 +1827,9 @@ in Massachusetts (FIPS code 25) and Texas (FIPS code 48). Colored dots
 indicate the forecasts by three models, generated on November 19, 2022.
 Open black circles indicate the eventually observed values.
 MOBS-GLEAM_FLUH’s forecast for Massachusetts on November 26, 2022, and
-PSI-DICE’s forecast for Texas on December 10, 2022, are missing.
+PSI-DICE’s forecast for Texas on December 10, 2022, are not shown. These
+forecasts were manually excluded from the original example dataset for
+demonstration purposes.
 </p>
 </div>
 </div>
@@ -2102,6 +2108,13 @@ the ensemble accuracy with only three models. An extensive application
 in more complex scenarios with larger ensembles is presented in our
 companion methodological paper <span class="citation">(Kim et al.
 2026)</span>.</p>
+<p>It should be noted that the example presented here is designed for
+illustration purposes to demonstrate the use of the proposed software,
+and the results should not be interpreted as an authoritative evaluation
+of model performance. A comprehensive analysis in our prior
+methodological study <span class="citation">(Kim et al. 2026)</span>
+shows that many models, including the ‘MOBS-GLEAM_FLUH’ model, are
+assessed as more important than the baseline model.</p>
 </div>
 </div>
 <div class="section level2">
@@ -2253,6 +2266,11 @@ component model to the accuracy of the ensemble depends on its own
 unique characteristics. The <code>modelimportance</code> package enables
 the quantification of the value that each component model adds to the
 ensemble performance in different evaluation contexts.</p>
+<p>In the example analysis, we showed the package workflow using a
+simple example dataset specifically designed solely to demonstrate our
+package’s capabilities; thus the results should not be taken as a
+definitive assessment of the models. A more complete model importance
+analysis is provided in our companion methodological paper <span class="citation">(Kim et al. 2026)</span>.</p>
 <p>The primary <code><a href="../reference/model_importance.html">model_importance()</a></code> function returns an S3
 object of class <code>model_imp_tbl</code> of tabular data containing
 component models and their importance metrics. Users are given a choice

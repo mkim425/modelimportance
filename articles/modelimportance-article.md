@@ -738,7 +738,10 @@ further specification is required for this output type. We have modified
 the example data slightly by removing some forecasts to demonstrate the
 handling of missing values. Therefore, MOBS-GLEAM_FLUH’s forecast for
 Massachusetts on November 26, 2022, and PSI-DICE’s forecast for Texas on
-December 10, 2022, are missing.
+December 10, 2022, are missing. We emphasize that this modification is
+made randomly and artificially to illustrate the impact of different
+handling approaches for missing forecasts and is not intended to provide
+a formal evaluation of model quality or performance.
 
 ``` r
 
@@ -788,8 +791,9 @@ weekly incident influenza hospitalizations in Massachusetts (FIPS code
 three models, generated on November 19, 2022. Open black circles
 indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast for
 Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on
-December 10, 2022, are
-missing.](modelimportance-article_files/figure-html/fig-example-median-lomo-1.png)
+December 10, 2022, are not shown. These forecasts were manually excluded
+from the original example dataset for demonstration
+purposes.](modelimportance-article_files/figure-html/fig-example-median-lomo-1.png)
 
 Figure 4: Plot of three point forecasts (median) and the eventually
 observed values from the `forecast_data` and `target_data` for weekly
@@ -798,7 +802,8 @@ Texas (FIPS code 48). Colored dots indicate the forecasts by three
 models, generated on November 19, 2022. Open black circles indicate the
 eventually observed values. MOBS-GLEAM_FLUH’s forecast for Massachusetts
 on November 26, 2022, and PSI-DICE’s forecast for Texas on December 10,
-2022, are missing.
+2022, are not shown. These forecasts were manually excluded from the
+original example dataset for demonstration purposes.
 
 ### Evaluation using LOMO algorithm
 
@@ -1134,6 +1139,14 @@ ensemble accuracy with only three models. An extensive application in
 more complex scenarios with larger ensembles is presented in our
 companion methodological paper (Kim et al. 2026).
 
+It should be noted that the example presented here is designed for
+illustration purposes to demonstrate the use of the proposed software,
+and the results should not be interpreted as an authoritative evaluation
+of model performance. A comprehensive analysis in our prior
+methodological study (Kim et al. 2026) shows that many models, including
+the ‘MOBS-GLEAM_FLUH’ model, are assessed as more important than the
+baseline model.
+
 ## 7. Computational complexity
 
 Content coming soon. This section will describe computational complexity
@@ -1289,6 +1302,13 @@ component model to the accuracy of the ensemble depends on its own
 unique characteristics. The `modelimportance` package enables the
 quantification of the value that each component model adds to the
 ensemble performance in different evaluation contexts.
+
+In the example analysis, we showed the package workflow using a simple
+example dataset specifically designed solely to demonstrate our
+package’s capabilities; thus the results should not be taken as a
+definitive assessment of the models. A more complete model importance
+analysis is provided in our companion methodological paper (Kim et al.
+2026).
 
 The primary
 [`model_importance()`](https://mkim425.github.io/modelimportance/reference/model_importance.md)
