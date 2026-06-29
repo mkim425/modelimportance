@@ -58,8 +58,6 @@ Suggests:
     testthat (>= 3.0.0),
     progressr (>= 0.15.1)
 Config/testthat/edition: 3
-Remotes:
-    hubverse-org/hubEvals
 VignetteBuilder: knitr
 URL: https://mkim425.github.io/modelimportance/
 Config/Needs/website: rmarkdown
