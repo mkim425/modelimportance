@@ -37,7 +37,7 @@ RoxygenNote: 7.3.3
 Imports:
     hubUtils (>= 0.4.0),
     dplyr (>= 1.1.4),
-    hubEvals (>= 0.0.0.9001),
+    hubEvals (>= 0.3.0),
     hubEnsembles (>= 0.1.9),
     methods (>= 4.4.3),
     purrr (>= 1.0.4),
