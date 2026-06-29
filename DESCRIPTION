@@ -37,7 +37,7 @@ RoxygenNote: 7.3.3
 Imports:
     hubUtils (>= 0.4.0),
     dplyr (>= 1.1.4),
-    hubEvals (>= 0.0.0.9001),
+    hubEvals (>= 0.3.0),
     hubEnsembles (>= 0.1.9),
     methods (>= 4.4.3),
     purrr (>= 1.0.4),
@@ -58,8 +58,6 @@ Suggests:
     testthat (>= 3.0.0),
     progressr (>= 0.15.1)
 Config/testthat/edition: 3
-Remotes:
-    hubverse-org/hubEvals
 VignetteBuilder: knitr
 URL: https://mkim425.github.io/modelimportance/
 Config/Needs/website: rmarkdown
