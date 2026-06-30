@@ -7,23 +7,14 @@ library(readr)
 library(dplyr)
 library(future)
 # Template for the fake data
-forecast_data <- hubExamples::forecast_outputs |>
-  dplyr::filter(
-    output_type %in% c("median"),
-    location == "25",
-    horizon == 1,
-    target_end_date == "2022-12-24"
-  ) |>
+forecast_data <- forecast_data_ma_h1 |>
   # select the first row
   slice(1) |>
   select(-model_id, -value)
 
-target_data <- hubExamples::forecast_target_ts |>
+target_data <- target_data_ma |>
   dplyr::filter(
-    target_end_date %in% unique(forecast_data$target_end_date),
-    location == "25",
-    target == "wk inc flu hosp",
-    target_end_date == "2022-12-24"
+    target_end_date %in% unique(forecast_data$target_end_date)
   ) |>
   # Rename columns to match the oracle output format
   rename(oracle_value = observation)

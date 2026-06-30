@@ -77,11 +77,14 @@ The paper proceeds as follows.
 
 ### 2.1 Dependencies and related software {#subsec:dependences}
 
-The `modelimportance` package is designed to work with the hubverse framework and, accordingly, depends on several packages in the hubverse ecosystem, such as `hubUtils` (@Rpackage-hubUtils), `hubEnsembles` (@Rpackage-hubEnsembles), `hubEvals` (@Rpackage-hubEvals), and `hubExamples` (@Rpackage-hubExamples). 
+The `modelimportance` package is designed to work with the hubverse framework and, accordingly, depends on several packages in the hubverse ecosystem, such as `hubUtils` (@Rpackage-hubUtils), `hubEnsembles` (@Rpackage-hubEnsembles), and `hubEvals` (@Rpackage-hubEvals).
 `modelimportance` uses a `model_out_tbl` S3 class as the model output format defined in `hubUtils`, which consists of utility functions to standardize prediction files and data formats (details in [Section 2.2](#subsec:model_output_format)).
 Ensembling predictions from multiple models relies on `hubEnsembles`, which offers a broadly applicable framework to construct multi-model ensembles using various ensemble methods.
 Calculation of forecast accuracy using various metrics is based on `hubEvals`, which internally leverages `scoringutils`.
-We use the example datasets from `hubExamples` for testing and demonstration purposes (see [Section 6](#sec:examples)). 
+
+
+We derived example datasets used for testing and demonstration purposes (see [Section 6](#sec:examples)) from the `hubExamples` (@Rpackage-hubExamples) package, which provides example datasets in the hubverse format.
+The dataset were locally stored for reproducibility within the package distribution, instead of requiring the `hubExamples` package as a dependency.
 
 For visualization of model importance scores, standard `ggplot2` [@Rpackage-ggplot2] functions can be applied. 
 Parallel computing is supported by the `furrr` [@Rpackage-furrr] and `future` [@Rpackage-future] packages, which allow users to specify the number of cores to use for parallel processing when calculating model importance scores across many tasks.
@@ -101,21 +104,14 @@ The prediction representation is specified as 'quantile' in the `output_type` co
 The predicted value corresponding to each quantile is recorded in the `value` column.
 
 
-
 ```{r, results='asis'}
 #| echo: false
 #| label: tbl-example-model_output
 #| tbl-cap: "Example of the model output for incident influenza
-#| hospitalizations (top 10 rows) extracted from `forecast_outputs` data in the
-#| [hubExamples]{.pkg} package."
+#| hospitalizations (top 10 rows) extracted from `forecast_data_example` data in the
+#| `modelimportance` package, which is originally from `hubExamples` package."
 
-forecast_data <- hubExamples::forecast_outputs |>
-  dplyr::filter(
-    .data$output_type %in% c("quantile"),
-    .data$location == "25"
-  )
-
-forecast_data |>
+forecast_data_example |>
   dplyr::filter(
     .data$reference_date == "2022-12-17",
     .data$horizon != 0
@@ -123,9 +119,10 @@ forecast_data |>
   head(10) |>
   knitr::kable(
                format = "html",
-               caption = "Table 1: Example of the model output for incident 
-               influenza hospitalizations (top 10 rows) extracted from 
-               `forecast_outputs` data in the `hubExamples` package.") |>
+               caption = "Table 1: Example of the model output for incident
+               influenza hospitalizations (top 10 rows) extracted from
+               `forecast_data_example` bundled in the `modelimportance` package, 
+               which is originally from `hubExamples` package.") |>
   kableExtra::kable_styling(
     font_size = 12,
     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
@@ -149,14 +146,7 @@ For each model, the quantile-based forecasts are shown for the target end dates 
 #|   represents the corresponding 90% prediction interval defined by the 0.05
 #|   and 0.95 quantiles.
 
-target_data <- hubExamples::forecast_target_ts |>
-  dplyr::filter(
-    target_end_date %in% unique(forecast_data$target_end_date),
-    location %in% unique(forecast_data$location),
-    target == "wk inc flu hosp"
-  )
-
-forecast_data |>
+forecast_data_example |>
   filter(
     reference_date == "2022-12-17",
     horizon != 0,
@@ -176,25 +166,25 @@ forecast_data |>
     alpha = 0.5
   ) +
   geom_point(
-    data = target_data |> filter(target_end_date <= "2022-12-17"),
+    data = target_data_example |> filter(target_end_date <= "2022-12-17"),
     aes(y = observation, group = 1, color = "obs")
   ) +
   geom_line(
-    data = target_data |> filter(target_end_date <= "2022-12-17"),
+    data = target_data_example |> filter(target_end_date <= "2022-12-17"),
     aes(y = observation, group = 1, color = "obs")
   ) +
   geom_point(
-    data = target_data |> filter(target_end_date > "2022-12-17"),
+    data = target_data_example |> filter(target_end_date > "2022-12-17"),
     aes(y = observation, group = 1, color = "truth"),
     shape = 1, alpha = 1
   ) +
   geom_line(
-    data = target_data |> filter(target_end_date > "2022-12-17"),
+    data = target_data_example |> filter(target_end_date > "2022-12-17"),
     aes(y = observation, group = 1, color = "truth"),
     alpha = 0.75
   ) +
   # coord_cartesian(ylim = c(0, 500)) +
-  scale_x_date(breaks = target_data$target_end_date, date_labels = "%Y-%m-%d") +
+  scale_x_date(breaks = target_data_example$target_end_date, date_labels = "%Y-%m-%d") +
   labs(
     y = "Weekly Hospitalization",
     x = "Date"
@@ -626,7 +616,7 @@ The output returned by `aggregate()` is a data frame with columns `model_id` and
 
 ## 6. Examples {#sec:examples}
 
-In this section, we illustrate how to use the `model_importance()` function to evaluate the importance of component models within an ensemble. The examples show various combinations of the arguments described in [Section 4](#sec:main-function). Example forecast and target data is sourced from the 'hubExamples' package, which provides sample datasets for multiple modeling hubs in the hubverse format. 
+In this section, we illustrate how to use the `model_importance()` function to evaluate the importance of component models within an ensemble. The examples show various combinations of the arguments described in [Section 4](#sec:main-function). Example forecast and target data are originally sourced from `hubExamples` package, which provides sample datasets for multiple modeling hubs in the hubverse format.
 
 ### 6.1 Example data {#sec:example-data}
 
@@ -635,6 +625,7 @@ These forecasts are made for two target end dates, November 26, 2022 (horizon 1)
 The output type is `median` and the `output_type_id` column has `NA`s as no further specification is required for this output type. 
 We have modified the example data slightly by removing some forecasts to demonstrate the handling of missing values. 
 Therefore, MOBS-GLEAM_FLUH's forecast for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on December 10, 2022, are missing.
+We emphasize that this modification is made randomly and artificially to illustrate the impact of different handling approaches for missing forecasts and is not intended to provide a formal evaluation of model quality or performance.
 
 
 ```{r code-forecast_data}
@@ -690,7 +681,8 @@ Additionally, the forecasts for Massachusetts are relatively more accurate compa
 #|   Colored dots indicate the forecasts by three models, generated on November 19, 2022.
 #|   Open black circles indicate the eventually observed values. MOBS-GLEAM_FLUH's forecast
 #|   for Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on
-#|   December 10, 2022, are missing.
+#|   December 10, 2022, are not shown. These forecasts were manually excluded from the
+#|   original example dataset for demonstration purposes.
 
 
 target_data |>
@@ -1095,6 +1087,8 @@ In this section, we explored each component model's contribution to the ensemble
 accuracy with only three models. An extensive application in more complex 
 scenarios with larger ensembles is presented in our companion methodological paper [@kim2026beyond].
 
+It should be noted that the example presented here is designed for illustration purposes to demonstrate the use of the proposed software, and the results should not be interpreted as an authoritative evaluation of model performance. A comprehensive analysis in our prior methodological study [@kim2026beyond] shows that many models, including the 'MOBS-GLEAM_FLUH' model, are assessed as more important than the baseline model.
+
 
 ## 7. Computational complexity {#sec:computational-complexity}
 
@@ -1173,6 +1167,8 @@ All code changes were systematically reviewed by fellow team members, and this e
 ## Summary and discussion {#sec:discussion}
 
 Multi-model ensemble forecasts often provide better accuracy and robustness than single models, and are widely used in decision-making and policy planning across various domains. The contribution of each component model to the accuracy of the ensemble depends on its own unique characteristics. The `modelimportance` package enables the quantification of the value that each component model adds to the ensemble performance in different evaluation contexts. 
+
+In the example analysis, we showed the package workflow using a simple example dataset specifically designed solely to demonstrate our package's capabilities; thus the results should not be taken as a definitive assessment of the models. A more complete model importance analysis is provided in our companion methodological paper [@kim2026beyond].
 
 The primary `model_importance()` function returns an S3 object of class `model_imp_tbl` of tabular data containing component models and their importance metrics. Users are given a choice of ensemble methods, model importance algorithms (either LOMO or LASOMO), and options to handle missing values. 
 These features enable the package to serve as a versatile tool to aid collaborative efforts to construct an effective ensemble model across a wide range of forecasting tasks. 
