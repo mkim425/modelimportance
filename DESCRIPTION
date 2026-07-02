@@ -47,7 +47,7 @@ Imports:
     rlang (>= 1.1.6),
     stats (>= 4.4.3)
 Depends: 
-    R (>= 3.5)
+    R (>= 4.1.0)
 Suggests: 
     knitr,
     rmarkdown,
