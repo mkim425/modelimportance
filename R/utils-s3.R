@@ -2,17 +2,38 @@
 #'
 #' @param x An object of class `model_imp_tbl`.
 #' @param ... Additional arguments passed to the print method.
+#' @returns `x`, returned invisibly. Called for its side effect of printing
+#' the model importance score table (a `model_imp_tbl` object, i.e., a
+#' data frame of per-task importance scores by model) to the console.
 #' @export
 print.model_imp_tbl <- function(x, ...) {
   cat("Model importance result by task\n")
   cat("---------------------------------\n")
   print(as.data.frame(x))
+  invisible(x)
 }
 
 #' Summary method for model importance score table
 #'
 #' @param object An object of class `model_imp_tbl`.
 #' @param ... Additional arguments passed to the print method.
+#' @returns A list of class `summary.model_imp_tbl` with four elements:
+#' \describe{
+#'   \item{all_models}{A character vector of the unique model IDs present in
+#'   `object`.}
+#'   \item{all_tasks}{A data frame with one row per unique prediction task
+#'   (one column per task ID, e.g. `location`, `horizon`,
+#'   `target_end_date`).}
+#'   \item{model_summary}{A data frame with one row per model and columns
+#'   `model_id`, `n_tasks` (number of tasks the model was scored on),
+#'   `min_importance`, `max_importance`, and `n_NA` (number of tasks with a
+#'   missing importance score).}
+#'   \item{task_winners}{A data frame with one row per prediction task and
+#'   columns for the task ID(s), `top_model` (the model with the highest
+#'   importance score for that task), and `max_score` (that model's
+#'   importance score).}
+#' }
+#' This object is printed via \code{\link{print.summary.model_imp_tbl}}.
 #' @importFrom dplyr n
 #' @importFrom rlang .data
 #' @export
@@ -63,6 +84,9 @@ summary.model_imp_tbl <- function(object, ...) {
 #'
 #' @param x An object of class `summary.model_imp_tbl`.
 #' @param ... Additional arguments passed to the print method.
+#' @returns `x`, returned invisibly. Called for its side effect of printing
+#' a human-readable summary (number of models and tasks, and the top-scoring
+#' model for a subset of tasks) to the console.
 #' @importFrom rlang .data
 #' @importFrom utils head
 #' @export

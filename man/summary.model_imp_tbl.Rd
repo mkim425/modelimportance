@@ -11,6 +11,25 @@
 
 \item{...}{Additional arguments passed to the print method.}
 }
+\value{
+A list of class \code{summary.model_imp_tbl} with four elements:
+\describe{
+\item{all_models}{A character vector of the unique model IDs present in
+\code{object}.}
+\item{all_tasks}{A data frame with one row per unique prediction task
+(one column per task ID, e.g. \code{location}, \code{horizon},
+\code{target_end_date}).}
+\item{model_summary}{A data frame with one row per model and columns
+\code{model_id}, \code{n_tasks} (number of tasks the model was scored on),
+\code{min_importance}, \code{max_importance}, and \code{n_NA} (number of tasks with a
+missing importance score).}
+\item{task_winners}{A data frame with one row per prediction task and
+columns for the task ID(s), \code{top_model} (the model with the highest
+importance score for that task), and \code{max_score} (that model's
+importance score).}
+}
+This object is printed via \code{\link{print.summary.model_imp_tbl}}.
+}
 \description{
 Summary method for model importance score table
 }
