@@ -119,7 +119,7 @@
 #' model importance.
 #' See [aggregate.model_imp_tbl()] for more details on how to use this method.
 #'
-#' @examples \dontrun{
+#' @examples
 #' library(dplyr)
 #' forecast_data <- forecast_data_raw |>
 #'   dplyr::filter(
@@ -143,7 +143,7 @@
 #'   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
 #'   subset_wt = "equal", agg_fun = median
 #' )
-#' }
+
 model_importance <- function(
   forecast_data,
   oracle_output_data,

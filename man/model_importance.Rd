@@ -148,7 +148,6 @@ See \code{\link[=aggregate.model_imp_tbl]{aggregate.model_imp_tbl()}} for more d
 }
 
 \examples{
-\dontrun{
 library(dplyr)
 forecast_data <- forecast_data_raw |>
   dplyr::filter(
@@ -172,5 +171,4 @@ model_importance(
   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
   subset_wt = "equal", agg_fun = median
 )
-}
 }
