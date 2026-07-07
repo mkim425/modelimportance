@@ -28,8 +28,7 @@ Authors@R: c(
            email = "elray1@umass.edu", 
            role = c("aut"))
     )
-Description: Provides metrics for quantifying the contribution of individual 
-    component models to the predictive accuracy of ensemble forecasts.
+Description: Provides metrics for quantifying the contribution of individual component models to the predictive accuracy of ensemble forecasts. The package implements the Leave-One-Model-Out (LOMO) and Leave-All-Subset-of-One-Model-Out (LASOMO) model importance metrics, enabling users to assess the relative importance of component models and better understand the performance of ensemble forecasting systems. Methods are described in Kim et al. (2026) <doi:10.1016/j.ijforecast.2025.12.006>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
