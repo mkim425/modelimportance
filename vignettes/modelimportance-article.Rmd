@@ -18,7 +18,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
-options(width = 200)
+oldpar <- par(no.readonly = TRUE)
+oldopts <- options()
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -1203,5 +1204,9 @@ Given a fixed mid-sized subset, as $n$ increases, the weight assigned to this su
 
 On the other hand, for subsets of extreme sizes (e.g., $k=1$ or $k=n-1$), the weights under permutation-based weighting scheme decrease only at $O({1}/{n})$, much slower under the equal weighting scheme. This implies that in scenarios with a large number of models, the contributions of these extreme-sized subsets play a relatively larger role in the calculation of model importance scores when using permutation-based weights compared to the equal weighting approach.
 
+```{r, include = FALSE}
+options(oldopts)
+par(oldpar)
+```
 
 ## References
