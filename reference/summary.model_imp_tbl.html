@@ -18,8 +18,10 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/get-started.html">Get started</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/mkim425/modelimportance/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -29,7 +31,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Summary method for model importance score table</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/mkim425/modelimportance/blob/main/R/utils-s3.R" class="external-link"><code>R/utils-s3.R</code></a></small>
       <div class="d-none name"><code>summary.model_imp_tbl.Rd</code></div>
     </div>
 
@@ -55,6 +57,32 @@
 <dd><p>Additional arguments passed to the print method.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A list of class <code>summary.model_imp_tbl</code> with four elements:</p><dl><dt>all_models</dt>
+<dd><p>A character vector of the unique model IDs present in
+<code>object</code>.</p></dd>
+
+<dt>all_tasks</dt>
+<dd><p>A data frame with one row per unique prediction task
+(one column per task ID, e.g. <code>location</code>, <code>horizon</code>,
+<code>target_end_date</code>).</p></dd>
+
+<dt>model_summary</dt>
+<dd><p>A data frame with one row per model and columns
+<code>model_id</code>, <code>n_tasks</code> (number of tasks the model was scored on),
+<code>min_importance</code>, <code>max_importance</code>, and <code>n_NA</code> (number of tasks with a
+missing importance score).</p></dd>
+
+<dt>task_winners</dt>
+<dd><p>A data frame with one row per prediction task and
+columns for the task ID(s), <code>top_model</code> (the model with the highest
+importance score for that task), and <code>max_score</code> (that model's
+importance score).</p></dd>
+
+
+</dl><p>This object is printed via <code><a href="print.summary.model_imp_tbl.html">print.summary.model_imp_tbl</a></code>.</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
@@ -65,7 +93,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

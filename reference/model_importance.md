@@ -112,7 +112,7 @@ the input `forecast_data`.
 
 The `oracle_output_data` is a data frame that contains the ground truth
 values for the variables used to define modeling targets. It is referred
-to as “oracle” because it is formatted as if an oracle made a perfect
+to as "oracle" because it is formatted as if an oracle made a perfect
 point prediction equal to the truth. This data must follow the oracle
 output format defined in the hubverse standard, which includes
 independent task ID columns (e.g., `location`, `target_date`), the
@@ -163,8 +163,15 @@ for more details on how to use this method.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 library(dplyr)
+#> 
+#> Attaching package: ‘dplyr’
+#> The following objects are masked from ‘package:stats’:
+#> 
+#>     filter, lag
+#> The following objects are masked from ‘package:base’:
+#> 
+#>     intersect, setdiff, setequal, union
 forecast_data <- forecast_data_raw |>
   dplyr::filter(
     location == "25",
@@ -181,11 +188,50 @@ model_importance(
   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
   subset_wt = "equal"
 )
+#> Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
+#> The available model IDs are:
+#>       Flusight-baseline
+#>   MOBS-GLEAM_FLUH
+#>   PSI-DICE 
+#> (a total of 3 models)
+#> Note: This function uses 'furrr' and 'future' for parallelization.
+#> To enable parallel execution, please set future::plan(multisession).
+#> 
+#> All tasks meet the minimum model requirement of 2 models.
+#> Model importance result by task
+#> ---------------------------------
+#>            model_id reference_date          target horizon location
+#> 1 Flusight-baseline     2022-11-19 wk inc flu hosp       1       25
+#> 2   MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25
+#> 3          PSI-DICE     2022-11-19 wk inc flu hosp       1       25
+#>   target_end_date output_type importance
+#> 1      2022-11-26      median       -5.5
+#> 2      2022-11-26      median       -8.5
+#> 3      2022-11-26      median       14.0
 # Example with the additional argument in `...`.
 model_importance(
   forecast_data = forecast_data, oracle_output_data = target_data,
   ensemble_fun = "simple_ensemble", importance_algorithm = "lomo",
   subset_wt = "equal", agg_fun = median
 )
-} # }
+#> Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).
+#> The available model IDs are:
+#>       Flusight-baseline
+#>   MOBS-GLEAM_FLUH
+#>   PSI-DICE 
+#> (a total of 3 models)
+#> Note: This function uses 'furrr' and 'future' for parallelization.
+#> To enable parallel execution, please set future::plan(multisession).
+#> 
+#> All tasks meet the minimum model requirement of 2 models.
+#> Model importance result by task
+#> ---------------------------------
+#>            model_id reference_date          target horizon location
+#> 1 Flusight-baseline     2022-11-19 wk inc flu hosp       1       25
+#> 2   MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25
+#> 3          PSI-DICE     2022-11-19 wk inc flu hosp       1       25
+#>   target_end_date output_type importance
+#> 1      2022-11-26      median      -16.5
+#> 2      2022-11-26      median      -19.5
+#> 3      2022-11-26      median        3.0
 ```

@@ -2,7 +2,7 @@
 
 ## Authors
 
-- **Minsu Kim**. Author, maintainer.
+- **Minsu Kim**. Author, maintainer, copyright holder.
   [](https://orcid.org/0009-0008-4637-3589)
 
 - **Li Shandross**. Author, contributor.
@@ -17,14 +17,17 @@
 
 ## Citation
 
+Source:
+[`DESCRIPTION`](https://github.com/mkim425/modelimportance/blob/main/DESCRIPTION)
+
 Kim M, Shandross L, Reich N, Ray E (2026). *modelimportance: Measuring
 Contributions of Component Models to Ensemble Forecast Accuracy*. R
-package version 0.1.0, <https://mkim425.github.io/modelimportance/>.
+package version 0.1.0, <https://github.com/mkim425/modelimportance>.
 
     @Manual{,
       title = {modelimportance: Measuring Contributions of Component Models to Ensemble Forecast Accuracy},
       author = {Minsu Kim and Li Shandross and Nicholas Reich and Evan Ray},
       year = {2026},
       note = {R package version 0.1.0},
-      url = {https://mkim425.github.io/modelimportance/},
+      url = {https://github.com/mkim425/modelimportance},
     }

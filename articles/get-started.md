@@ -57,18 +57,19 @@ forecast_data <- forecast_data_raw |>
 # Display the forecast data
 forecast_data
 #> # A tibble: 10 × 9
-#>    model_id          reference_date target          horizon location target_end_date output_type output_type_id value
-#>    <chr>             <date>         <chr>             <int> <chr>    <date>          <chr>       <chr>          <dbl>
-#>  1 Flusight-baseline 2022-11-19     wk inc flu hosp       1 25       2022-11-26      median      NA                51
-#>  2 Flusight-baseline 2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      NA                51
-#>  3 Flusight-baseline 2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      NA              1052
-#>  4 Flusight-baseline 2022-11-19     wk inc flu hosp       3 48       2022-12-10      median      NA              1052
-#>  5 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      NA                43
-#>  6 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      NA              1072
-#>  7 MOBS-GLEAM_FLUH   2022-11-19     wk inc flu hosp       3 48       2022-12-10      median      NA               688
-#>  8 PSI-DICE          2022-11-19     wk inc flu hosp       1 25       2022-11-26      median      NA                90
-#>  9 PSI-DICE          2022-11-19     wk inc flu hosp       3 25       2022-12-10      median      NA               159
-#> 10 PSI-DICE          2022-11-19     wk inc flu hosp       1 48       2022-11-26      median      NA              1226
+#>    model_id   reference_date target horizon location target_end_date output_type
+#>    <chr>      <date>         <chr>    <int> <chr>    <date>          <chr>      
+#>  1 Flusight-… 2022-11-19     wk in…       1 25       2022-11-26      median     
+#>  2 Flusight-… 2022-11-19     wk in…       3 25       2022-12-10      median     
+#>  3 Flusight-… 2022-11-19     wk in…       1 48       2022-11-26      median     
+#>  4 Flusight-… 2022-11-19     wk in…       3 48       2022-12-10      median     
+#>  5 MOBS-GLEA… 2022-11-19     wk in…       3 25       2022-12-10      median     
+#>  6 MOBS-GLEA… 2022-11-19     wk in…       1 48       2022-11-26      median     
+#>  7 MOBS-GLEA… 2022-11-19     wk in…       3 48       2022-12-10      median     
+#>  8 PSI-DICE   2022-11-19     wk in…       1 25       2022-11-26      median     
+#>  9 PSI-DICE   2022-11-19     wk in…       3 25       2022-12-10      median     
+#> 10 PSI-DICE   2022-11-19     wk in…       1 48       2022-11-26      median     
+#> # ℹ 2 more variables: output_type_id <chr>, value <dbl>
 ```
 
 The corresponding target data contains the observed hospitalization
@@ -125,19 +126,32 @@ scores_lomo <- model_importance(
 print(scores_lomo)
 #> Model importance result by task
 #> ---------------------------------
-#>             model_id reference_date          target horizon location target_end_date output_type importance
-#> 1  Flusight-baseline     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median  -19.50000
-#> 2    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median         NA
-#> 3           PSI-DICE     2022-11-19 wk inc flu hosp       1       25      2022-11-26      median   19.50000
-#> 4  Flusight-baseline     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median  -32.33333
-#> 5    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median  -22.33333
-#> 6           PSI-DICE     2022-11-19 wk inc flu hosp       1       48      2022-11-26      median   54.66667
-#> 7  Flusight-baseline     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median  -16.66667
-#> 8    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median  -20.66667
-#> 9           PSI-DICE     2022-11-19 wk inc flu hosp       3       25      2022-12-10      median   37.33333
-#> 10 Flusight-baseline     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median  182.00000
-#> 11   MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median -182.00000
-#> 12          PSI-DICE     2022-11-19 wk inc flu hosp       3       48      2022-12-10      median         NA
+#>             model_id reference_date          target horizon location
+#> 1  Flusight-baseline     2022-11-19 wk inc flu hosp       1       25
+#> 2    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25
+#> 3           PSI-DICE     2022-11-19 wk inc flu hosp       1       25
+#> 4  Flusight-baseline     2022-11-19 wk inc flu hosp       1       48
+#> 5    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       48
+#> 6           PSI-DICE     2022-11-19 wk inc flu hosp       1       48
+#> 7  Flusight-baseline     2022-11-19 wk inc flu hosp       3       25
+#> 8    MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       25
+#> 9           PSI-DICE     2022-11-19 wk inc flu hosp       3       25
+#> 10 Flusight-baseline     2022-11-19 wk inc flu hosp       3       48
+#> 11   MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       3       48
+#> 12          PSI-DICE     2022-11-19 wk inc flu hosp       3       48
+#>    target_end_date output_type importance
+#> 1       2022-11-26      median  -19.50000
+#> 2       2022-11-26      median         NA
+#> 3       2022-11-26      median   19.50000
+#> 4       2022-11-26      median  -32.33333
+#> 5       2022-11-26      median  -22.33333
+#> 6       2022-11-26      median   54.66667
+#> 7       2022-12-10      median  -16.66667
+#> 8       2022-12-10      median  -20.66667
+#> 9       2022-12-10      median   37.33333
+#> 10      2022-12-10      median  182.00000
+#> 11      2022-12-10      median -182.00000
+#> 12      2022-12-10      median         NA
 ```
 
 For models that missed forecasts for certain tasks, `NA` values were

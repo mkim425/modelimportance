@@ -18,3 +18,9 @@ print(x, ...)
 - ...:
 
   Additional arguments passed to the print method.
+
+## Value
+
+`x`, returned invisibly. Called for its side effect of printing the
+model importance score table (a `model_imp_tbl` object, i.e., a data
+frame of per-task importance scores by model) to the console.

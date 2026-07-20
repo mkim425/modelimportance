@@ -52,8 +52,10 @@ outcome
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/get-started.html">Get started</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/mkim425/modelimportance/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -63,7 +65,7 @@ outcome
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Quantifies the contribution of ensemble component models to ensemble prediction accuracy for each prediction task.</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/mkim425/modelimportance/blob/main/R/model_importance.R" class="external-link"><code>R/model_importance.R</code></a></small>
       <div class="d-none name"><code>model_importance.Rd</code></div>
     </div>
 
@@ -169,7 +171,7 @@ regardless of its original name in the input <code>forecast_data</code>.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The <code>oracle_output_data</code> is a data frame that contains the ground truth
 values for the variables used to define modeling targets. It is referred to
-as “oracle” because it is formatted as if an oracle made a perfect point
+as "oracle" because it is formatted as if an oracle made a perfect point
 prediction equal to the truth. This data must follow the oracle output format
 defined in the hubverse standard, which includes independent task ID columns
 (e.g., <code>location</code>, <code>target_date</code>), the <code>output_type</code> column specifying the
@@ -217,8 +219,15 @@ See <code><a href="aggregate.model_imp_tbl.html">aggregate.model_imp_tbl()</a></
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘dplyr’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:stats’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     filter, lag</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, setdiff, setequal, union</span>
 <span class="r-in"><span><span class="va">forecast_data</span> <span class="op">&lt;-</span> <span class="va">forecast_data_raw</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">location</span> <span class="op">==</span> <span class="st">"25"</span>,</span></span>
@@ -235,13 +244,52 @@ See <code><a href="aggregate.model_imp_tbl.html">aggregate.model_imp_tbl()</a></
 <span class="r-in"><span>  ensemble_fun <span class="op">=</span> <span class="st">"simple_ensemble"</span>, importance_algorithm <span class="op">=</span> <span class="st">"lomo"</span>,</span></span>
 <span class="r-in"><span>  subset_wt <span class="op">=</span> <span class="st">"equal"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The available model IDs are:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  	 Flusight-baseline</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 	 MOBS-GLEAM_FLUH</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 	 PSI-DICE </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> (a total of 3 models)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Note: This function uses 'furrr' and 'future' for parallelization.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To enable parallel execution, please set future::plan(multisession).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All tasks meet the minimum model requirement of 2 models.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model importance result by task</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            model_id reference_date          target horizon location</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Flusight-baseline     2022-11-19 wk inc flu hosp       1       25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3          PSI-DICE     2022-11-19 wk inc flu hosp       1       25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   target_end_date output_type importance</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      2022-11-26      median       -5.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      2022-11-26      median       -8.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      2022-11-26      median       14.0</span>
 <span class="r-in"><span><span class="co"># Example with the additional argument in `...`.</span></span></span>
 <span class="r-in"><span><span class="fu">model_importance</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  forecast_data <span class="op">=</span> <span class="va">forecast_data</span>, oracle_output_data <span class="op">=</span> <span class="va">target_data</span>,</span></span>
 <span class="r-in"><span>  ensemble_fun <span class="op">=</span> <span class="st">"simple_ensemble"</span>, importance_algorithm <span class="op">=</span> <span class="st">"lomo"</span>,</span></span>
 <span class="r-in"><span>  subset_wt <span class="op">=</span> <span class="st">"equal"</span>, agg_fun <span class="op">=</span> <span class="va">median</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Evaluating forecasts from 2022-11-19 to 2022-11-19  (a total of 1 forecast date(s)).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The available model IDs are:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  	 Flusight-baseline</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 	 MOBS-GLEAM_FLUH</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 	 PSI-DICE </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> (a total of 3 models)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Note: This function uses 'furrr' and 'future' for parallelization.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> To enable parallel execution, please set future::plan(multisession).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All tasks meet the minimum model requirement of 2 models.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model importance result by task</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            model_id reference_date          target horizon location</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Flusight-baseline     2022-11-19 wk inc flu hosp       1       25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   MOBS-GLEAM_FLUH     2022-11-19 wk inc flu hosp       1       25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3          PSI-DICE     2022-11-19 wk inc flu hosp       1       25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   target_end_date output_type importance</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      2022-11-26      median      -16.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      2022-11-26      median      -19.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      2022-11-26      median        3.0</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -253,7 +301,7 @@ See <code><a href="aggregate.model_imp_tbl.html">aggregate.model_imp_tbl()</a></
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

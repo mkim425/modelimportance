@@ -1548,7 +1548,6 @@ The RAPIDD ebola forecasting challenge, vol. 22 (March): 13–21.
 
 Wickham, Hadley. 2011. “Testthat: Get Started with Testing.” *The R
 Journal* 3: 5–10.
-<https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf>.
 
 Wickham, Hadley. 2016. *ggplot2: Elegant Graphics for Data Analysis*.
 Springer-Verlag New York. <https://ggplot2.tidyverse.org>.
