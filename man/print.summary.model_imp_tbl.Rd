@@ -11,6 +11,11 @@
 
 \item{...}{Additional arguments passed to the print method.}
 }
+\value{
+\code{x}, returned invisibly. Called for its side effect of printing
+a human-readable summary (number of models and tasks, and the top-scoring
+model for a subset of tasks) to the console.
+}
 \description{
 Print method for summary of model importance score table
 }

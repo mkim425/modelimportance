@@ -6,7 +6,7 @@ Authors@R: c(
     person(given = "Minsu", 
            family = "Kim",
            email = "minsu@umass.edu", 
-           role = c("aut", "cre"),
+           role = c("aut", "cre", 'cph'),
            comment = c(ORCID = "0009-0008-4637-3589")),
     person(given = "Li",
            family = "Shandross",
@@ -28,8 +28,7 @@ Authors@R: c(
            email = "elray1@umass.edu", 
            role = c("aut"))
     )
-Description: Provides metrics for quantifying the contribution of individual 
-    component models to the predictive accuracy of ensemble forecasts.
+Description: Provides metrics for quantifying the contribution of individual component models to the predictive accuracy of ensemble forecasts. The package implements the Leave-One-Model-Out (LOMO) and Leave-All-Subset-of-One-Model-Out (LASOMO) model importance metrics, enabling users to assess the relative importance of component models and better understand the performance of ensemble forecasting systems. Methods are described in Kim et al. (2026) <doi:10.1016/j.ijforecast.2025.12.006>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -47,7 +46,7 @@ Imports:
     rlang (>= 1.1.6),
     stats (>= 4.4.3)
 Depends: 
-    R (>= 3.5)
+    R (>= 4.1.0)
 Suggests: 
     knitr,
     rmarkdown,
@@ -59,6 +58,7 @@ Suggests:
     progressr (>= 0.15.1)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-URL: https://mkim425.github.io/modelimportance/
+URL: https://github.com/mkim425/modelimportance
 Config/Needs/website: rmarkdown
+BugReports: https://github.com/mkim425/modelimportance/issues
 LazyData: true

@@ -11,4 +11,8 @@
 ^[.]?air[.]toml$
 ^\.vscode$
 ^CODE_OF_CONDUCT\.md$
+^cran-comments\.md$
 ^data-raw$
+^CRAN-SUBMISSION$
+^manuscript$
+^modelimportance/Meta$

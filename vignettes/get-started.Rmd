@@ -17,7 +17,8 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
-options(width = 200)
+oldpar <- par(no.readonly = TRUE)
+oldopts <- options()
 library(dplyr)
 library(ggplot2)
 library(kableExtra)
@@ -277,5 +278,10 @@ See detailed discussions on execution time and computational feasibility in the
 [Computational complexity](../articles/modelimportance-article.html#sec:computational-complexity) section of the accompanying article.
 
 An extensive application in more complex scenarios with a larger number of models can be found in @kim2026beyond.
+
+```{r, include=FALSE}
+options(oldopts)
+par(oldpar)
+```
 
 ## References

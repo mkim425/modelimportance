@@ -11,6 +11,11 @@
 
 \item{...}{Additional arguments passed to the print method.}
 }
+\value{
+\code{x}, returned invisibly. Called for its side effect of printing
+the model importance score table (a \code{model_imp_tbl} object, i.e., a
+data frame of per-task importance scores by model) to the console.
+}
 \description{
 Print method for model importance score table
 }
