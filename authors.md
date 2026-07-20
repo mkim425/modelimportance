@@ -18,7 +18,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/mkim425/modelimportance/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/mkim425/modelimportance/blob/modelimportance-v0.1.0/DESCRIPTION)
 
 Kim M, Shandross L, Reich N, Ray E (2026). *modelimportance: Measuring
 Contributions of Component Models to Ensemble Forecast Accuracy*. R
