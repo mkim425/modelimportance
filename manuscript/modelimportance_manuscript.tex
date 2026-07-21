@@ -211,7 +211,7 @@ often offer improved accuracy and stability compared to individual
 models. As each model has its own unique characteristics, understanding
 and measuring the value of each constituent model can support the
 construction of effective ensembles. The \proglang{R} package
-\pkg{modelimportance} provides tools to quantify how each component
+\texttt{modelimportance} provides tools to quantify how each component
 model contributes to the accuracy of ensemble performance for both point
 and probabilistic forecasts. The package supports multiple ensemble
 methods and multiple model importance metrics. Additionally, the
@@ -221,11 +221,12 @@ and practitioners. It helps not only in constructing an effective
 ensemble model across a wide range of forecasting tasks, but also in
 understanding the role of each model within the ensemble and gaining
 insights into individual models themselves. This package follows the
-`hubverse' framework, which is a collection of open-source software,
-tools and data standards developed to promote collaborative modeling hub
-efforts and simplify their setup and operation. Doing so enables
-seamless integration and flexibility with other forecasting tools and
-systems, allowing many analyses to be performed on existing hubs.}
+\href{https://hubverse.io/}{`hubverse'} framework, which is a collection
+of open-source software, tools and data standards developed to promote
+collaborative modeling hub efforts and simplify their setup and
+operation. Doing so enables seamless integration and flexibility with
+other forecasting tools and systems, allowing many analyses to be
+performed on existing hubs.}
 
 %% at least one keyword must be supplied
 \Keywords{ensemble, forecast, prediction, model importance, Shapley
@@ -437,8 +438,9 @@ Ensembling predictions from multiple models relies on
 \pkg{hubEnsembles}, which offers a broadly applicable framework to
 construct multi-model ensembles using various ensemble methods.
 Calculation of forecast accuracy using various metrics is based on
-\pkg{hubEvals}, which internally leverages \pkg{scoringutils}. We
-derived example datasets used for testing and demonstration purposes
+\pkg{hubEvals}, which internally leverages \pkg{scoringutils}.
+
+We derived example datasets used for testing and demonstration purposes
 (see \hyperref[sec:examples]{Section 6}) from the \texttt{hubExamples}
 (\citet{Rpackage-hubExamples}) package, which provides example datasets
 in the hubverse format. The dataset were locally stored for
@@ -518,10 +520,9 @@ Flusight-baseline & 2022-12-17 & wk inc flu hosp & 2 & 25 & 2022-12-31 & quantil
 }
 
 \caption{\label{tbl-example-model_output}Example of the model output for
-incident influenza hospitalizations (top 10 rows) extracted from the
-\texttt{forecast\_outputs} data bundled in the \texttt{modelimportance}
-package, which is originally sourced from the \texttt{hubExamples}
-package.}
+incident influenza hospitalizations (top 10 rows) extracted from
+\texttt{forecast\_data\_example} bundled in the \texttt{modelimportance}
+package, which is originally from \texttt{hubExamples} package.}
 
 \end{table}%
 
@@ -866,6 +867,36 @@ will be assigned for that task.
 )
 \end{verbatim}
 
+\begin{table}
+
+\centering{
+
+\centering\begingroup\fontsize{10.5}{12.5}\selectfont
+
+\begin{tabular}{l>{\raggedright\arraybackslash}p{3.8cm}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.8cm}}
+\toprule
+Argument & Description & Possible Values & Default\\
+\midrule
+\cellcolor{gray!10}{\texttt{forecast\_data}} & \cellcolor{gray!10}{Forecasts} & \cellcolor{gray!10}{Table of model output} & \cellcolor{gray!10}{N/A}\\
+\texttt{oracle\_output\_data} & Ground truth data & Table of oracle output & N/A\\
+\cellcolor{gray!10}{\texttt{ensemble\_fun}} & \cellcolor{gray!10}{Ensemble method} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}, \texttt{"linear\_pool"}} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}}\\
+\texttt{importance\_algorithm} & Algorithm to calculate importance & \texttt{"lomo", "lasomo"} & \texttt{"lomo"}\\
+\cellcolor{gray!10}{\texttt{subset\_wt}} & \cellcolor{gray!10}{Method for assigning weight to subsets when using LASOMO algorithm} & \cellcolor{gray!10}{\texttt{"equal", "perm\_based"}} & \cellcolor{gray!10}{\texttt{"equal"}}\\
+\addlinespace
+\texttt{min\_log\_score} & Minimum value to replace for log score & Non-positive numeric & -10\\
+\cellcolor{gray!10}{\texttt{...}} & \cellcolor{gray!10}{Optional arguments for \texttt{"simple\_ensemble"}} & \cellcolor{gray!10}{Varies} & \cellcolor{gray!10}{\texttt{agg\_fun="mean"}}\\
+\bottomrule
+\end{tabular}
+\endgroup{}
+
+}
+
+\caption{\label{tbl-arguments1}Description of the arguments for the
+\texttt{model\_importance()} function, including their purpose, possible
+values, and default settings.}
+
+\end{table}%
+
 The \texttt{forecast\_data} parameter is a data frame of predictions
 that is automatically coerced to a \texttt{model\_out\_tbl} format (if
 it is not one already), which is the standard S3 class model output
@@ -915,36 +946,6 @@ calculating the importance metric based on the log score. The default
 value is set to -10, following the CDC FluSight thresholding convention
 \citep{brooks2018nonmechanistic, reich_accuracy_2019}. Users may choose
 a different value based on their practical needs.
-
-\begin{table}
-
-\centering{
-
-\centering\begingroup\fontsize{10.5}{12.5}\selectfont
-
-\begin{tabular}{l>{\raggedright\arraybackslash}p{3.8cm}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.8cm}}
-\toprule
-Argument & Description & Possible Values & Default\\
-\midrule
-\cellcolor{gray!10}{\texttt{forecast\_data}} & \cellcolor{gray!10}{Forecasts} & \cellcolor{gray!10}{Table of model output} & \cellcolor{gray!10}{N/A}\\
-\texttt{oracle\_output\_data} & Ground truth data & Table of oracle output & N/A\\
-\cellcolor{gray!10}{\texttt{ensemble\_fun}} & \cellcolor{gray!10}{Ensemble method} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}, \texttt{"linear\_pool"}} & \cellcolor{gray!10}{\texttt{"simple\_ensemble"}}\\
-\texttt{importance\_algorithm} & Algorithm to calculate importance & \texttt{"lomo", "lasomo"} & \texttt{"lomo"}\\
-\cellcolor{gray!10}{\texttt{subset\_wt}} & \cellcolor{gray!10}{Method for assigning weight to subsets when using LASOMO algorithm} & \cellcolor{gray!10}{\texttt{"equal", "perm\_based"}} & \cellcolor{gray!10}{\texttt{"equal"}}\\
-\addlinespace
-\texttt{min\_log\_score} & Minimum value to replace for log score & Non-positive numeric & -10\\
-\cellcolor{gray!10}{\texttt{...}} & \cellcolor{gray!10}{Optional arguments for \texttt{"simple\_ensemble"}} & \cellcolor{gray!10}{Varies} & \cellcolor{gray!10}{\texttt{agg\_fun="mean"}}\\
-\bottomrule
-\end{tabular}
-\endgroup{}
-
-}
-
-\caption{\label{tbl-arguments1}Description of the arguments for the
-\texttt{model\_importance()} function, including their purpose, possible
-values, and default settings.}
-
-\end{table}%
 
 The \texttt{model\_importance()} function returns an object of S3 class
 \texttt{model\_imp\_tbl} of model important scores, with columns
@@ -1100,7 +1101,11 @@ has \texttt{NA}s as no further specification is required for this output
 type. We have modified the example data slightly by removing some
 forecasts to demonstrate the handling of missing values. Therefore,
 MOBS-GLEAM\_FLUH's forecast for Massachusetts on November 26, 2022, and
-PSI-DICE's forecast for Texas on December 10, 2022, are missing.
+PSI-DICE's forecast for Texas on December 10, 2022, are missing. We
+emphasize that this modification is made randomly and artificially to
+illustrate the impact of different handling approaches for missing
+forecasts and is not intended to provide a formal evaluation of model
+quality or performance.
 
 \begin{verbatim}
 > forecast_data |>
@@ -1177,7 +1182,8 @@ influenza hospitalizations in Massachusetts (FIPS code 25) and Texas
 generated on November 19, 2022. Open black circles indicate the
 eventually observed values. MOBS-GLEAM\_FLUH's forecast for
 Massachusetts on November 26, 2022, and PSI-DICE's forecast for Texas on
-December 10, 2022, are missing.}
+December 10, 2022, are are not shown. These forecasts were manually
+excluded from the original example dataset for demonstration purposes.}
 
 \end{figure}%
 
@@ -1584,6 +1590,14 @@ ensemble accuracy with only three models. An extensive application in
 more complex scenarios with larger ensembles is presented in our
 companion methodological paper \citep{kim2026beyond}.
 
+It should be noted that the example presented here is designed for
+illustration purposes to demonstrate the use of the proposed software,
+and the results should not be interpreted as an authoritative evaluation
+of model performance. A comprehensive analysis in our prior
+methodological study \citep{kim2026beyond} shows that many models,
+including the `MOBS-GLEAM\_FLUH' model, are assessed as more important
+than the baseline model.
+
 \section{Computational complexity}\label{sec:computational-complexity}
 
 This section describes the computational complexity of LOMO and LASOMO
@@ -1729,6 +1743,13 @@ component model to the accuracy of the ensemble depends on its own
 unique characteristics. The \pkg{modelimportance} package enables the
 quantification of the value that each component model adds to the
 ensemble performance in different evaluation contexts.
+
+In the example analysis, we showed the package workflow using a simple
+example dataset specifically designed solely to demonstrate our
+package's capabilities; thus the results should not be taken as a
+definitive assessment of the models. A more complete model importance
+analysis is provided in our companion methodological paper
+\citep{kim2026beyond}.
 
 The primary \texttt{model\_importance()} function returns an S3 object
 of class \texttt{model\_imp\_tbl} of tabular data containing component
